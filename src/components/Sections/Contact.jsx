@@ -111,8 +111,7 @@ export default function Contact() {
           from_email: formData.email,
           subject: formData.subject,
           message: formData.message,
-          ticket_id: ticketId,
-          "g-recaptcha-response": recaptchaToken
+          ticket_id: ticketId
         },
         process.env.REACT_APP_USER_ID
       );
