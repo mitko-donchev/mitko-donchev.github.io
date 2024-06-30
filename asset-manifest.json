@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/static/css/main.437937fd.css",
-    "main.js": "/static/js/main.637ef966.js",
+    "main.js": "/static/js/main.ddde1b84.js",
     "static/js/453.924a3189.chunk.js": "/static/js/453.924a3189.chunk.js",
     "static/media/logo.png": "/static/media/logo.dde48cd7a478303dc6b6.png",
     "static/media/add2.png": "/static/media/add2.c6561f30e37c892231a4.png",
-    "static/media/header-img.png": "/static/media/header-img.b336388f9771e206c315.png",
     "static/media/1.png": "/static/media/1.c02e7a9a022e1ad4931d.png",
+    "static/media/header-img.png": "/static/media/header-img.b336388f9771e206c315.png",
     "static/media/2.png": "/static/media/2.3e0fb8806e548ba1b446.png",
     "static/media/3.png": "/static/media/3.b23dde9cc4185b0594f6.png",
     "static/media/logo02.svg": "/static/media/logo02.ef3dc4768d89bf758521d844dc1406e2.svg",
@@ -14,6 +14,7 @@
     "static/media/4.png": "/static/media/4.d4e5596206b405c68cb4.png",
     "static/media/logo03.svg": "/static/media/logo03.ed39a486d651c4499e1cc1e7717dfc41.svg",
     "static/media/logo06.svg": "/static/media/logo06.7fcfefcaa956903796a1150cbef55634.svg",
+    "static/media/app-store-label.svg": "/static/media/app-store-label.8c4986ee4828b47d16f5cd694ef065f2.svg",
     "static/media/logo05.svg": "/static/media/logo05.e583f97db1f0a140ca92e3cf84c88b12.svg",
     "static/media/logo04.svg": "/static/media/logo04.d4601325c6147b5d07ef7a4513368711.svg",
     "static/media/slick.svg": "/static/media/slick.2630a3e3eab21c607e21.svg",
@@ -22,11 +23,11 @@
     "static/media/slick.woff": "/static/media/slick.295183786cd8a1389865.woff",
     "index.html": "/index.html",
     "main.437937fd.css.map": "/static/css/main.437937fd.css.map",
-    "main.637ef966.js.map": "/static/js/main.637ef966.js.map",
+    "main.ddde1b84.js.map": "/static/js/main.ddde1b84.js.map",
     "453.924a3189.chunk.js.map": "/static/js/453.924a3189.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.437937fd.css",
-    "static/js/main.637ef966.js"
+    "static/js/main.ddde1b84.js"
   ]
 }
