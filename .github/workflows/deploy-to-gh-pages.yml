@@ -13,7 +13,7 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm install
-          npm react-scripts build
+          npm run-script build
         env:
           REACT_APP_SERVICE_ID: ${{ secrets.REACT_APP_SERVICE_ID }}
           REACT_APP_TEMPLATE_ID: ${{ secrets.REACT_APP_TEMPLATE_ID }}
