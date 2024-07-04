@@ -70,7 +70,7 @@ export default function TopNavbar() {
             <li className="semiBold font15 pointer flexCenter">
               <a className="radius8 lightBg" style={{ padding: "10px 15px" }}>
                 <Link activeClass="active" style={{ padding: "10px 15px" }} to="pricing" smooth={true} offset={-80}>
-                  Get an offer
+                  Check offers
                 </Link>
               </a>
             </li>
@@ -88,7 +88,7 @@ const Wrapper = styled.nav`
   left: 0;
   z-in
   dex: 999;
-  z-index: 9999;
+  z-index: 9998;
 `;
 
 const NavInner = styled.div`

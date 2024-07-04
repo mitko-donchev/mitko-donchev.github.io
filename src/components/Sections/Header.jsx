@@ -24,7 +24,7 @@ export default function Header() {
             Epic Millennium is a pioneering platform that leverages cutting-edge technology to deliver innovative solutions, transforming ideas into future-ready realities.
           </HeaderP>
           <BtnWrapper>
-            <FullButton title="Get an offer" action={handleOfferClick} />
+            <FullButton title="Check offers" action={handleOfferClick} />
           </BtnWrapper>
         </div>
       </LeftSide>
