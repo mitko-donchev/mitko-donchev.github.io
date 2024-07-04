@@ -77,7 +77,7 @@ export default function Services() {
                 <h4 className="font20 regular" style={{ marginBottom: "8px" }}>can be brought to life</h4>
                 <ButtonsRow className="flexNullCenter" style={{ margin: "30px 0" }}>
                   <div style={{ width: "190px" }}>
-                    <FullButton title="Get an offer" action={handleOfferClick} />
+                    <FullButton title="Check offers" action={handleOfferClick} />
                   </div>
                   <div style={{ width: "190px", marginLeft: "15px" }}>
                     <FullButton title="Contact Us" action={handleContactClick} border />
