@@ -130,41 +130,124 @@
    border-spacing: 0;
  }
 
+ /* DESIGN TOKENS — Dark Neon / Cyber theme */
+ :root {
+   --bg: #0A0A0F;
+   --bg-elevated: #14141C;
+   --bg-alt: #1B1B27;
+   --text: #F5F5FA;
+   --text-muted: #A0A0B8;
+   --accent: #7C3AED;
+   --accent-2: #22D3EE;
+   --accent-glow: rgba(124, 58, 237, 0.45);
+   --border: rgba(255, 255, 255, 0.08);
+ }
+
  a {
    text-decoration: none !important;
-   color: #0B093B;
+   color: var(--text);
  }
 
  a:hover {
-   color: #7620FF;
+   color: var(--accent-2);
  }
 
- input:-webkit-autofill {
-   -webkit-box-shadow: 0 0 0 50px #fff inset;
-   /* Change the color to your own background color */
-   box-shadow: transparent;
-   -webkit-text-fill-color: #fff;
+ input:-webkit-autofill,
+ input:-webkit-autofill:hover,
+ input:-webkit-autofill:focus,
+ textarea:-webkit-autofill {
+   -webkit-box-shadow: 0 0 0 50px var(--bg) inset;
+   box-shadow: 0 0 0 50px var(--bg) inset;
+   -webkit-text-fill-color: var(--text);
  }
 
  body {
-   background: #fff;
-   color: #0B093B;
-   font-family: 'Khula', sans-serif;
+   background: var(--bg);
+   color: var(--text);
+   font-family: 'Rajdhani', 'Inter', sans-serif;
    overflow-x: hidden;
    font-size: 16px;
    font-weight: 400;
+   position: relative;
+ }
+
+ /* ONE unified ambient background for the whole page.
+    A fixed layer behind all content: deep radial glows + a faint cyber grid.
+    No per-section boxes/bands — every section sits on this single surface. */
+ body::before {
+   content: "";
+   position: fixed;
+   inset: 0;
+   z-index: -2;
+   pointer-events: none;
+   background:
+     radial-gradient(900px circle at 15% 0%, rgba(124, 58, 237, 0.22), transparent 55%),
+     radial-gradient(1000px circle at 85% 20%, rgba(34, 211, 238, 0.14), transparent 55%),
+     radial-gradient(1200px circle at 50% 100%, rgba(124, 58, 237, 0.16), transparent 60%),
+     var(--bg);
+ }
+
+ /* Fixed cyber-grid overlay with a slow parallax drift (motion-gated below). */
+ body::after {
+   content: "";
+   position: fixed;
+   inset: -80px;
+   z-index: -1;
+   pointer-events: none;
+   background-image:
+     linear-gradient(rgba(124, 58, 237, 0.05) 1px, transparent 1px),
+     linear-gradient(90deg, rgba(124, 58, 237, 0.05) 1px, transparent 1px);
+   background-size: 44px 44px;
+   -webkit-mask-image: radial-gradient(circle at 50% 40%, #000 55%, transparent 100%);
+   mask-image: radial-gradient(circle at 50% 40%, #000 55%, transparent 100%);
+   animation: gridDrift 24s linear infinite;
+ }
+
+ @keyframes gridDrift {
+   from { transform: translate3d(0, 0, 0); }
+   to { transform: translate3d(0, 44px, 0); }
+ }
+
+ /* Visible keyboard focus for all interactive elements */
+ a:focus-visible,
+ button:focus-visible,
+ input:focus-visible,
+ textarea:focus-visible,
+ [tabindex]:focus-visible {
+   outline: 2px solid var(--accent-2);
+   outline-offset: 2px;
+ }
+
+ h1, h2, h3, h4, h5, h6 {
+   font-family: 'Orbitron', 'Rajdhani', sans-serif;
+   letter-spacing: 0.02em;
+ }
+
+ .displayFont {
+   font-family: 'Orbitron', 'Rajdhani', sans-serif !important;
  }
 
  .container {
    width: 100%;
    max-width: 1220px;
    margin: 0 auto;
-   padding: 0px 30px;
+   /* Longhand so a section's `padding-top/bottom` can't wipe the side gutters
+      (styled-components inject after this sheet, so shorthand would lose). */
+   padding-left: 30px;
+   padding-right: 30px;
  }
 
  @media only screen and (max-width: 859px) {
    .container {
-     padding: 0 15px;
+     padding-left: 24px;
+     padding-right: 24px;
+   }
+ }
+
+ @media only screen and (max-width: 400px) {
+   .container {
+     padding-left: 18px;
+     padding-right: 18px;
    }
  }
 
@@ -214,8 +297,8 @@
  }
 
  .active {
-   border-bottom: 2px solid #7620FF;
-   color: #7620FF;
+   border-bottom: 2px solid var(--accent-2);
+   color: var(--accent-2);
  }
 
  .tag {
@@ -224,9 +307,132 @@
  }
 
  .shadow {
-   box-shadow: 0 0 11px rgba(237, 232, 237, 0.5);
-   -webkit-box-shadow: 0 0 11px rgba(237, 232, 237, 0.5);
-   -moz-box-shadow: 0 0 11px rgba(237, 232, 237, 0.5);
+   box-shadow: 0 0 11px rgba(0, 0, 0, 0.5);
+   -webkit-box-shadow: 0 0 11px rgba(0, 0, 0, 0.5);
+   -moz-box-shadow: 0 0 11px rgba(0, 0, 0, 0.5);
+ }
+
+ /* NEON / CYBER UTILITIES */
+ .glow {
+   box-shadow: 0 0 24px var(--accent-glow);
+ }
+
+ .textGradient {
+   background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+   -webkit-background-clip: text;
+   background-clip: text;
+   -webkit-text-fill-color: transparent;
+   color: transparent;
+ }
+
+ .neonBorder {
+   border: 1px solid var(--border);
+   box-shadow: inset 0 0 12px rgba(124, 58, 237, 0.15);
+ }
+
+ /* Neon text glow for headlines (futuristic display feel) */
+ .textGlow {
+   text-shadow: 0 0 18px var(--accent-glow), 0 0 40px rgba(34, 211, 238, 0.25);
+ }
+
+ /* HUD kicker label — small, tracked-out, cyan, with a leading tick */
+ .hudLabel {
+   display: inline-flex;
+   align-items: center;
+   gap: 10px;
+   color: var(--accent-2);
+   font-family: 'Orbitron', sans-serif;
+   font-size: 0.7rem;
+   letter-spacing: 0.32em;
+   text-transform: uppercase;
+ }
+ .hudLabel::before,
+ .hudLabel::after {
+   content: "";
+   width: 26px;
+   height: 1px;
+ }
+ .hudLabel::before {
+   background: linear-gradient(90deg, transparent, var(--accent-2));
+ }
+ .hudLabel::after {
+   background: linear-gradient(90deg, var(--accent-2), transparent);
+ }
+
+ /* Full-width gradient hairline used to separate sections instead of boxes */
+ .divider {
+   width: 100%;
+   height: 1px;
+   border: 0;
+   background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent-2) 70%, transparent);
+   opacity: 0.4;
+ }
+
+ /* Corner-bracket frame — a frameless HUD accent (no solid box) */
+ .brackets {
+   position: relative;
+ }
+ .brackets::before,
+ .brackets::after {
+   content: "";
+   position: absolute;
+   width: 22px;
+   height: 22px;
+   pointer-events: none;
+ }
+ .brackets::before {
+   top: 0;
+   left: 0;
+   border-top: 2px solid var(--accent-2);
+   border-left: 2px solid var(--accent-2);
+ }
+ .brackets::after {
+   bottom: 0;
+   right: 0;
+   border-bottom: 2px solid var(--accent-2);
+   border-right: 2px solid var(--accent-2);
+ }
+
+ /* Cyber grid background (for the hero) */
+ .gridBg {
+   background-color: var(--bg);
+   background-image:
+     linear-gradient(rgba(124, 58, 237, 0.06) 1px, transparent 1px),
+     linear-gradient(90deg, rgba(124, 58, 237, 0.06) 1px, transparent 1px);
+   background-size: 40px 40px;
+ }
+
+ /* Optional faint scanline overlay */
+ .scanlines {
+   position: relative;
+ }
+
+ .scanlines::after {
+   content: "";
+   position: absolute;
+   inset: 0;
+   pointer-events: none;
+   background: repeating-linear-gradient(
+     to bottom,
+     rgba(255, 255, 255, 0.03) 0px,
+     rgba(255, 255, 255, 0.03) 1px,
+     transparent 1px,
+     transparent 3px
+   );
+ }
+
+ /* Respect users who prefer reduced motion */
+ @media (prefers-reduced-motion: reduce) {
+   .animate {
+     transition: none !important;
+   }
+
+   *,
+   *::before,
+   *::after {
+     animation-duration: 0.001ms !important;
+     animation-iteration-count: 1 !important;
+   }
  }
 
  /* FLEXBOX */
@@ -363,23 +569,23 @@
 
  /* COLORS */
  .darkColor {
-   color: #0B093B;
+   color: var(--text);
  }
 
  .purpleColor {
-   color: #7620FF;
+   color: var(--accent);
  }
 
  .orangeColor {
-   color: #F2B300;
+   color: var(--accent-2);
  }
 
  .lightColor {
-   color: #F5F5F5;
+   color: var(--text-muted);
  }
 
  .coralColor {
-   color: #C4FFFF;
+   color: var(--accent-2);
  }
 
  .greenColor {
@@ -387,32 +593,35 @@
  }
 
  .greyColor {
-   color: #707070;
+   color: var(--text-muted);
  }
 
  .whiteColor {
    color: #fff;
  }
 
- /* BACKGROUNDS */
+ /* BACKGROUNDS
+    The page now has ONE unified ambient background (body::before/::after).
+    Section-level bg helpers are transparent so nothing reads as a band/box.
+    Solid accents kept for the few elements that truly need fills. */
  .darkBg {
-   background-color: #0B093B;
+   background-color: transparent;
  }
 
  .purpleBg {
-   background-color: #7620FF;
+   background-color: var(--accent);
  }
 
  .orangeBg {
-   background-color: #F2B300;
+   background-color: var(--accent-2);
  }
 
  .lightBg {
-   background-color: #F5F5F5;
+   background-color: transparent;
  }
 
  .coralBg {
-   background-color: #C4FFFF;
+   background-color: transparent;
  }
 
  .greenBg {
@@ -420,9 +629,9 @@
  }
 
  .greyBg {
-   background-color: #707070;
+   background-color: transparent;
  }
 
  .whiteBg {
-   background-color: #fff;
+   background-color: transparent;
  }
