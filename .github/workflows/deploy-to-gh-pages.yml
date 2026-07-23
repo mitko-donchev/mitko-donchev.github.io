@@ -11,7 +11,7 @@ jobs:
     environment: github-pages
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js ⚙️
         uses: actions/setup-node@v4
@@ -19,17 +19,19 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install and Build 🔧
-        run: |
-          npm install
-          npm run-script build
+      - name: Install 📦
+        run: npm ci
+
+      - name: Build 🔧
+        run: npm run build
         env:
-          CI: ""
+          CI: "false"
+          NODE_OPTIONS: "--max-old-space-size=4096"
           REACT_APP_SERVICE_ID: ${{ secrets.REACT_APP_SERVICE_ID }}
           REACT_APP_TEMPLATE_ID: ${{ secrets.REACT_APP_TEMPLATE_ID }}
           REACT_APP_USER_ID: ${{ secrets.REACT_APP_USER_ID }}
           REACT_APP_RECAPTCHA_KEY: ${{ secrets.REACT_APP_RECAPTCHA_KEY }}
-          
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
