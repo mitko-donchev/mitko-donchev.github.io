@@ -19,11 +19,19 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Pin npm
+      - name: Pin npm 📌
         run: npm install -g npm@11
 
       - name: Install 📦
+        timeout-minutes: 3
         run: npm ci --no-audit --no-fund
+
+      - name: Upload npm debug log 🐞
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-debug-log
+          path: ~/.npm/_logs/
 
       - name: Build 🔧
         run: npm run build
