@@ -1,6 +1,6 @@
 {
   "short_name": "Epic Millennium",
-  "name": "Epic Millennium - Producing inovative mobile applications",
+  "name": "Epic Millennium — Project Zero",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#0A0A0F",
+  "background_color": "#0A0A0F"
 }
