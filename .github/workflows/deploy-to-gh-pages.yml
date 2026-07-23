@@ -13,31 +13,12 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ⚙️
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Pin npm 📌
-        run: npm install -g npm@11
-
-      - name: Install 📦
-        timeout-minutes: 3
-        run: npm ci --no-audit --no-fund
-
-      - name: Upload npm debug log 🐞
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: npm-debug-log
-          path: ~/.npm/_logs/
-
-      - name: Build 🔧
-        run: npm run build
+      - name: Install and Build 🔧
+        run: |
+          npm install
+          npm run-script build
         env:
-          CI: "false"
-          NODE_OPTIONS: "--max-old-space-size=4096"
+          CI: ""
           REACT_APP_SERVICE_ID: ${{ secrets.REACT_APP_SERVICE_ID }}
           REACT_APP_TEMPLATE_ID: ${{ secrets.REACT_APP_TEMPLATE_ID }}
           REACT_APP_USER_ID: ${{ secrets.REACT_APP_USER_ID }}
