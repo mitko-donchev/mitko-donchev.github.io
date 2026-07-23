@@ -61,6 +61,7 @@ const Wrapper = styled.section`
 `;
 
 const Inner = styled.div`
+  width: 100%;
   max-width: 860px;
   margin: 0 auto;
   display: flex;
@@ -100,6 +101,7 @@ const WorkingTitleNote = styled.p`
 `;
 
 const Tagline = styled.p`
+  width: 100%;
   max-width: 620px;
   color: var(--text-muted);
   line-height: 1.7rem;
@@ -156,7 +158,9 @@ const ScrollHint = styled.div`
   color: var(--text-muted);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  @media (max-width: 560px) {
+  /* Hide on narrow OR short viewports, where the absolute hint would
+     otherwise land on top of the CTA buttons. */
+  @media (max-width: 560px), (max-height: 760px) {
     display: none;
   }
 `;

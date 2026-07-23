@@ -113,6 +113,8 @@ const BurderWrapper = styled.button`
   height: 100%;
   padding: 0 15px;
   display: none;
+  color: var(--accent);
+  filter: drop-shadow(0 0 8px var(--accent-glow));
   @media (max-width: 760px) {
     display: block;
   }

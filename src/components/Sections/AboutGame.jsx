@@ -87,7 +87,8 @@ export default function AboutGame() {
 
 const Wrapper = styled.section`
   width: 100%;
-  padding: 90px 0;
+  padding-top: 90px;
+  padding-bottom: 90px;
 `;
 
 const About = styled.div`

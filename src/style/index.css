@@ -231,12 +231,23 @@
    width: 100%;
    max-width: 1220px;
    margin: 0 auto;
-   padding: 0px 30px;
+   /* Longhand so a section's `padding-top/bottom` can't wipe the side gutters
+      (styled-components inject after this sheet, so shorthand would lose). */
+   padding-left: 30px;
+   padding-right: 30px;
  }
 
  @media only screen and (max-width: 859px) {
    .container {
-     padding: 0 15px;
+     padding-left: 24px;
+     padding-right: 24px;
+   }
+ }
+
+ @media only screen and (max-width: 400px) {
+   .container {
+     padding-left: 18px;
+     padding-right: 18px;
    }
  }
 
