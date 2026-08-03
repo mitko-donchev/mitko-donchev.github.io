@@ -5,12 +5,11 @@ import {
   STUDIO_TAGLINE,
   STUDIO_MISSION,
   STUDIO_TEAM_BLURB,
+  STUDIO_TEAM,
   DISCORD_URL,
   TWITTER_URL,
   YOUTUBE_URL,
 } from "../../config/links";
-
-const TEAM_ROLES = ["Design", "Code", "Art"];
 
 const SOCIALS = [
   { href: DISCORD_URL, label: "Discord", aria: "Join our Discord", Icon: DiscordIcon },
@@ -33,9 +32,10 @@ export default function Studio() {
       <TeamSection className="textCenter">
         <p className="font15" style={{ color: "var(--text-muted)" }}>{STUDIO_TEAM_BLURB}</p>
         <TeamRow className="flexCenter">
-          {TEAM_ROLES.map((role) => (
-            <TeamMember key={role} className="flexCenter flexColumn">
+          {STUDIO_TEAM.map(({ name, role }) => (
+            <TeamMember key={name} className="flexCenter flexColumn">
               <Avatar aria-hidden="true" />
+              <NameLabel className="font15 semiBold">{name}</NameLabel>
               <RoleLabel className="font13">{role}</RoleLabel>
             </TeamMember>
           ))}
@@ -115,7 +115,7 @@ const TeamRow = styled.div`
 `;
 
 const TeamMember = styled.div`
-  gap: 14px;
+  gap: 12px;
 `;
 
 /* Frameless avatar: a soft gradient orb with a glow ring, no hard box. */
@@ -129,7 +129,12 @@ const Avatar = styled.div`
   box-shadow: 0 0 24px var(--accent-glow);
 `;
 
+const NameLabel = styled.span`
+  color: var(--text);
+`;
+
 const RoleLabel = styled.span`
+  margin-top: -6px;
   color: var(--text-muted);
   letter-spacing: 0.16em;
   text-transform: uppercase;

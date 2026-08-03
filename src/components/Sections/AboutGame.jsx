@@ -6,7 +6,6 @@ import FullButton from "../Buttons/FullButton";
 import {
   STEAM_URL,
   GAME_NAME,
-  GAME_WORKING_TITLE_NOTE,
   GAME_GENRE,
   GAME_SYNOPSIS,
   GAME_VERSE_LEAD,
@@ -37,10 +36,7 @@ export default function AboutGame() {
       <About className="flexSpaceCenter">
         <AboutLeft>
           <span className="hudLabel">01 // The Game</span>
-          <p className="font13" style={{ color: "var(--text-muted)", letterSpacing: "0.06em", marginTop: "18px" }}>
-            {GAME_WORKING_TITLE_NOTE}
-          </p>
-          <h1 className="font40 extraBold textGradient displayFont" style={{ marginBottom: "6px" }}>
+          <h1 className="font40 extraBold textGradient displayFont" style={{ margin: "18px 0 6px 0" }}>
             {GAME_NAME}
           </h1>
           <Genre className="font15">{GAME_GENRE}</Genre>

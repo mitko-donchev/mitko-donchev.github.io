@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-scroll";
+import { Link, scrollSpy } from "react-scroll";
 // Components
 import Sidebar from "../Nav/Sidebar";
 import Backdrop from "../Elements/Backdrop";
@@ -15,11 +15,17 @@ export default function TopNavbar() {
   const [sidebarOpen, toggleSidebar] = useState(false);
 
   useEffect(() => {
-    window.addEventListener("scroll", () => setY(window.scrollY));
-    return () => {
-      window.removeEventListener("scroll", () => setY(window.scrollY));
-    };
-  }, [y]);
+    const onScroll = () => setY(window.scrollY);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // react-scroll only recomputes the active link on a scroll event, so on first
+  // load (scrollY === 0, no scroll yet) no nav item is highlighted. Nudge the spy
+  // once after mount so "Home" is selected straight away.
+  useEffect(() => {
+    scrollSpy.update();
+  }, []);
 
   return (
     <>

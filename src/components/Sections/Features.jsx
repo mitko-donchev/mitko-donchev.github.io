@@ -4,7 +4,7 @@ import styled from "styled-components";
 import ServiceBox from "../Elements/ServiceBox";
 import FullButton from "../Buttons/FullButton";
 // Config
-import { STEAM_URL, CTA_WISHLIST } from "../../config/links";
+import { STEAM_URL, CTA_WISHLIST, GAME_NAME } from "../../config/links";
 
 const FEATURES = [
   {
@@ -44,7 +44,7 @@ export default function Features() {
       <HeaderInfo>
         <span className="hudLabel">02 // Features</span>
         <h1 className="font40 extraBold displayFont" style={{ marginTop: "18px" }}>
-          What Makes <span className="textGradient">Project Zero</span>
+          What Makes <span className="textGradient">{GAME_NAME}</span>
         </h1>
         <p className="font15" style={{ color: "var(--text-muted)", maxWidth: "540px" }}>
           Built for players who want worlds worth exploring and choices that actually matter.
@@ -61,7 +61,7 @@ export default function Features() {
       <Teaser className="textCenter">
         <h2 className="font40 semiBold displayFont textGradient textGlow">From gamers, for gamers</h2>
         <p className="font18" style={{ color: "var(--text-muted)", margin: "16px 0 30px 0" }}>
-          Wishlist Project Zero and follow the journey.
+          Wishlist {GAME_NAME} and follow the journey.
         </p>
         <div style={{ width: "220px", margin: "0 auto" }}>
           <FullButton title={CTA_WISHLIST} action={handleWishlistClick} glow />

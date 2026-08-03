@@ -2,7 +2,7 @@
 // Rebranding text and URLs live here so a single edit updates the whole site.
 
 // --- External links (placeholders — swap for the real URLs later) ---
-// TODO: Steam store / wishlist page for Project Zero.
+// TODO: Steam store / wishlist page for Waybound.
 export const STEAM_URL = "https://store.steampowered.com/";
 // TODO: community Discord invite.
 export const DISCORD_URL = "#";
@@ -19,10 +19,13 @@ export const STUDIO_TAGLINE = "Built by gamers. Made for gamers.";
 export const STUDIO_MISSION =
   "Epic Millennium is an independent studio building the games we always wanted to play. No publishers dictating the vision, no compromises — just games crafted by players, for players.";
 export const STUDIO_TEAM_BLURB = "A small, independent team.";
+export const STUDIO_TEAM = [
+  { name: "Dimitar Petrov", role: "Game Developer" },
+  { name: "Mitko Donchev", role: "Game Developer" },
+];
 
 // --- Game ---
-export const GAME_NAME = "Project Zero";
-export const GAME_WORKING_TITLE_NOTE = "Working title — final name TBD.";
+export const GAME_NAME = "Waybound";
 export const GAME_GENRE = "Action RPG · Roguelike";
 
 // Atmospheric teaser copy.
@@ -59,6 +62,6 @@ export const CTA_DEMO_BADGE = "Demo coming soon";
 
 // --- SEO / social ---
 export const SITE_URL = "https://www.epicmillennium.com";
-export const SITE_TITLE = "Epic Millennium — Project Zero (Working Title)";
+export const SITE_TITLE = "Epic Millennium — Waybound";
 export const SITE_DESCRIPTION =
-  "Project Zero is an action-RPG roguelike about a cursed village that won't let you leave. Roam the woods, fields, and caves — and loop back. Built in Godot by indie studio Epic Millennium — wishlist on Steam and get notified when the demo drops.";
+  "Waybound is an action-RPG roguelike about a cursed village that won't let you leave. Roam the woods, fields, and caves — and loop back. Built in Godot by indie studio Epic Millennium — wishlist on Steam and get notified when the demo drops.";
