@@ -9,7 +9,6 @@ import {
   STEAM_URL,
   TRAILER_URL,
   GAME_NAME,
-  GAME_WORKING_TITLE_NOTE,
   CTA_WISHLIST,
   CTA_TRAILER,
   CTA_DEMO_BADGE,
@@ -30,7 +29,6 @@ export default function Hero() {
         <BrandLockup src={LogoFull} alt="Epic Millennium — Game Development Studio" />
         <span className="hudLabel">Debut Title</span>
         <Title className="extraBold displayFont textGradient textGlow">{GAME_NAME}</Title>
-        <WorkingTitleNote className="font14">{GAME_WORKING_TITLE_NOTE}</WorkingTitleNote>
         <Tagline className="font18">
           Trapped in a cursed village that pulls you back every time you try to leave.
           Roam the woods, fields, and caves — die, and return — an action-RPG roguelike
@@ -44,10 +42,6 @@ export default function Hero() {
           <Dot aria-hidden="true" /> {CTA_DEMO_BADGE}
         </DemoBadge>
       </Inner>
-      <ScrollHint aria-hidden="true">
-        <span className="font12">Scroll</span>
-        <ScrollLine />
-      </ScrollHint>
     </Wrapper>
   );
 }
@@ -91,13 +85,6 @@ const Title = styled.h1`
   @media (max-width: 560px) {
     font-size: 3rem;
   }
-`;
-
-const WorkingTitleNote = styled.p`
-  color: var(--text-muted);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  margin-top: 18px;
 `;
 
 const Tagline = styled.p`
@@ -144,29 +131,4 @@ const Dot = styled.span`
     0%, 100% { opacity: 1; }
     50% { opacity: 0.35; }
   }
-`;
-
-const ScrollHint = styled.div`
-  position: absolute;
-  bottom: 34px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-muted);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  /* Hide on narrow OR short viewports, where the absolute hint would
-     otherwise land on top of the CTA buttons. */
-  @media (max-width: 560px), (max-height: 760px) {
-    display: none;
-  }
-`;
-
-const ScrollLine = styled.span`
-  width: 1px;
-  height: 46px;
-  background: linear-gradient(var(--accent-2), transparent);
 `;
