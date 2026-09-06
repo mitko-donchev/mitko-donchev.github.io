@@ -151,24 +151,20 @@ function YouTubeIcon() {
 
 const Wrapper = styled.section`
   width: 100%;
-  padding-top: 110px;
-  padding-bottom: 120px;
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
 `;
 
 const Head = styled.div`
   max-width: 780px;
-  margin: 88px auto 0 auto;
+  margin: var(--space-group) auto 0 auto;
   text-align: center;
 `;
 
 const Title = styled.h2`
-  font-size: 3.6rem;
+  font-size: var(--type-title);
   font-weight: 600;
   margin-top: 20px;
-
-  @media (max-width: 760px) {
-    font-size: 2.4rem;
-  }
 `;
 
 const Mission = styled.p`
@@ -221,7 +217,7 @@ const TenetBody = styled.p`
 `;
 
 const Team = styled.div`
-  margin-top: 100px;
+  margin-top: var(--space-block);
   padding-top: 46px;
   border-top: 1px solid var(--hairline);
   text-align: center;

@@ -133,8 +133,8 @@ export default function AboutGame() {
 
 const Wrapper = styled.section`
   width: 100%;
-  padding-top: 110px;
-  padding-bottom: 110px;
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
 `;
 
 const Lede = styled.div`
@@ -163,14 +163,10 @@ const GateColumn = styled.div`
 `;
 
 const Title = styled.h2`
-  font-size: 4.6rem;
+  font-size: var(--type-display);
   font-weight: 600;
   line-height: 1;
   margin: 20px 0 10px 0;
-
-  @media (max-width: 960px) {
-    font-size: 3.4rem;
-  }
 `;
 
 const Subtitle = styled.p`
@@ -187,12 +183,11 @@ const BookBeat = styled.div`
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   gap: 70px;
   align-items: center;
-  margin-top: 130px;
+  margin-top: var(--space-block);
 
   @media (max-width: 960px) {
     grid-template-columns: 1fr;
     gap: 44px;
-    margin-top: 90px;
   }
 `;
 
@@ -205,14 +200,11 @@ const BookCopy = styled.div`
 `;
 
 const BookTitle = styled.h3`
-  font-size: 3rem;
+  /* 3rem at the top end, where --type-subtitle stops at 2.8rem. */
+  font-size: clamp(2rem, 6.8vw, 3rem);
   font-weight: 600;
   color: var(--bone);
   margin: 18px 0 26px 0;
-
-  @media (max-width: 960px) {
-    font-size: 2.2rem;
-  }
 `;
 
 /* The open question, set apart. The site is allowed to ask it. */
@@ -287,7 +279,7 @@ const StatusRow = styled.div`
   display: flex;
   align-items: flex-end;
   gap: 56px;
-  margin-top: 110px;
+  margin-top: var(--space-block);
   padding-top: 36px;
   border-top: 1px solid var(--hairline);
   flex-wrap: wrap;

@@ -209,7 +209,7 @@ const Wrapper = styled.section`
      positioned and so takes no space of its own — it sits from 34px to about
      116px off the bottom. At 100px the demo badge landed on top of it on any
      900px-tall screen, which is most laptops. */
-  padding: 120px 0 150px 0;
+  padding: clamp(76px, 11vw, 120px) 0 clamp(112px, 14vw, 150px) 0;
 
   @media (max-height: 700px) {
     padding: 96px 0 132px 0;

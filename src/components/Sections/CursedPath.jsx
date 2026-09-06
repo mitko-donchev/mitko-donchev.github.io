@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components";
 // Hooks
 import useInView from "../../hooks/useInView";
+import useMediaQuery from "../../hooks/useMediaQuery";
 import useReducedMotion from "../../hooks/useReducedMotion";
 // Config
 import {
@@ -34,8 +35,6 @@ const RETURN_TAIL =
   "C962,278 998,150 906,98 C820,50 640,74 500,68 " +
   "C352,62 176,66 122,148 C100,182 104,246 128,300";
 
-const LOOP = `${OUTBOUND} ${RETURN_TAIL}`;
-
 const NODES = [
   { x: 128, y: 300 },
   { x: 312, y: 262 },
@@ -43,6 +42,72 @@ const NODES = [
   { x: 676, y: 252 },
   { x: 866, y: 292 },
 ];
+
+/* The same road, surveyed down the page instead of across it.
+
+   A phone cannot hold a 1000-unit map: squeezed to fit, the waypoint names
+   come out a few pixels tall, and held at full size it has to be dragged
+   sideways, which hides half the road behind an edge nobody knows to swipe.
+   So the portrait viewport gets a portrait map. Same five waypoints, same
+   order, same undrawn return leg — turned through ninety degrees, with the
+   names set beside each node where there is room for them. */
+const OUTBOUND_V =
+  "M60,60 C60,105 72,150 72,195 C72,240 56,285 56,330 " +
+  "C56,375 74,420 74,465 C74,510 60,555 60,600";
+
+const RETURN_TAIL_V =
+  "C60,644 172,656 244,618 C316,580 316,78 244,42 C172,6 60,18 60,60";
+
+const NODES_V = [
+  { x: 60, y: 60 },
+  { x: 72, y: 195 },
+  { x: 56, y: 330 },
+  { x: 74, y: 465 },
+  { x: 60, y: 600 },
+];
+
+const gridLines = (verticals, horizontals) => [
+  ...verticals.map((line) => ({ key: `v${line.x1}`, ...line })),
+  ...horizontals.map((line) => ({ key: `h${line.y1}`, ...line })),
+];
+
+/* Everything the two orientations disagree about, in one place: the road, the
+   nodes, the survey grid, and where a node hangs its name. */
+const ACROSS = {
+  viewBox: "0 0 1000 420",
+  outbound: OUTBOUND,
+  loop: `${OUTBOUND} ${RETURN_TAIL}`,
+  nodes: NODES,
+  grid: gridLines(
+    [0, 1, 2, 3, 4, 5, 6, 7].map((column) => ({
+      x1: 60 + column * 126, y1: 26, x2: 60 + column * 126, y2: 394,
+    })),
+    [0, 1, 2, 3].map((row) => ({
+      x1: 40, y1: 60 + row * 100, x2: 960, y2: 60 + row * 100,
+    }))
+  ),
+  tick: { x1: 0, y1: 26, x2: 0, y2: 38 },
+  label: { x: 0, y: 54, anchor: "middle" },
+  distance: { x: 0, y: 72, anchor: "middle" },
+};
+
+const DOWN = {
+  viewBox: "0 0 340 660",
+  outbound: OUTBOUND_V,
+  loop: `${OUTBOUND_V} ${RETURN_TAIL_V}`,
+  nodes: NODES_V,
+  grid: gridLines(
+    [0, 1, 2, 3, 4].map((column) => ({
+      x1: 24 + column * 72, y1: 18, x2: 24 + column * 72, y2: 642,
+    })),
+    [0, 1, 2, 3, 4, 5].map((row) => ({
+      x1: 14, y1: 40 + row * 100, x2: 326, y2: 40 + row * 100,
+    }))
+  ),
+  tick: { x1: 22, y1: 0, x2: 32, y2: 0 },
+  label: { x: 40, y: -2, anchor: "start" },
+  distance: { x: 40, y: 16, anchor: "start" },
+};
 
 /* One lap. Slow on purpose — the road is a sentence, not a loading bar. */
 const LAP_SECONDS = 22;
@@ -83,6 +148,8 @@ const GLYPHS = {
 export default function CursedPath() {
   const [wrapRef, inView] = useInView({ threshold: 0.2 });
   const reduced = useReducedMotion();
+  const stacked = useMediaQuery("(max-width: 860px)");
+  const layout = stacked ? DOWN : ACROSS;
 
   // The waypoint whose card is showing. `hovered` is the visitor taking over;
   // `reached` is the traveller's own progress. Hover wins while it lasts.
@@ -121,15 +188,16 @@ export default function CursedPath() {
        by hand — the nodes are authored as coordinates, so their arc lengths
        would otherwise have to be kept in sync by eye. */
     const SAMPLES = 900;
-    const nodeArcLengths = NODES.map(() => 0);
-    const nodeBest = NODES.map(() => Infinity);
+    const nodes = layout.nodes;
+    const nodeArcLengths = nodes.map(() => 0);
+    const nodeBest = nodes.map(() => Infinity);
 
     for (let step = 0; step <= SAMPLES; step += 1) {
       const length = (step / SAMPLES) * total;
       const point = loopPath.getPointAtLength(length);
-      for (let index = 0; index < NODES.length; index += 1) {
-        const dx = point.x - NODES[index].x;
-        const dy = point.y - NODES[index].y;
+      for (let index = 0; index < nodes.length; index += 1) {
+        const dx = point.x - nodes[index].x;
+        const dy = point.y - nodes[index].y;
         const distance = dx * dx + dy * dy;
         if (distance < nodeBest[index]) {
           nodeBest[index] = distance;
@@ -159,7 +227,10 @@ export default function CursedPath() {
       /* Visible only on the drawn road. Past the far gate it dims out over a
          short distance, stays gone for the undrawn leg, and comes back up
          just before the village gate — so it is never seen crossing. */
-      const FADE = 70;
+      /* Proportional, not absolute: the portrait loop is a fraction of the
+         landscape one's length, and a fixed 70 units there would dim the wisp
+         out most of the way down the road. */
+      const FADE = total * 0.028;
       let presence = 1;
       if (travelled > outboundEnd) {
         presence = Math.max(0, 1 - (travelled - outboundEnd) / FADE);
@@ -225,7 +296,9 @@ export default function CursedPath() {
       stop();
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [reduced, inView]);
+    // layout: rotating the map replaces the path the traveller walks, so the
+    // arc lengths have to be sampled again from the new geometry.
+  }, [reduced, inView, layout]);
 
   const current = PATH_WAYPOINTS[active] || PATH_WAYPOINTS[0];
 
@@ -237,8 +310,8 @@ export default function CursedPath() {
         <Intro className="font18">{PATH_INTRO}</Intro>
       </Head>
 
-      <MapFrame $in={inView}>
-        <Svg viewBox="0 0 1000 420" role="img" aria-label={`${PATH_TITLE} — a surveyed map of the road out of the village, from the village gate to the far gate`}>
+      <MapFrame $in={inView} $stacked={stacked}>
+        <Svg viewBox={layout.viewBox} $stacked={stacked} role="img" aria-label={`${PATH_TITLE} — a surveyed map of the road out of the village, from the village gate to the far gate`}>
           <defs>
             <radialGradient id="wispGlow">
               <stop offset="0%" stopColor="#FBE7BC" stopOpacity="1" />
@@ -261,25 +334,13 @@ export default function CursedPath() {
 
           {/* Faint survey grid — a chart of somewhere real, not a diagram. */}
           <g opacity="0.16">
-            {[0, 1, 2, 3, 4, 5, 6, 7].map((column) => (
+            {layout.grid.map((line) => (
               <line
-                key={`v${column}`}
-                x1={60 + column * 126}
-                y1="26"
-                x2={60 + column * 126}
-                y2="394"
-                stroke="var(--bone)"
-                strokeWidth="0.5"
-                strokeDasharray="2 9"
-              />
-            ))}
-            {[0, 1, 2, 3].map((row) => (
-              <line
-                key={`h${row}`}
-                x1="40"
-                y1={60 + row * 100}
-                x2="960"
-                y2={60 + row * 100}
+                key={line.key}
+                x1={line.x1}
+                y1={line.y1}
+                x2={line.x2}
+                y2={line.y2}
                 stroke="var(--bone)"
                 strokeWidth="0.5"
                 strokeDasharray="2 9"
@@ -289,16 +350,16 @@ export default function CursedPath() {
 
           {/* The road itself: a wide dim bed with the lit line drawn over it. */}
           <path
-            d={OUTBOUND}
+            d={layout.outbound}
             fill="none"
             stroke="rgba(232,163,61,0.13)"
             strokeWidth="11"
             strokeLinecap="round"
           />
-          <RoadPath d={OUTBOUND} $in={inView} />
+          <RoadPath key={layout.viewBox} d={layout.outbound} $in={inView} />
 
           {/* Measured, invisible, and the only thing the traveller follows. */}
-          <path ref={loopRef} d={LOOP} fill="none" stroke="none" />
+          <path ref={loopRef} d={layout.loop} fill="none" stroke="none" />
 
           {/* Comet tail, then the head, so the head sits on top. */}
           {!reduced &&
@@ -312,13 +373,13 @@ export default function CursedPath() {
               />
             ))}
 
-          <g ref={travellerRef} transform="translate(128 300)">
+          <g ref={travellerRef} transform={`translate(${layout.nodes[0].x} ${layout.nodes[0].y})`}>
             <circle r="19" fill="url(#wispGlow)" />
             <Wisp r="3.6" $still={reduced} />
           </g>
 
           {/* Waypoints last: they are the thing you read. */}
-          {NODES.map((node, index) => {
+          {layout.nodes.map((node, index) => {
             const data = PATH_WAYPOINTS[index];
             const isActive = index === active;
             return (
@@ -344,11 +405,23 @@ export default function CursedPath() {
                 <circle r="16" fill="var(--ink)" fillOpacity="0.82" />
                 <Glyph transform="scale(0.68)">{GLYPHS[data.icon]}</Glyph>
 
-                <line x1="0" y1="26" x2="0" y2="38" stroke="var(--hairline-strong)" strokeWidth="1" />
-                <NodeLabel y="54" textAnchor="middle" $active={isActive}>
+                {/* Down the page the name goes beside the node, not under it:
+                    stacked labels would collide with the next waypoint. */}
+                <line
+                  x1={layout.tick.x1} y1={layout.tick.y1}
+                  x2={layout.tick.x2} y2={layout.tick.y2}
+                  stroke="var(--hairline-strong)" strokeWidth="1"
+                />
+                <NodeLabel
+                  x={layout.label.x} y={layout.label.y}
+                  textAnchor={layout.label.anchor} $active={isActive}
+                >
                   {data.name}
                 </NodeLabel>
-                <NodeDistance y="72" textAnchor="middle" $active={isActive}>
+                <NodeDistance
+                  x={layout.distance.x} y={layout.distance.y}
+                  textAnchor={layout.distance.anchor} $active={isActive}
+                >
                   {data.distance}
                 </NodeDistance>
               </Node>
@@ -391,21 +464,18 @@ export default function CursedPath() {
 
 const Wrapper = styled.div`
   width: 100%;
-  margin-top: 110px;
+  margin-top: var(--space-block);
 `;
 
 const Head = styled.div`
   max-width: 640px;
-  margin-bottom: 44px;
+  margin-bottom: var(--space-group);
 `;
 
 const Title = styled.h2`
-  font-size: 3.6rem;
+  font-size: var(--type-title);
   font-weight: 600;
   margin: 16px 0 14px 0;
-  @media (max-width: 760px) {
-    font-size: 2.5rem;
-  }
 `;
 
 const Intro = styled.p`
@@ -419,28 +489,13 @@ const MapFrame = styled.div`
   opacity: ${(props) => (props.$in ? 1 : 0)};
   transition: opacity 1s var(--ease-out);
 
-  /* The map holds its width on small screens and scrolls sideways. The mask
-     softens the cut so the road looks like it carries on past the edge —
-     which is also the honest answer. */
-  @media (max-width: 860px) {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px,
-      #000 calc(100% - 18px), transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0, #000 18px,
-      #000 calc(100% - 18px), transparent 100%);
+  /* The map used to hold 720px here and scroll sideways behind a mask. It
+     read as broken: you saw half a road, the far labels were sliced mid-word,
+     and nothing said it moved. The portrait geometry replaces all of that, so
+     there is no overflow left to hide. */
 
-    /* &, or stylis makes this a descendant selector and it hides the
-       scrollbars of the children instead of this element's own. */
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  /* A pool of ember light under the road, so the map sits in the world
-     rather than floating on the page. */
+  /* A pool of ember light along the road, so the map sits in the world rather
+     than floating on the page. It follows the road's axis. */
   &::before {
     content: "";
     position: absolute;
@@ -450,22 +505,31 @@ const MapFrame = styled.div`
     bottom: 6%;
     background: radial-gradient(60% 70% at 50% 60%, rgba(232, 163, 61, 0.10), transparent 72%);
     pointer-events: none;
+
+    ${(props) => props.$stacked && `
+      left: -6%;
+      right: 34%;
+      top: 4%;
+      bottom: 4%;
+      background: radial-gradient(58% 46% at 42% 50%, rgba(232, 163, 61, 0.10), transparent 72%);
+    `}
   }
 `;
 
+/* No min-width any more: the portrait viewBox is authored to fit the viewport
+   it is chosen for, so the survey stays legible without being dragged. */
 const Svg = styled.svg`
   display: block;
   width: 100%;
   height: auto;
   overflow: visible;
 
-  /* Below this the map would be squeezed until the waypoint names are a few
-     pixels tall. A survey you cannot read is not a survey, so on a phone it
-     keeps its size and the reader drags along the road instead. */
-  @media (max-width: 860px) {
-    width: 720px;
-    min-width: 720px;
-  }
+  /* The portrait map is narrow and tall; centring it stops the road hugging
+     the left edge on a wide-ish tablet still under the breakpoint. */
+  ${(props) => props.$stacked && `
+    max-width: 380px;
+    margin: 0 auto;
+  `}
 `;
 
 /* Draws itself once, west to east. pathLength normalises the dash maths so
@@ -564,7 +628,7 @@ const Card = styled.div`
 `;
 
 const CardIndex = styled.span`
-  font-size: 2.6rem;
+  font-size: var(--type-numeral);
   line-height: 1;
   color: var(--ember);
   opacity: 0.42;
@@ -584,12 +648,9 @@ const CardTop = styled.div`
 `;
 
 const CardName = styled.h3`
-  font-size: 2rem;
+  font-size: var(--type-heading);
   font-weight: 600;
   color: var(--bone);
-  @media (max-width: 620px) {
-    font-size: 1.6rem;
-  }
 `;
 
 const CardDistance = styled.span`
@@ -636,7 +697,7 @@ const Facts = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
-  margin-top: 56px;
+  margin-top: var(--space-group);
   padding-top: 34px;
   border-top: 1px solid var(--hairline);
 

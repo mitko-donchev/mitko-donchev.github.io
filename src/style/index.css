@@ -78,6 +78,49 @@ button { font-family: inherit; }
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* ------------------------------------------------------------------------
+     Vertical rhythm
+
+     Three steps, fluid rather than stepped. The page used to carry the same
+     110-130px between every block at every width, which is generous on a
+     desktop and absurd on a phone — it put roughly 330px of nothing between
+     a call to action and the next heading. clamp() lets the same rule read
+     as air on a wide screen and as a gap on a narrow one, with no breakpoint
+     for the layout to jump at.
+
+     --space-section  between one numbered section and the next
+     --space-block    between major blocks inside a section
+     --space-group    between a heading and the thing it introduces
+
+     Each ramp reaches its ceiling by 1300px, so every common desktop width
+     gets exactly the value it had before. At 8.5vw the block step was still
+     climbing at 1440px and quietly cost that width 8px.
+     ------------------------------------------------------------------------ */
+  --space-section: clamp(58px, 9vw, 110px);
+  --space-block: clamp(52px, 10vw, 130px);
+  --space-group: clamp(26px, 5vw, 60px);
+
+  /* ------------------------------------------------------------------------
+     Type scale
+
+     Same argument. Every display size below was written twice — once for
+     desktop and once inside a max-width query — so headings snapped a whole
+     rem at the breakpoint and were sized for 760px at 390px. The preferred
+     term is in vw so the heading tracks the measure it sits on. The hero
+     title has always been written this way; this is the rest of the page
+     catching up with it.
+
+     Floors are set so a 390px phone lands on roughly the size the old
+     max-width query gave it — the point is to remove the jump, not to shrink
+     the headings. Ceilings are each heading's existing desktop size, so
+     nothing above 760px moves at all.
+     ------------------------------------------------------------------------ */
+  --type-display: clamp(2.6rem, 11vw, 4.6rem);
+  --type-title: clamp(2.3rem, 8vw, 3.6rem);
+  --type-subtitle: clamp(2rem, 6.4vw, 2.8rem);
+  --type-heading: clamp(1.6rem, 4.6vw, 2rem);
+  --type-numeral: clamp(1.9rem, 5.4vw, 2.6rem);
+
   /* Legacy aliases. Older markup still names these; mapped rather than
      deleted so nothing renders unstyled. */
   --bg: var(--ink);

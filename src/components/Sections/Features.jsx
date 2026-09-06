@@ -170,25 +170,23 @@ function Card({ icon, title, body, index }) {
 
 const Wrapper = styled.section`
   width: 100%;
-  padding-top: 110px;
-  padding-bottom: 110px;
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
 `;
 
 const Head = styled.div`
-  margin-top: 88px;
-  margin-bottom: 56px;
+  margin-top: var(--space-group);
+  margin-bottom: var(--space-group);
   max-width: 760px;
 `;
 
 const Title = styled.h2`
-  font-size: 3.4rem;
+  /* Its own ceiling: the shared --type-title maxes at 3.6rem and this
+     heading has always been 3.4rem on a desktop. */
+  font-size: clamp(2.3rem, 7.6vw, 3.4rem);
   font-weight: 600;
   margin-top: 18px;
   color: var(--bone);
-
-  @media (max-width: 760px) {
-    font-size: 2.3rem;
-  }
 `;
 
 const Accent = styled.span``;
@@ -287,17 +285,16 @@ const CardBody = styled.p`
 
 const Teaser = styled.div`
   max-width: 620px;
-  margin: 120px auto 0 auto;
+  margin: var(--space-block) auto 0 auto;
   text-align: center;
 `;
 
 const TeaserTitle = styled.h2`
-  font-size: 2.8rem;
+  font-size: var(--type-subtitle);
   font-weight: 600;
   color: var(--bone);
 
   @media (max-width: 760px) {
-    font-size: 2rem;
   }
 `;
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 // Hooks
 import useInView from "../../hooks/useInView";
+import useMediaQuery from "../../hooks/useMediaQuery";
 import useReducedMotion from "../../hooks/useReducedMotion";
 // Config
 import { BESTIARY, BESTIARY_INTRO } from "../../config/links";
@@ -30,6 +31,16 @@ const GROUND = 344;
 const VIEW_WIDTH = 1000;
 const VIEW_HEIGHT = 384;
 const COLUMN = VIEW_WIDTH / BESTIARY.length;
+
+/* On a phone the line-up becomes a column of rows, one creature each, and the
+   comparison has to survive the change. It does, because every row is drawn
+   at this one scale in real pixels — not fitted to its box — so the golem's
+   row really is more than twice the height of the ranger's, and the eye-line
+   rule repeats on each one to say where 1.80 m falls. Four figures side by
+   side on a 390px screen was the alternative, and it was unreadable. */
+const STACK_UNITS_PER_METRE = 40;
+const STACK_WIDTH = 104;
+const STACK_HEADROOM = 14;
 
 /* Figures are authored in a 100-unit box standing on y=100. `top` is the
    highest ink in that box, and the layout uses it to make the drawn head —
@@ -159,9 +170,92 @@ function CountUp({ value, active, delay = 0 }) {
   return <>{shown.toFixed(2)}</>;
 }
 
+/* The written half of an entry. Shared so the wide line-up's legend and the
+   stacked rows cannot drift apart. */
+function Entry({ entry, index, inView }) {
+  return (
+    <>
+      <LegendKind $friendly={entry.friendly}>{entry.kind}</LegendKind>
+      <LegendName className="displayFont">{entry.name}</LegendName>
+      <LegendHeight className="displayFont">
+        <CountUp value={entry.height} active={inView} delay={index * 130} /> m
+      </LegendHeight>
+      <LegendStat>{entry.stat}</LegendStat>
+      <LegendNote className="loreFont">{entry.note}</LegendNote>
+    </>
+  );
+}
+
 export default function Bestiary() {
   const [ref, inView] = useInView({ threshold: 0.25 });
   const [active, setActive] = useState(null);
+  const stacked = useMediaQuery("(max-width: 860px)");
+
+  if (stacked) {
+    return (
+      <Wrapper ref={ref}>
+        <Head>
+          <SectionLabel className="hudLabel">What walks it</SectionLabel>
+          <Intro className="font18">{BESTIARY_INTRO}</Intro>
+        </Head>
+
+        <StackNote>
+          Every figure below is drawn to the same scale. The dashed rule is{" "}
+          {HERO_HEIGHT.toFixed(2)} m — your eye line.
+        </StackNote>
+
+        <Stack>
+          {BESTIARY.map((entry, index) => {
+            const figure = FIGURES[entry.id];
+            const scale = (entry.height * STACK_UNITS_PER_METRE) / (100 - figure.top);
+            const boxHeight = entry.height * STACK_UNITS_PER_METRE + STACK_HEADROOM;
+            const ground = boxHeight - 1;
+            const eyeLine = ground - HERO_HEIGHT * STACK_UNITS_PER_METRE;
+            return (
+              <Row key={entry.id} $in={inView} $delay={index * 110}>
+                <RowArt
+                  width={STACK_WIDTH}
+                  height={boxHeight}
+                  viewBox={`0 0 ${STACK_WIDTH} ${boxHeight}`}
+                  aria-hidden="true"
+                >
+                  <line
+                    x1="0" y1={ground} x2={STACK_WIDTH} y2={ground}
+                    stroke="var(--hairline-strong)" strokeWidth="1"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <line
+                    x1="0" y1={eyeLine} x2={STACK_WIDTH} y2={eyeLine}
+                    stroke="rgba(232, 163, 61, 0.34)" strokeWidth="1"
+                    strokeDasharray="5 7" vectorEffect="non-scaling-stroke"
+                  />
+                  <ellipse
+                    cx={STACK_WIDTH / 2} cy={ground + 2}
+                    rx={26 * Math.sqrt(scale)} ry={4.5 * Math.sqrt(scale)}
+                    fill={entry.friendly ? "rgba(95,182,168,0.16)" : "rgba(232,163,61,0.16)"}
+                  />
+                  <RowFigure
+                    $friendly={entry.friendly}
+                    transform={`translate(${STACK_WIDTH / 2 - 50 * scale} ${ground - 100 * scale}) scale(${scale})`}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    vectorEffect="non-scaling-stroke"
+                  >
+                    {figure.art}
+                  </RowFigure>
+                </RowArt>
+
+                <RowText>
+                  <Entry entry={entry} index={index} inView={inView} />
+                </RowText>
+              </Row>
+            );
+          })}
+        </Stack>
+      </Wrapper>
+    );
+  }
 
   return (
     <Wrapper ref={ref}>
@@ -269,13 +363,7 @@ export default function Bestiary() {
               onMouseEnter={() => setActive(entry.id)}
               onMouseLeave={() => setActive(null)}
             >
-              <LegendKind $friendly={entry.friendly}>{entry.kind}</LegendKind>
-              <LegendName className="displayFont">{entry.name}</LegendName>
-              <LegendHeight className="displayFont">
-                <CountUp value={entry.height} active={inView} delay={index * 130} /> m
-              </LegendHeight>
-              <LegendStat>{entry.stat}</LegendStat>
-              <LegendNote className="loreFont">{entry.note}</LegendNote>
+              <Entry entry={entry} index={index} inView={inView} />
             </LegendItem>
           );
         })}
@@ -288,12 +376,12 @@ export default function Bestiary() {
 
 const Wrapper = styled.div`
   width: 100%;
-  margin-top: 130px;
+  margin-top: var(--space-block);
 `;
 
 const Head = styled.div`
   max-width: 620px;
-  margin-bottom: 60px;
+  margin-bottom: var(--space-group);
 `;
 
 /* The kicker is this section's title, so it is a heading and not a loose
@@ -308,28 +396,11 @@ const Intro = styled.p`
   margin-top: 18px;
 `;
 
+/* The wide line-up is desktop-only now; the phone gets <Stack> instead, so
+   there is no sideways scroll and no mask left here. */
 const Strip = styled.div`
   width: 100%;
   margin-bottom: 34px;
-
-  /* Same reasoning as the map: the line-up only means anything if the
-     heights can be compared, so on a phone it holds its size and scrolls. */
-  @media (max-width: 860px) {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px,
-      #000 calc(100% - 18px), transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0, #000 18px,
-      #000 calc(100% - 18px), transparent 100%);
-
-    /* &, or stylis makes this a descendant selector and it hides the
-       scrollbars of the children instead of this element's own. */
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
 `;
 
 /* Height comes from the viewBox aspect, so the whole line-up scales as one
@@ -339,11 +410,61 @@ const StripSvg = styled.svg`
   width: 100%;
   height: auto;
   overflow: visible;
+`;
 
-  @media (max-width: 860px) {
-    width: 720px;
-    min-width: 720px;
+/* --- the stacked, one-per-row form ---------------------------------------- */
+
+const StackNote = styled.p`
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--bone-faint);
+  margin-bottom: 30px;
+`;
+
+const Stack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+`;
+
+/* Bottom-aligned, so the figure stands on the row's floor whatever the text
+   beside it does. */
+const Row = styled.div`
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  opacity: ${(props) => (props.$in ? 1 : 0)};
+  transform: translate3d(0, ${(props) => (props.$in ? 0 : 14)}px, 0);
+  transition:
+    opacity 0.7s var(--ease-out) ${(props) => props.$delay}ms,
+    transform 0.7s var(--ease-out) ${(props) => props.$delay}ms;
+
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 1;
+    transform: none;
   }
+`;
+
+/* Fixed pixel width and height — never `width: 100%`. The moment this scales
+   to its container the rows stop sharing a scale and the comparison, which is
+   the only reason the line-up exists, is gone. */
+const RowArt = styled.svg`
+  display: block;
+  flex: none;
+  overflow: visible;
+`;
+
+const RowFigure = styled.g`
+  path,
+  circle {
+    stroke: ${(props) => (props.$friendly ? "var(--verdigris)" : "var(--bone-dim)")};
+  }
+`;
+
+const RowText = styled.div`
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 2px;
 `;
 
 const GroundLine = styled.line`
