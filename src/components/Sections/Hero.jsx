@@ -211,7 +211,10 @@ const Wrapper = styled.section`
      900px-tall screen, which is most laptops. */
   padding: clamp(76px, 11vw, 120px) 0 clamp(112px, 14vw, 150px) 0;
 
-  @media (max-height: 700px) {
+  /* Short laptops only. Without the width bound this also caught small
+     phones, which then took the stepped padding instead of the clamp above -
+     the devices the clamp exists for. */
+  @media (max-height: 700px) and (min-width: 761px) {
     padding: 96px 0 132px 0;
   }
 `;

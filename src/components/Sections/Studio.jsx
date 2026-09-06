@@ -15,6 +15,7 @@ import {
   TWITTER_URL,
   YOUTUBE_URL,
 } from "../../config/links";
+import { STACK_BREAKPOINT } from "../../config/breakpoints";
 
 const AVATARS = {
   mitko: MitkoImg,
@@ -177,11 +178,11 @@ const Creed = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 46px;
-  margin-top: 92px;
+  margin-top: var(--space-block);
   padding-top: 46px;
   border-top: 1px solid var(--hairline);
 
-  @media (max-width: 860px) {
+  @media (max-width: ${STACK_BREAKPOINT}px) {
     grid-template-columns: 1fr;
     gap: 38px;
   }
@@ -314,7 +315,7 @@ const SocialRow = styled.div`
   display: flex;
   justify-content: center;
   gap: 44px;
-  margin-top: 92px;
+  margin-top: var(--space-block);
   padding-top: 46px;
   border-top: 1px solid var(--hairline);
   flex-wrap: wrap;

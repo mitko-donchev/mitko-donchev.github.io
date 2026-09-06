@@ -6,6 +6,7 @@ import useMediaQuery from "../../hooks/useMediaQuery";
 import useReducedMotion from "../../hooks/useReducedMotion";
 // Config
 import { BESTIARY, BESTIARY_INTRO } from "../../config/links";
+import { STACKED } from "../../config/breakpoints";
 
 /* A true-scale line-up.
 
@@ -41,6 +42,7 @@ const COLUMN = VIEW_WIDTH / BESTIARY.length;
 const STACK_UNITS_PER_METRE = 40;
 const STACK_WIDTH = 104;
 const STACK_HEADROOM = 14;
+
 
 /* Figures are authored in a 100-unit box standing on y=100. `top` is the
    highest ink in that box, and the layout uses it to make the drawn head —
@@ -132,6 +134,18 @@ const FIGURES = {
   },
 };
 
+/* Uniform scale chosen so the figure's highest ink lands exactly on its real
+   height above the ground — the empty headroom in the 100-unit box must not
+   count toward the measurement. Shared by both forms: the wide line-up and
+   the stacked rows differ only in their pixels-per-metre, and the moment
+   these two sums drift apart the drawings stop being measurements. */
+const figureScale = (entry, unitsPerMetre) =>
+  (entry.height * unitsPerMetre) / (100 - FIGURES[entry.id].top);
+
+/* Places a 100-unit-tall figure with its feet on `ground`, centred on `cx`. */
+const standOn = (scale, cx, ground) =>
+  `translate(${cx - 50 * scale} ${ground - 100 * scale}) scale(${scale})`;
+
 /* Counts a metre value up as the strip arrives. Small enough to live here;
    it exists only so the numbers land with the figures instead of before. */
 function CountUp({ value, active, delay = 0 }) {
@@ -189,16 +203,17 @@ function Entry({ entry, index, inView }) {
 export default function Bestiary() {
   const [ref, inView] = useInView({ threshold: 0.25 });
   const [active, setActive] = useState(null);
-  const stacked = useMediaQuery("(max-width: 860px)");
+  const stacked = useMediaQuery(STACKED);
 
-  if (stacked) {
-    return (
-      <Wrapper ref={ref}>
-        <Head>
-          <SectionLabel className="hudLabel">What walks it</SectionLabel>
-          <Intro className="font18">{BESTIARY_INTRO}</Intro>
-        </Head>
+  return (
+    <Wrapper ref={ref}>
+      <Head>
+        <SectionLabel className="hudLabel">What walks it</SectionLabel>
+        <Intro className="font18">{BESTIARY_INTRO}</Intro>
+      </Head>
 
+      {stacked ? (
+        <>
         <StackNote>
           Every figure below is drawn to the same scale. The dashed rule is{" "}
           {HERO_HEIGHT.toFixed(2)} m — your eye line.
@@ -207,7 +222,7 @@ export default function Bestiary() {
         <Stack>
           {BESTIARY.map((entry, index) => {
             const figure = FIGURES[entry.id];
-            const scale = (entry.height * STACK_UNITS_PER_METRE) / (100 - figure.top);
+            const scale = figureScale(entry, STACK_UNITS_PER_METRE);
             const boxHeight = entry.height * STACK_UNITS_PER_METRE + STACK_HEADROOM;
             const ground = boxHeight - 1;
             const eyeLine = ground - HERO_HEIGHT * STACK_UNITS_PER_METRE;
@@ -236,7 +251,7 @@ export default function Bestiary() {
                   />
                   <RowFigure
                     $friendly={entry.friendly}
-                    transform={`translate(${STACK_WIDTH / 2 - 50 * scale} ${ground - 100 * scale}) scale(${scale})`}
+                    transform={standOn(scale, STACK_WIDTH / 2, ground)}
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -253,17 +268,9 @@ export default function Bestiary() {
             );
           })}
         </Stack>
-      </Wrapper>
-    );
-  }
-
-  return (
-    <Wrapper ref={ref}>
-      <Head>
-        <SectionLabel className="hudLabel">What walks it</SectionLabel>
-        <Intro className="font18">{BESTIARY_INTRO}</Intro>
-      </Head>
-
+        </>
+      ) : (
+        <>
       <Strip>
         <StripSvg
           viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
@@ -299,10 +306,7 @@ export default function Bestiary() {
 
           {BESTIARY.map((entry, index) => {
             const figure = FIGURES[entry.id];
-            /* Uniform scale chosen so the figure's highest ink lands exactly
-               on its real height above the ground — the empty headroom in the
-               100-unit box must not count toward the measurement. */
-            const scale = (entry.height * UNITS_PER_METRE) / (100 - figure.top);
+            const scale = figureScale(entry, UNITS_PER_METRE);
             const centre = COLUMN * (index + 0.5);
             const isActive = active === entry.id;
             return (
@@ -338,7 +342,7 @@ export default function Bestiary() {
 
                 {/* Feet on the ground, height in metres, every time. */}
                 <g
-                  transform={`translate(${centre - 50 * scale} ${GROUND - 100 * scale}) scale(${scale})`}
+                  transform={standOn(scale, centre, GROUND)}
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -368,6 +372,8 @@ export default function Bestiary() {
           );
         })}
       </Legend>
+        </>
+      )}
     </Wrapper>
   );
 }
@@ -530,21 +536,14 @@ const FigureGroup = styled.g`
   }
 `;
 
+/* No max-width rules here: <Legend> is only rendered above STACK_BREAKPOINT
+   now, so anything narrower is <Stack>'s job and a query here would be dead. */
 const Legend = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-top: 40px;
   padding: 0 4%;
-
-  @media (max-width: 860px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 34px 20px;
-    padding: 0;
-  }
-  @media (max-width: 460px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const LegendItem = styled.div`
@@ -552,10 +551,6 @@ const LegendItem = styled.div`
   cursor: pointer;
   opacity: ${(props) => (props.$active ? 1 : 0.82)};
   transition: opacity 0.3s var(--ease-soft);
-
-  @media (max-width: 860px) {
-    text-align: left;
-  }
 `;
 
 const LegendKind = styled.div`

@@ -142,12 +142,11 @@ const Lede = styled.div`
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
   gap: 70px;
   align-items: center;
-  margin-top: 88px;
+  margin-top: var(--space-group);
 
   @media (max-width: 960px) {
     grid-template-columns: 1fr;
     gap: 48px;
-    margin-top: 60px;
   }
 `;
 
@@ -170,12 +169,9 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 3.4vw, 1.5rem);
   color: var(--bone-dim);
   margin-bottom: 30px;
-  @media (max-width: 960px) {
-    font-size: 1.25rem;
-  }
 `;
 
 const BookBeat = styled.div`
@@ -238,25 +234,20 @@ const SynopsisP = styled.p`
    edge. */
 const Verse = styled.blockquote`
   max-width: 720px;
-  margin: 120px auto;
+  margin: var(--space-block) auto;
   padding: 0;
   text-align: center;
-
-  @media (max-width: 760px) {
-    margin: 80px auto;
-  }
 `;
 
 const VerseLine = styled.p`
   margin: 0;
-  font-size: 1.9rem;
+  font-size: clamp(1.35rem, 4.4vw, 1.9rem);
   font-weight: 400;
   line-height: 1.85;
   color: var(--bone);
   text-shadow: 0 0 40px rgba(232, 163, 61, 0.18);
 
   @media (max-width: 760px) {
-    font-size: 1.35rem;
     line-height: 1.7;
   }
 `;

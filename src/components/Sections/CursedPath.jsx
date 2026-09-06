@@ -12,6 +12,7 @@ import {
   PATH_WAYPOINTS,
   PATH_FACTS,
 } from "../../config/links";
+import { STACKED } from "../../config/breakpoints";
 
 /* ---------------------------------------------------------------------------
    Geometry
@@ -66,11 +67,6 @@ const NODES_V = [
   { x: 60, y: 600 },
 ];
 
-const gridLines = (verticals, horizontals) => [
-  ...verticals.map((line) => ({ key: `v${line.x1}`, ...line })),
-  ...horizontals.map((line) => ({ key: `h${line.y1}`, ...line })),
-];
-
 /* Everything the two orientations disagree about, in one place: the road, the
    nodes, the survey grid, and where a node hangs its name. */
 const ACROSS = {
@@ -78,17 +74,18 @@ const ACROSS = {
   outbound: OUTBOUND,
   loop: `${OUTBOUND} ${RETURN_TAIL}`,
   nodes: NODES,
-  grid: gridLines(
-    [0, 1, 2, 3, 4, 5, 6, 7].map((column) => ({
+  grid: [
+    ...[0, 1, 2, 3, 4, 5, 6, 7].map((column) => ({
       x1: 60 + column * 126, y1: 26, x2: 60 + column * 126, y2: 394,
     })),
-    [0, 1, 2, 3].map((row) => ({
+    ...[0, 1, 2, 3].map((row) => ({
       x1: 40, y1: 60 + row * 100, x2: 960, y2: 60 + row * 100,
-    }))
-  ),
+    })),
+  ],
   tick: { x1: 0, y1: 26, x2: 0, y2: 38 },
-  label: { x: 0, y: 54, anchor: "middle" },
-  distance: { x: 0, y: 72, anchor: "middle" },
+  /* One block, so the name and the distance beneath it cannot end up on
+     different sides of the node. */
+  label: { x: 0, anchor: "middle", y: 54, distanceY: 72 },
 };
 
 const DOWN = {
@@ -96,17 +93,16 @@ const DOWN = {
   outbound: OUTBOUND_V,
   loop: `${OUTBOUND_V} ${RETURN_TAIL_V}`,
   nodes: NODES_V,
-  grid: gridLines(
-    [0, 1, 2, 3, 4].map((column) => ({
+  grid: [
+    ...[0, 1, 2, 3, 4].map((column) => ({
       x1: 24 + column * 72, y1: 18, x2: 24 + column * 72, y2: 642,
     })),
-    [0, 1, 2, 3, 4, 5].map((row) => ({
+    ...[0, 1, 2, 3, 4, 5].map((row) => ({
       x1: 14, y1: 40 + row * 100, x2: 326, y2: 40 + row * 100,
-    }))
-  ),
+    })),
+  ],
   tick: { x1: 22, y1: 0, x2: 32, y2: 0 },
-  label: { x: 40, y: -2, anchor: "start" },
-  distance: { x: 40, y: 16, anchor: "start" },
+  label: { x: 40, anchor: "start", y: -2, distanceY: 16 },
 };
 
 /* One lap. Slow on purpose — the road is a sentence, not a loading bar. */
@@ -148,7 +144,7 @@ const GLYPHS = {
 export default function CursedPath() {
   const [wrapRef, inView] = useInView({ threshold: 0.2 });
   const reduced = useReducedMotion();
-  const stacked = useMediaQuery("(max-width: 860px)");
+  const stacked = useMediaQuery(STACKED);
   const layout = stacked ? DOWN : ACROSS;
 
   // The waypoint whose card is showing. `hovered` is the visitor taking over;
@@ -334,9 +330,9 @@ export default function CursedPath() {
 
           {/* Faint survey grid — a chart of somewhere real, not a diagram. */}
           <g opacity="0.16">
-            {layout.grid.map((line) => (
+            {layout.grid.map((line, index) => (
               <line
-                key={line.key}
+                key={index}
                 x1={line.x1}
                 y1={line.y1}
                 x2={line.x2}
@@ -419,8 +415,8 @@ export default function CursedPath() {
                   {data.name}
                 </NodeLabel>
                 <NodeDistance
-                  x={layout.distance.x} y={layout.distance.y}
-                  textAnchor={layout.distance.anchor} $active={isActive}
+                  x={layout.label.x} y={layout.label.distanceY}
+                  textAnchor={layout.label.anchor} $active={isActive}
                 >
                   {data.distance}
                 </NodeDistance>
@@ -616,7 +612,7 @@ const Card = styled.div`
   display: flex;
   gap: 26px;
   align-items: flex-start;
-  margin-top: 52px;
+  margin-top: var(--space-group);
   padding: 30px 0 0 0;
   border-top: 1px solid var(--hairline);
   min-height: 178px;

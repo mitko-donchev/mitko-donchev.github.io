@@ -7,6 +7,7 @@ import Reveal from "../Elements/Reveal";
 import useReducedMotion from "../../hooks/useReducedMotion";
 // Config
 import { GAME_NAME } from "../../config/links";
+import { STACK_BREAKPOINT } from "../../config/breakpoints";
 
 /* Four claims, each one traceable to something that actually exists in the
    build. Nothing here describes the road's real trick — that is the game's to
@@ -196,7 +197,7 @@ const Grid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 22px;
 
-  @media (max-width: 860px) {
+  @media (max-width: ${STACK_BREAKPOINT}px) {
     grid-template-columns: 1fr;
   }
 `;
@@ -293,9 +294,6 @@ const TeaserTitle = styled.h2`
   font-size: var(--type-subtitle);
   font-weight: 600;
   color: var(--bone);
-
-  @media (max-width: 760px) {
-  }
 `;
 
 const TeaserBody = styled.p`

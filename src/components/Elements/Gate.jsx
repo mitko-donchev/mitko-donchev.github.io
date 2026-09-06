@@ -127,19 +127,18 @@ export default function Gate() {
             <stop offset="100%" stopColor="#150F0A" />
           </linearGradient>
 
-          {/* Same rule as the sign glow: centred and r=0.5, so it reaches zero
-              on the ellipse edge instead of being cut off there. */}
+          {/* Centre and radius both 0.5, so the falloff reaches zero exactly
+              at the edge of the ellipse it fills. Anything shorter gets
+              clipped mid-falloff and the clip shows as a hard arc. The bias
+              lives in where the ellipse is placed, not in the gradient. */}
           <radialGradient id="gateHalo" cx="0.5" cy="0.5" r="0.5">
             <stop offset="0%" stopColor="#E8A33D" stopOpacity="0.4" />
             <stop offset="62%" stopColor="#B9741F" stopOpacity="0.13" />
             <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
           </radialGradient>
 
-          {/* The lanterns washing the board from underneath. Centre and radius
-              are both 0.5 so the falloff reaches zero exactly at the edge of
-              the ellipse — anything shorter clips, and a clipped glow shows a
-              hard arc across the beam. The bias is in where the ellipse sits,
-              not in the gradient. */}
+          {/* The lanterns washing the board from underneath. Same 0.5/0.5
+              rule as gateHalo above, dimmer and sat higher up. */}
           <radialGradient id="signGlow" cx="0.5" cy="0.5" r="0.5">
             <stop offset="0%" stopColor="#E8A33D" stopOpacity="0.32" />
             <stop offset="55%" stopColor="#B9741F" stopOpacity="0.11" />
@@ -293,7 +292,7 @@ export default function Gate() {
 
         {/* Cut into the board, then the face of the cut catching the fire. */}
         <SignCut x="300" y="105.5" textAnchor="middle">{GAME_NAME}</SignCut>
-        <SignFace x="300" y="103" textAnchor="middle" $still={reduced}>{GAME_NAME}</SignFace>
+        <SignFace x="300" y="103" textAnchor="middle">{GAME_NAME}</SignFace>
 
         {/* --- Lanterns under the beam -------------------------------------- */}
         {[140, 460].map((x, index) => (
@@ -387,7 +386,7 @@ const Svg = styled.svg`
 /* The name, in the display face, so the board and the wordmark elsewhere on
    the page are recognisably the same hand. */
 const signType = `
-  font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  font-family: var(--font-display);
   font-size: 58px;
   font-weight: 600;
   letter-spacing: 2px;
@@ -400,15 +399,13 @@ const SignCut = styled.text`
   opacity: 0.85;
 `;
 
+/* Deliberately not animated. It carried a 6s 0.9-to-1 opacity loop, which is
+   below the threshold anyone notices and kept the largest text node on the
+   page repainting inside the root drop-shadow filter. The board reads as lit
+   from the signGlow ellipse behind it instead. */
 const SignFace = styled.text`
   ${signType}
   fill: url(#signLetter);
-  animation: ${(props) => (props.$still ? "none" : "signLight 6s ease-in-out infinite")};
-
-  @keyframes signLight {
-    0%, 100% { opacity: 0.9; }
-    50% { opacity: 1; }
-  }
 `;
 
 /* The far end of the road, pulsing like something is standing there. */

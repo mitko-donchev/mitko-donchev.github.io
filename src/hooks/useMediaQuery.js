@@ -17,9 +17,6 @@ export default function useMediaQuery(query) {
   useEffect(() => {
     const list = window.matchMedia(query);
     const onChange = () => setMatches(list.matches);
-    // Sync once on mount: the query can have changed between the initial
-    // state and the effect running, and on the server it started false.
-    onChange();
     list.addEventListener("change", onChange);
     return () => list.removeEventListener("change", onChange);
   }, [query]);
