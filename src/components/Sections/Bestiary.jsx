@@ -220,7 +220,7 @@ export default function Bestiary() {
                 $friendly={entry.friendly}
                 tabIndex={0}
                 role="button"
-                aria-label={`${entry.name}, ${entry.kind}, ${entry.height} metres, ${entry.stat}`}
+                aria-label={`${entry.name}, ${entry.kind}, ${entry.height} metres, ${entry.stat}. ${entry.note}`}
                 onMouseEnter={() => setActive(entry.id)}
                 onMouseLeave={() => setActive(null)}
                 onFocus={() => setActive(entry.id)}

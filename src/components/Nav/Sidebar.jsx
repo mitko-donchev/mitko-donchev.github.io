@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-scroll";
 // Assets
@@ -9,8 +9,20 @@ import { SteamMark } from "../Buttons/WishlistButton";
 import { CTA_WISHLIST, STEAM_URL } from "../../config/links";
 
 export default function Sidebar({ sidebarOpen, toggleSidebar }) {
+  /* A panel covering the page closes on Escape. Without this the only way
+     out is to find the small X, which is the one thing a keyboard user
+     cannot do quickly. */
+  useEffect(() => {
+    if (!sidebarOpen) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") toggleSidebar(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [sidebarOpen, toggleSidebar]);
+
   return (
-    <Wrapper className="animate darkBg" $sidebarOpen={sidebarOpen}>
+    <Wrapper $sidebarOpen={sidebarOpen} aria-hidden={!sidebarOpen}>
       <SidebarHeader className="flexSpaceCenter">
         <div className="flexNullCenter">
           <LogoIcon />
@@ -18,7 +30,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }) {
             Epic Millennium
           </span>
         </div>
-        <CloseBtn onClick={() => toggleSidebar(!sidebarOpen)} className="animate pointer">
+        <CloseBtn onClick={() => toggleSidebar(!sidebarOpen)} className="animate pointer" aria-label="Close menu">
           <CloseIcon />
         </CloseBtn>
       </SidebarHeader>
@@ -28,6 +40,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }) {
           <Link
             onClick={() => toggleSidebar(!sidebarOpen)}
             activeClass="active"
+            href="#home"
             to="home"
             spy={true}
             smooth={true}
@@ -40,6 +53,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }) {
           <Link
             onClick={() => toggleSidebar(!sidebarOpen)}
             activeClass="active"
+            href="#game"
             to="game"
             spy={true}
             smooth={true}
@@ -52,6 +66,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }) {
           <Link
             onClick={() => toggleSidebar(!sidebarOpen)}
             activeClass="active"
+            href="#features"
             to="features"
             spy={true}
             smooth={true}
@@ -64,6 +79,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }) {
           <Link
             onClick={() => toggleSidebar(!sidebarOpen)}
             activeClass="active"
+            href="#studio"
             to="studio"
             spy={true}
             smooth={true}
@@ -157,11 +173,22 @@ const Wrapper = styled.nav`
   padding: 0 30px;
   right: ${(props) => (props.$sidebarOpen ? "0px" : "-400px")};
   z-index: 9999;
-  border-left: 1px solid var(--border);
-  background: rgba(10, 10, 15, 0.92);
+  border-left: 1px solid var(--hairline-strong);
+  background: rgba(8, 11, 18, 0.94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
+  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.55);
+
+  /* The drawer is always in the document, parked off the right edge. Its
+     links are real links now, which means that without this a keyboard user
+     tabs through five controls they cannot see. visibility takes them out of
+     the tab order and out of hit testing; the delay lets the panel finish
+     sliding out before it goes. */
+  visibility: ${(props) => (props.$sidebarOpen ? "visible" : "hidden")};
+  transition:
+    right 0.35s var(--ease-out),
+    visibility 0s linear ${(props) => (props.$sidebarOpen ? "0s" : "0.35s")};
+
   @media (max-width: 400px) {
     width: 100%;
   }

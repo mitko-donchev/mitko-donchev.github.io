@@ -331,7 +331,7 @@ export default function CursedPath() {
                 $delay={420 + index * 130}
                 tabIndex={0}
                 role="button"
-                aria-label={`${data.name}, ${data.distance}`}
+                aria-label={`${data.name}, ${data.distance}. ${data.lore} ${data.intel.join(". ")}.`}
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
                 onFocus={() => setHovered(index)}

@@ -19,14 +19,14 @@ export default function Footer() {
       <div className="container">
         <hr className="divider" />
         <Bar>
-          <Brand to="home" smooth={true} offset={-80} className="pointer flexNullCenter">
+          <Brand href="#home" to="home" smooth={true} offset={-80} className="pointer flexNullCenter">
             <LogoImg />
             <Mark className="displayFont">Epic Millennium</Mark>
           </Brand>
 
           <Meta>
             <Copyright>© {year} Epic Millennium</Copyright>
-            <TopLink to="home" smooth={true} offset={-80} className="pointer">
+            <TopLink href="#home" to="home" smooth={true} offset={-80} className="pointer">
               Back to top
               <Arrow viewBox="0 0 12 14" aria-hidden="true">
                 <path d="M6 13V2M6 2L1.5 6.5M6 2l4.5 4.5" />
