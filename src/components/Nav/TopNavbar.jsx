@@ -33,15 +33,13 @@ export default function TopNavbar() {
       {sidebarOpen && <Backdrop toggleSidebar={toggleSidebar} />}
       <Wrapper
         className="flexCenter animate"
-        scrolled={y > 100}
+        $scrolled={y > 100}
         style={y > 100 ? { height: "60px" } : { height: "80px" }}
       >
         <NavInner className="container flexSpaceCenter">
           <Link className="pointer flexNullCenter" to="home" smooth={true}>
             <LogoIcon />
-            <LogoText style={{ marginLeft: "15px", marginTop: "5px" }} className="font20 extraBold displayFont">
-              Epic Millennium
-            </LogoText>
+            <LogoText className="displayFont">Epic Millennium</LogoText>
           </Link>
           <BurderWrapper className="pointer" onClick={() => toggleSidebar(!sidebarOpen)}>
             <BurgerIcon />
@@ -95,17 +93,21 @@ const Wrapper = styled.nav`
   background-color: transparent;
   border-bottom: 1px solid transparent;
   ${(props) =>
-    props.scrolled &&
+    props.$scrolled &&
     `
-    background-color: rgba(10, 10, 15, 0.55);
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    background-color: rgba(11, 14, 20, 0.66);
+    border-bottom: 1px solid var(--hairline);
+    backdrop-filter: blur(16px) saturate(130%);
+    -webkit-backdrop-filter: blur(16px) saturate(130%);
   `}
 `;
 
-const LogoText = styled.h1`
-  color: var(--text);
+const LogoText = styled.span`
+  margin-left: 14px;
+  font-size: 1.24rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--bone);
 `;
 
 const NavInner = styled.div`
@@ -128,6 +130,23 @@ const BurderWrapper = styled.button`
 
 const UlWrapper = styled.ul`
   display: flex;
+
+  li a {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    transition: color 0.3s var(--ease-soft);
+  }
+
+  li a:hover,
+  li a.active {
+    color: var(--ember);
+  }
+
   @media (max-width: 760px) {
     display: none;
   }
@@ -141,17 +160,21 @@ const UlWrapperRight = styled.ul`
 
 const NavCTA = styled.a`
   display: inline-block;
-  padding: 10px 20px;
+  padding: 11px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  font-size: 0.938rem;
-  color: #fff !important;
-  background-color: var(--accent);
-  border: 1px solid var(--accent);
-  box-shadow: 0 0 20px var(--accent-glow);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bone) !important;
+  border: 1px solid var(--hairline-strong);
+  background: transparent;
+  transition: 0.35s var(--ease-soft);
+
   :hover {
-    background-color: #8b4bf5;
-    color: #fff !important;
-    box-shadow: 0 0 32px var(--accent-glow);
+    color: #20160A !important;
+    background: var(--ember);
+    border-color: var(--ember);
+    box-shadow: 0 6px 26px rgba(232, 163, 61, 0.3);
   }
 `;

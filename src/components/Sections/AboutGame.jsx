@@ -2,12 +2,22 @@ import React from "react";
 import styled from "styled-components";
 // Components
 import FullButton from "../Buttons/FullButton";
+import Reveal from "../Elements/Reveal";
+import CursedPath from "./CursedPath";
+import Bestiary from "./Bestiary";
+import Gate from "../Elements/Gate";
+import Book from "../Elements/Book";
 // Config
 import {
   STEAM_URL,
   GAME_NAME,
   GAME_GENRE,
+  GAME_SUBTITLE,
   GAME_SYNOPSIS,
+  BOOK_KICKER,
+  BOOK_TITLE,
+  BOOK_BODY,
+  BOOK_QUESTION,
   GAME_VERSE_LEAD,
   GAME_VERSE,
   GAME_VERSE_TAIL,
@@ -33,171 +43,288 @@ export default function AboutGame() {
   return (
     <Wrapper id="game" className="container">
       <hr className="divider" />
-      <About className="flexSpaceCenter">
-        <AboutLeft>
-          <span className="hudLabel">01 // The Game</span>
-          <h1 className="font40 extraBold textGradient displayFont" style={{ margin: "18px 0 6px 0" }}>
-            {GAME_NAME}
-          </h1>
-          <Genre className="font15">{GAME_GENRE}</Genre>
+
+      <Lede>
+        <Copy>
+          <Reveal>
+            <span className="hudLabel">01 — The Game</span>
+          </Reveal>
+          <Reveal delay={80}>
+            <Title className="displayFont textGradient">{GAME_NAME}</Title>
+          </Reveal>
+          <Reveal delay={140}>
+            <Genre>{GAME_GENRE}</Genre>
+          </Reveal>
+          <Reveal delay={170}>
+            <Subtitle className="loreFont">{GAME_SUBTITLE}</Subtitle>
+          </Reveal>
           {GAME_SYNOPSIS.map((paragraph, index) => (
-            <SynopsisP key={index} className="font15">
-              {paragraph}
-            </SynopsisP>
+            <Reveal key={paragraph.slice(0, 24)} delay={200 + index * 70}>
+              <SynopsisP className="font18">{paragraph}</SynopsisP>
+            </Reveal>
           ))}
-          <Verse>
-            <VerseFade className="font15 displayFont">{GAME_VERSE_LEAD}</VerseFade>
-            {GAME_VERSE.map((line, index) => (
-              <VerseLine key={index} className="font15 displayFont">
-                {line}
-              </VerseLine>
-            ))}
-            <VerseFade className="font15 displayFont" $trailing>
-              {GAME_VERSE_TAIL}
-            </VerseFade>
-          </Verse>
-          <StatusRow>
-            {STATS.map((stat) => (
-              <Stat key={stat.label}>
-                <StatLabel className="font12">{stat.label}</StatLabel>
-                <StatValue className="font18 displayFont">{stat.value}</StatValue>
-              </Stat>
-            ))}
-          </StatusRow>
-          <ButtonsRow className="flexNullCenter">
-            <div style={{ width: "220px" }}>
-              <FullButton title={CTA_WISHLIST} action={handleWishlistClick} glow />
-            </div>
-          </ButtonsRow>
-        </AboutLeft>
-        <AboutRight>
-          {/* TODO: replace with real key art / logo, e.g. src/assets/img/game/key-art.png */}
-          <KeyArt className="brackets flexCenter">
-            <span className="hudLabel">{GAME_NAME} — Key Art TBD</span>
-          </KeyArt>
-        </AboutRight>
-      </About>
+        </Copy>
+
+        <GateColumn>
+          <Reveal delay={160} y={40}>
+            <Gate />
+          </Reveal>
+        </GateColumn>
+      </Lede>
+
+      {/* The object the game is named after, and the reason it opens the way
+          it does. */}
+      <BookBeat>
+        <BookArt>
+          <Reveal y={34}>
+            <Book />
+          </Reveal>
+        </BookArt>
+        <BookCopy>
+          <Reveal delay={60}>
+            <span className="hudLabel">{BOOK_KICKER}</span>
+          </Reveal>
+          <Reveal delay={120}>
+            <BookTitle className="displayFont">{BOOK_TITLE}</BookTitle>
+          </Reveal>
+          {BOOK_BODY.map((paragraph, index) => (
+            <Reveal key={paragraph.slice(0, 20)} delay={180 + index * 70}>
+              <SynopsisP className="font18">{paragraph}</SynopsisP>
+            </Reveal>
+          ))}
+          <Reveal delay={340}>
+            <BookQuestion className="loreFont font18">{BOOK_QUESTION}</BookQuestion>
+          </Reveal>
+        </BookCopy>
+      </BookBeat>
+
+      {/* The verse gets the full width and a lot of air. It is the only place
+          on the page where the village speaks, so nothing shares the room. */}
+      <Reveal delay={60}>
+        <Verse>
+          <VerseFade className="loreFont font18">{GAME_VERSE_LEAD}</VerseFade>
+          {GAME_VERSE.map((line, index) => (
+            <VerseLine key={line} className="loreFont" style={{ transitionDelay: `${index * 90}ms` }}>
+              {line}
+            </VerseLine>
+          ))}
+          <VerseFade className="loreFont font18" $trailing>
+            {GAME_VERSE_TAIL}
+          </VerseFade>
+        </Verse>
+      </Reveal>
+
+      {/* The centrepiece — the arena as a map, walked on a loop. */}
+      <CursedPath />
+
+      {/* And what is standing on it. */}
+      <Bestiary />
+
+      <Reveal>
+        <StatusRow>
+          {STATS.map((stat) => (
+            <Stat key={stat.label}>
+              <StatLabel>{stat.label}</StatLabel>
+              <StatValue className="displayFont">{stat.value}</StatValue>
+            </Stat>
+          ))}
+          <StatAction>
+            <FullButton title={CTA_WISHLIST} action={handleWishlistClick} glow />
+          </StatAction>
+        </StatusRow>
+      </Reveal>
     </Wrapper>
   );
 }
 
 const Wrapper = styled.section`
   width: 100%;
-  padding-top: 90px;
-  padding-bottom: 90px;
+  padding-top: 110px;
+  padding-bottom: 110px;
 `;
 
-const About = styled.div`
-  margin-top: 70px;
-  gap: 60px;
+const Lede = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 70px;
+  align-items: center;
+  margin-top: 88px;
+
   @media (max-width: 960px) {
-    flex-direction: column;
-    gap: 40px;
+    grid-template-columns: 1fr;
+    gap: 48px;
+    margin-top: 60px;
   }
 `;
 
-const AboutLeft = styled.div`
-  width: 55%;
+const Copy = styled.div`
+  min-width: 0;
+`;
+
+const GateColumn = styled.div`
+  min-width: 0;
   @media (max-width: 960px) {
-    width: 100%;
-    order: 1;
+    order: -1;
   }
 `;
 
-const AboutRight = styled.div`
-  width: 42%;
+const Title = styled.h2`
+  font-size: 4.6rem;
+  font-weight: 600;
+  line-height: 1;
+  margin: 20px 0 10px 0;
+
   @media (max-width: 960px) {
-    width: 100%;
-    order: 0;
+    font-size: 3.4rem;
   }
+`;
+
+const Subtitle = styled.p`
+  font-size: 1.5rem;
+  color: var(--bone-dim);
+  margin-bottom: 30px;
+  @media (max-width: 960px) {
+    font-size: 1.25rem;
+  }
+`;
+
+const BookBeat = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 70px;
+  align-items: center;
+  margin-top: 130px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+    gap: 44px;
+    margin-top: 90px;
+  }
+`;
+
+const BookArt = styled.div`
+  min-width: 0;
+`;
+
+const BookCopy = styled.div`
+  min-width: 0;
+`;
+
+const BookTitle = styled.h3`
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--bone);
+  margin: 18px 0 26px 0;
+
+  @media (max-width: 960px) {
+    font-size: 2.2rem;
+  }
+`;
+
+/* The open question, set apart. The site is allowed to ask it. */
+const BookQuestion = styled.p`
+  margin-top: 26px;
+  padding-left: 22px;
+  border-left: 1px solid rgba(232, 163, 61, 0.35);
+  color: var(--ember);
+  line-height: 1.7;
+  max-width: 480px;
 `;
 
 const Genre = styled.p`
-  color: var(--accent-2);
-  letter-spacing: 0.1em;
+  color: var(--verdigris);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  margin-bottom: 26px;
+  margin-bottom: 32px;
 `;
 
 const SynopsisP = styled.p`
-  max-width: 520px;
-  color: var(--text-muted);
-  line-height: 1.7rem;
-  margin-bottom: 16px;
+  max-width: 560px;
+  color: var(--bone-dim);
+  line-height: 1.8;
+  margin-bottom: 20px;
 `;
 
-/* In-world verse: no box — an excerpt lifted from an old text. The core
-   stanza reads clearly; a lead-in and a trailing line fade at the edges as
-   if the page were torn away above and below. */
+/* The verse, set as a rubbing taken from something older than the page: the
+   stanza reads clean and the lines above and below it dissolve at the torn
+   edge. */
 const Verse = styled.blockquote`
-  max-width: 520px;
-  margin: 34px 0 12px 0;
+  max-width: 720px;
+  margin: 120px auto;
   padding: 0;
+  text-align: center;
+
+  @media (max-width: 760px) {
+    margin: 80px auto;
+  }
 `;
 
 const VerseLine = styled.p`
   margin: 0;
-  font-style: italic;
-  line-height: 1.9rem;
-  letter-spacing: 0.02em;
-  color: var(--text-muted);
+  font-size: 1.9rem;
+  font-weight: 400;
+  line-height: 1.85;
+  color: var(--bone);
+  text-shadow: 0 0 40px rgba(232, 163, 61, 0.18);
+
+  @media (max-width: 760px) {
+    font-size: 1.35rem;
+    line-height: 1.7;
+  }
 `;
 
-/* Faded fragment before/after the stanza. Masked to dissolve toward the
-   torn edge of the "page" (top-left for the lead, bottom-right for the tail). */
 const VerseFade = styled.p`
-  margin: ${(props) => (props.$trailing ? "6px 0 0 0" : "0 0 6px 0")};
-  font-style: italic;
-  line-height: 1.9rem;
-  letter-spacing: 0.02em;
-  color: var(--text-muted);
-  opacity: 0.5;
+  margin: ${(props) => (props.$trailing ? "22px 0 0 0" : "0 0 22px 0")};
+  color: var(--bone-faint);
+  line-height: 1.8;
   -webkit-mask-image: ${(props) =>
     props.$trailing
-      ? "linear-gradient(105deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 92%)"
-      : "linear-gradient(285deg, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)"};
+      ? "linear-gradient(100deg, rgba(0,0,0,1) 24%, rgba(0,0,0,0) 94%)"
+      : "linear-gradient(280deg, rgba(0,0,0,1) 32%, rgba(0,0,0,0) 100%)"};
   mask-image: ${(props) =>
     props.$trailing
-      ? "linear-gradient(105deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 92%)"
-      : "linear-gradient(285deg, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)"};
+      ? "linear-gradient(100deg, rgba(0,0,0,1) 24%, rgba(0,0,0,0) 94%)"
+      : "linear-gradient(280deg, rgba(0,0,0,1) 32%, rgba(0,0,0,0) 100%)"};
 `;
 
 const StatusRow = styled.div`
   display: flex;
-  gap: 44px;
-  margin: 38px 0;
+  align-items: flex-end;
+  gap: 56px;
+  margin-top: 110px;
+  padding-top: 36px;
+  border-top: 1px solid var(--hairline);
   flex-wrap: wrap;
 `;
 
 const Stat = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 `;
 
 const StatLabel = styled.span`
-  color: var(--text-muted);
-  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
+  color: var(--bone-faint);
 `;
 
 const StatValue = styled.span`
-  color: var(--text);
+  font-size: 1.5rem;
+  color: var(--bone);
+  line-height: 1.1;
 `;
 
-const ButtonsRow = styled.div``;
+const StatAction = styled.div`
+  width: 230px;
+  margin-left: auto;
 
-const KeyArt = styled.div`
-  width: 100%;
-  height: 460px;
-  padding: 20px;
-  text-align: center;
-  background:
-    radial-gradient(circle at 50% 45%, rgba(124, 58, 237, 0.16), transparent 65%);
-  @media (max-width: 960px) {
-    height: 320px;
-  }
-  @media (max-width: 560px) {
-    height: 260px;
+  @media (max-width: 720px) {
+    margin-left: 0;
+    width: 100%;
   }
 `;

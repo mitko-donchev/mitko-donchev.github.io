@@ -11,13 +11,15 @@ export default function App() {
       <Helmet>
         <title>{SITE_TITLE}</title>
         <meta name="description" content={SITE_DESCRIPTION} />
-        <meta name="theme-color" content="#0A0A0F" />
+        <meta name="theme-color" content="#0B0E14" />
 
-        {/* Google Fonts: Orbitron (display) + Rajdhani (body) */}
+        {/* Google Fonts. Cormorant Garamond is the voice of the world —
+            high-contrast and carved, for headings and lore. Inter is the voice
+            of the interface. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Rajdhani:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
 

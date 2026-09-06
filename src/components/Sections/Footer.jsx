@@ -27,9 +27,7 @@ export default function Footer() {
             <SideCol className="flexNullCenter">
               <Link className="flexCenter animate pointer" to="home" smooth={true} offset={-80}>
                 <LogoImg />
-                <h1 className="font15 extraBold whiteColor" style={{ marginLeft: "15px" }}>
-                  Epic Millennium
-                </h1>
+                <FooterMark className="displayFont">Epic Millennium</FooterMark>
               </Link>
             </SideCol>
 
@@ -96,8 +94,16 @@ export default function Footer() {
   );
 }
 
-const Wrapper = styled.div`
+const Wrapper = styled.footer`
   width: 100%;
+  padding-bottom: 20px;
+`;
+
+const FooterMark = styled.span`
+  margin-left: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--bone);
 `;
 /* 1fr | auto | 1fr grid: the equal outer rails guarantee the middle
    column is centered on the page regardless of the side content widths. */
@@ -124,6 +130,7 @@ const MiddleCol = styled.div`
 `;
 const StyleP = styled.p`
   margin: 0;
+  color: var(--bone-faint);
   @media (max-width: 550px) {
     margin: 0 0 12px 0;
     text-align: center;
