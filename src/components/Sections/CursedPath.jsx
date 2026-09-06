@@ -432,7 +432,9 @@ const MapFrame = styled.div`
     mask-image: linear-gradient(90deg, transparent 0, #000 18px,
       #000 calc(100% - 18px), transparent 100%);
 
-    ::-webkit-scrollbar {
+    /* &, or stylis makes this a descendant selector and it hides the
+       scrollbars of the children instead of this element's own. */
+    &::-webkit-scrollbar {
       display: none;
     }
   }
