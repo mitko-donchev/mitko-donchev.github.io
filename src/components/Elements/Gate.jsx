@@ -46,6 +46,10 @@ const SWING = 78;
 
 const DOOR = { top: 356, bottom: GROUND, width: 190, left: 310, right: 690 };
 
+/* One decimal is well under half a device pixel at any scale this reaches, and
+   it keeps the path strings short enough to be worth rebuilding every frame. */
+const round = (value) => Math.round(value * 10) / 10;
+
 /* A point on a door leaf, in leaf coordinates: t runs 0 (hinge) to 1 (free
    edge), h runs 0 (top) to 1 (ground). The leaf swings inward, so t also
    carries the point away from the viewer — project it toward the horizon by
@@ -59,8 +63,6 @@ function doorPoint(side, t, h, radians) {
 
   return `${round(CENTRE + (hinge + reach - CENTRE) * scale)},${round(HORIZON + (y - HORIZON) * scale)}`;
 }
-
-const round = (value) => Math.round(value * 10) / 10;
 
 /* Ledged and braced, the way a village builds a door: vertical boards, two
    iron straps off the hinge, one diagonal taking the sag. */
@@ -230,464 +232,462 @@ const Gate = forwardRef(function Gate({ narrow = false }, ref) {
   }), []);
 
   return (
-    <Scene>
-      <Svg
-        ref={sceneRef}
-        viewBox={narrow ? NARROW_VIEW : WIDE_VIEW}
-        role="img"
-        aria-label={GATE_ALT}
-      >
-        <defs>
-          {/* One gradient in user space for every piece of timber, so posts,
-              beam and braces take the same light and no joint shows a seam. */}
-          <linearGradient id="gateTimber" gradientUnits="userSpaceOnUse" x1="200" y1="90" x2="800" y2="560">
-            <stop offset="0%" stopColor="#332517" />
-            <stop offset="54%" stopColor="#22190F" />
-            <stop offset="100%" stopColor="#150F09" />
+    <Svg
+      ref={sceneRef}
+      viewBox={narrow ? NARROW_VIEW : WIDE_VIEW}
+      role="img"
+      aria-label={GATE_ALT}
+    >
+      <defs>
+        {/* One gradient in user space for every piece of timber, so posts,
+            beam and braces take the same light and no joint shows a seam. */}
+        <linearGradient id="gateTimber" gradientUnits="userSpaceOnUse" x1="200" y1="90" x2="800" y2="560">
+          <stop offset="0%" stopColor="#332517" />
+          <stop offset="54%" stopColor="#22190F" />
+          <stop offset="100%" stopColor="#150F09" />
+        </linearGradient>
+
+        <linearGradient id="gateShingle" gradientUnits="userSpaceOnUse" x1="0" y1="96" x2="0" y2="168">
+          <stop offset="0%" stopColor="#1B140D" />
+          <stop offset="100%" stopColor="#2E2114" />
+        </linearGradient>
+
+        <linearGradient id="gateTimberDark" gradientUnits="userSpaceOnUse" x1="0" y1="370" x2="0" y2="560">
+          <stop offset="0%" stopColor="#1A130C" />
+          <stop offset="100%" stopColor="#080604" />
+        </linearGradient>
+
+        {/* Fades at both ends, or it reads as a rule drawn across the page
+            rather than as the ground the gate is standing in. */}
+        <linearGradient id="groundLine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1000" y2="0">
+          <stop offset="0%" stopColor="#EDE6D8" stopOpacity="0" />
+          <stop offset="34%" stopColor="#EDE6D8" stopOpacity="0.1" />
+          <stop offset="66%" stopColor="#EDE6D8" stopOpacity="0.1" />
+          <stop offset="100%" stopColor="#EDE6D8" stopOpacity="0" />
+        </linearGradient>
+
+        <linearGradient id="signBoard" gradientUnits="userSpaceOnUse" x1="0" y1="356" x2="0" y2="236">
+          <stop offset="0%" stopColor="#3C2B1C" />
+          <stop offset="55%" stopColor="#281C13" />
+          <stop offset="100%" stopColor="#1B130D" />
+        </linearGradient>
+
+        <linearGradient id="signLetter" gradientUnits="userSpaceOnUse" x1="348" y1="330" x2="652" y2="252">
+          <stop offset="0%" stopColor="#C98A2E" />
+          <stop offset="26%" stopColor="#F7CE84" />
+          <stop offset="52%" stopColor="#FBE7BC" />
+          <stop offset="74%" stopColor="#E8A33D" />
+          <stop offset="100%" stopColor="#B9741F" />
+        </linearGradient>
+
+        <linearGradient id="gateBanner" gradientUnits="userSpaceOnUse" x1="0" y1="216" x2="0" y2="398">
+          <stop offset="0%" stopColor="#1B3B33" />
+          <stop offset="100%" stopColor="#0B1A16" />
+        </linearGradient>
+
+        {/* The only light is the fire on the road, so the rim on the inner
+            faces climbs from the ground and dies before it reaches the beam. */}
+        <linearGradient id="gateRim" gradientUnits="userSpaceOnUse" x1="0" y1="560" x2="0" y2="300">
+          <stop offset="0%" stopColor="#F7CE84" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
+        </linearGradient>
+
+        <linearGradient id="gateDoor" gradientUnits="userSpaceOnUse" x1="0" y1="356" x2="0" y2="560">
+          <stop offset="0%" stopColor="#241A11" />
+          <stop offset="100%" stopColor="#100B07" />
+        </linearGradient>
+
+        {/* Centre and radius both 0.5, so the falloff reaches zero exactly at
+            the edge of the ellipse it fills. Anything shorter is clipped
+            mid-falloff, and the clip shows as a hard arc. */}
+        <radialGradient id="signGlow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stopColor="#E8A33D" stopOpacity="0.2" />
+          <stop offset="55%" stopColor="#B9741F" stopOpacity="0.06" />
+          <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
+        </radialGradient>
+
+        <radialGradient id="fireGlow">
+          <stop offset="0%" stopColor="#F7CE84" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
+        </radialGradient>
+
+        {/* The warm band is narrow and sits just above the eye-line. Spread
+            any wider and the far distance stops reading as a village at dusk
+            and starts reading as a wall someone painted tan. */}
+        <linearGradient id="villageSky" gradientUnits="userSpaceOnUse" x1="0" y1="-400" x2="0" y2="560">
+          <stop offset="0%" stopColor="#04070E" />
+          <stop offset="60%" stopColor="#090F1C" />
+          <stop offset="74%" stopColor="#141324" />
+          <stop offset="80%" stopColor="#241A12" />
+          <stop offset="84%" stopColor="#0E0A08" />
+          <stop offset="100%" stopColor="#050404" />
+        </linearGradient>
+
+        <linearGradient id="villageRoad" gradientUnits="userSpaceOnUse" x1="0" y1={HORIZON} x2="0" y2={ROAD_END}>
+          <stop offset="0%" stopColor="#241811" stopOpacity="0" />
+          <stop offset="26%" stopColor="#1B120B" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#0F0A06" />
+        </linearGradient>
+
+        <radialGradient id="villageHearth" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stopColor="#E8A33D" stopOpacity="0.22" />
+          <stop offset="52%" stopColor="#B9741F" stopOpacity="0.07" />
+          <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
+        </radialGradient>
+
+        <linearGradient id="villageMist" gradientUnits="userSpaceOnUse" x1="0" y1="336" x2="0" y2="432">
+          <stop offset="0%" stopColor="#8FA6C4" stopOpacity="0" />
+          <stop offset="46%" stopColor="#9DB2CC" stopOpacity="0.1" />
+          <stop offset="100%" stopColor="#8FA6C4" stopOpacity="0" />
+        </linearGradient>
+
+        {/* Four ramps rather than a blur. A filter inside a mask is
+            re-rasterised every time the scene changes scale, which is every
+            frame of the walk in; four gradient-filled strips cost nothing and
+            land in the same place. */}
+        {[
+          ["featherL", 0, 0, 1, 0],
+          ["featherR", 1, 0, 0, 0],
+          ["featherT", 0, 0, 0, 1],
+          ["featherB", 0, 1, 0, 0],
+        ].map(([id, x1, y1, x2, y2]) => (
+          <linearGradient key={id} id={id} x1={x1} y1={y1} x2={x2} y2={y2}>
+            <stop offset="0%" stopColor="#000" />
+            <stop offset="100%" stopColor="#fff" />
           </linearGradient>
+        ))}
 
-          <linearGradient id="gateShingle" gradientUnits="userSpaceOnUse" x1="0" y1="96" x2="0" y2="168">
-            <stop offset="0%" stopColor="#1B140D" />
-            <stop offset="100%" stopColor="#2E2114" />
-          </linearGradient>
+        {/* Opaque edge to edge across the gap, and the falloff hidden behind
+            the posts and the beam — so the view through the gate has no edge
+            of its own anywhere you can see it. The corners are left black on
+            purpose: they sit under the roof, and black leaks nothing. */}
+        <mask id="throughGate">
+          <rect x="306" y="118" width="388" height="446" fill="#fff" />
+          <rect x="252" y="118" width="54" height="446" fill="url(#featherL)" />
+          <rect x="694" y="118" width="54" height="446" fill="url(#featherR)" />
+          <rect x="306" y="74" width="388" height="44" fill="url(#featherT)" />
+          {/* Longer at the bottom, where nothing covers it: the road carries
+              on out of the gate and fades into the ground you are standing on. */}
+          <rect x="306" y="564" width="388" height="58" fill="url(#featherB)" />
+          {/* And then the gate leaves the screen, and there is nothing left
+              for the opening to be an opening in. Lifting the mask at that
+              point is invisible; leaving it on keeps two soft vertical edges
+              tracking across the village all the way out. */}
+          <rect ref={openingRef} x="-3000" y="-3000" width="9000" height="9000" fill="#fff" opacity="0" />
+        </mask>
+      </defs>
 
-          <linearGradient id="gateTimberDark" gradientUnits="userSpaceOnUse" x1="0" y1="370" x2="0" y2="560">
-            <stop offset="0%" stopColor="#1A130C" />
-            <stop offset="100%" stopColor="#080604" />
-          </linearGradient>
+      {/* --- palisade, behind everything -------------------------------- */}
+      {/* Barely edged: a lit outline turns stakes into a picket fence. */}
+      <g stroke="rgba(237,230,216,0.05)" strokeWidth="1" fill="url(#gateTimberDark)">
+        {PALISADE.map((stake) => (
+          <path
+            key={stake.x}
+            opacity={Math.max(0.18, stake.fade)}
+            d={`M${stake.x},${GROUND} L${stake.x},${stake.top + 14}
+                L${stake.x + 9},${stake.top} L${stake.x + 18},${stake.top + 14}
+                L${stake.x + 18},${GROUND} Z`}
+          />
+        ))}
+      </g>
+      {/* --- the village, seen only through the gap ---------------------- */}
+      <g mask="url(#throughGate)">
+        <g ref={villageRef} opacity="0.16">
+          {/* Drawn far past the opening on every side: the gap triples on
+              the way in, and blank canvas at the edge of the mask would end
+              the illusion in one frame. */}
+          <rect x="-700" y="-400" width="2400" height="1400" fill="url(#villageSky)" />
 
-          {/* Fades at both ends, or it reads as a rule drawn across the page
-              rather than as the ground the gate is standing in. */}
-          <linearGradient id="groundLine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1000" y2="0">
-            <stop offset="0%" stopColor="#EDE6D8" stopOpacity="0" />
-            <stop offset="34%" stopColor="#EDE6D8" stopOpacity="0.1" />
-            <stop offset="66%" stopColor="#EDE6D8" stopOpacity="0.1" />
-            <stop offset="100%" stopColor="#EDE6D8" stopOpacity="0" />
-          </linearGradient>
+          {/* Far range, and something with towers on the last ridge that the
+              site never mentions again. */}
+          <path
+            d="M-700,372 L-700,318 C-400,300 -120,286 120,262 C300,244 372,308 470,300
+               C560,292 606,244 674,252 C740,260 776,300 842,292
+               C1000,272 1300,300 1700,286 L1700,372 Z"
+            fill="#080D18"
+          />
+          <g fill="#070B14">
+            <path d="M726,292 L726,250 L734,250 L734,262 L748,262 L748,242 L756,242 L756,262 L770,262 L770,254 L778,254 L778,296 Z" />
+            <path d="M748,242 L752,224 L756,242 Z" />
+          </g>
 
-          <linearGradient id="signBoard" gradientUnits="userSpaceOnUse" x1="0" y1="356" x2="0" y2="236">
-            <stop offset="0%" stopColor="#3C2B1C" />
-            <stop offset="55%" stopColor="#281C13" />
-            <stop offset="100%" stopColor="#1B130D" />
-          </linearGradient>
+          {/* Near ridge and treeline. */}
+          <path
+            d="M-700,372 L-700,352 C-300,346 -40,338 180,344 C330,348 372,314 452,322
+               C532,330 566,352 640,346 C716,340 760,316 830,324
+               C1100,352 1400,344 1700,338 L1700,372 Z"
+            fill="#050810"
+          />
+          <ellipse cx={CENTRE} cy="440" rx="330" ry="170" fill="url(#villageHearth)" />
+          <rect x="-700" y="336" width="2400" height="96" fill="url(#villageMist)" />
 
-          <linearGradient id="signLetter" gradientUnits="userSpaceOnUse" x1="348" y1="330" x2="652" y2="252">
-            <stop offset="0%" stopColor="#C98A2E" />
-            <stop offset="26%" stopColor="#F7CE84" />
-            <stop offset="52%" stopColor="#FBE7BC" />
-            <stop offset="74%" stopColor="#E8A33D" />
-            <stop offset="100%" stopColor="#B9741F" />
-          </linearGradient>
+          {/* The road, running out of the gate toward you. */}
+          <path
+            d={`M${roadEdge(HORIZON, -8)},${HORIZON} L${roadEdge(ROAD_END, -300)},${ROAD_END}
+                L${roadEdge(ROAD_END, 300)},${ROAD_END} L${roadEdge(HORIZON, 8)},${HORIZON} Z`}
+            fill="url(#villageRoad)"
+          />
+          <g stroke="rgba(247,206,132,0.07)" strokeWidth="1" fill="none">
+            <path d={`M${roadEdge(HORIZON, -3)},${HORIZON} L${roadEdge(ROAD_END, -120)},${ROAD_END}`} />
+            <path d={`M${roadEdge(HORIZON, 3)},${HORIZON} L${roadEdge(ROAD_END, 120)},${ROAD_END}`} />
+          </g>
+          {/* Rain, some time before you got here. */}
+          <g fill="rgba(247,206,132,0.08)">
+            <ellipse cx="476" cy="470" rx="12" ry="2.6" />
+            <ellipse cx="534" cy="512" rx="17" ry="3.4" />
+            <ellipse cx="454" cy="552" rx="22" ry="4.2" />
+          </g>
 
-          <linearGradient id="gateBanner" gradientUnits="userSpaceOnUse" x1="0" y1="216" x2="0" y2="398">
-            <stop offset="0%" stopColor="#1B3B33" />
-            <stop offset="100%" stopColor="#0B1A16" />
-          </linearGradient>
-
-          {/* The only light is the fire on the road, so the rim on the inner
-              faces climbs from the ground and dies before it reaches the beam. */}
-          <linearGradient id="gateRim" gradientUnits="userSpaceOnUse" x1="0" y1="560" x2="0" y2="300">
-            <stop offset="0%" stopColor="#F7CE84" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
-          </linearGradient>
-
-          <linearGradient id="gateDoor" gradientUnits="userSpaceOnUse" x1="0" y1="356" x2="0" y2="560">
-            <stop offset="0%" stopColor="#241A11" />
-            <stop offset="100%" stopColor="#100B07" />
-          </linearGradient>
-
-          {/* Centre and radius both 0.5, so the falloff reaches zero exactly at
-              the edge of the ellipse it fills. Anything shorter is clipped
-              mid-falloff, and the clip shows as a hard arc. */}
-          <radialGradient id="signGlow" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%" stopColor="#E8A33D" stopOpacity="0.2" />
-            <stop offset="55%" stopColor="#B9741F" stopOpacity="0.06" />
-            <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
-          </radialGradient>
-
-          <radialGradient id="fireGlow">
-            <stop offset="0%" stopColor="#F7CE84" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
-          </radialGradient>
-
-          {/* The warm band is narrow and sits just above the eye-line. Spread
-              any wider and the far distance stops reading as a village at dusk
-              and starts reading as a wall someone painted tan. */}
-          <linearGradient id="villageSky" gradientUnits="userSpaceOnUse" x1="0" y1="-400" x2="0" y2="560">
-            <stop offset="0%" stopColor="#04070E" />
-            <stop offset="60%" stopColor="#090F1C" />
-            <stop offset="74%" stopColor="#141324" />
-            <stop offset="80%" stopColor="#241A12" />
-            <stop offset="84%" stopColor="#0E0A08" />
-            <stop offset="100%" stopColor="#050404" />
-          </linearGradient>
-
-          <linearGradient id="villageRoad" gradientUnits="userSpaceOnUse" x1="0" y1={HORIZON} x2="0" y2={ROAD_END}>
-            <stop offset="0%" stopColor="#241811" stopOpacity="0" />
-            <stop offset="26%" stopColor="#1B120B" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#0F0A06" />
-          </linearGradient>
-
-          <radialGradient id="villageHearth" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%" stopColor="#E8A33D" stopOpacity="0.22" />
-            <stop offset="52%" stopColor="#B9741F" stopOpacity="0.07" />
-            <stop offset="100%" stopColor="#E8A33D" stopOpacity="0" />
-          </radialGradient>
-
-          <linearGradient id="villageMist" gradientUnits="userSpaceOnUse" x1="0" y1="336" x2="0" y2="432">
-            <stop offset="0%" stopColor="#8FA6C4" stopOpacity="0" />
-            <stop offset="46%" stopColor="#9DB2CC" stopOpacity="0.1" />
-            <stop offset="100%" stopColor="#8FA6C4" stopOpacity="0" />
-          </linearGradient>
-
-          {/* Four ramps rather than a blur. A filter inside a mask is
-              re-rasterised every time the scene changes scale, which is every
-              frame of the walk in; four gradient-filled strips cost nothing and
-              land in the same place. */}
-          {[
-            ["featherL", 0, 0, 1, 0],
-            ["featherR", 1, 0, 0, 0],
-            ["featherT", 0, 0, 0, 1],
-            ["featherB", 0, 1, 0, 0],
-          ].map(([id, x1, y1, x2, y2]) => (
-            <linearGradient key={id} id={id} x1={x1} y1={y1} x2={x2} y2={y2}>
-              <stop offset="0%" stopColor="#000" />
-              <stop offset="100%" stopColor="#fff" />
-            </linearGradient>
+          {/* Further up the slope is further away, so it is dimmer: the one
+              cue that keeps six flat shapes from reading as one flat row. */}
+          {COTTAGES.map((cottage) => (
+            <g key={`${cottage.x}-${cottage.y}`} opacity={0.5 + (cottage.y - 420) / 190}>
+              <Cottage {...cottage} />
+            </g>
           ))}
 
-          {/* Opaque edge to edge across the gap, and the falloff hidden behind
-              the posts and the beam — so the view through the gate has no edge
-              of its own anywhere you can see it. The corners are left black on
-              purpose: they sit under the roof, and black leaks nothing. */}
-          <mask id="throughGate">
-            <rect x="306" y="118" width="388" height="446" fill="#fff" />
-            <rect x="252" y="118" width="54" height="446" fill="url(#featherL)" />
-            <rect x="694" y="118" width="54" height="446" fill="url(#featherR)" />
-            <rect x="306" y="74" width="388" height="44" fill="url(#featherT)" />
-            {/* Longer at the bottom, where nothing covers it: the road carries
-                on out of the gate and fades into the ground you are standing on. */}
-            <rect x="306" y="564" width="388" height="58" fill="url(#featherB)" />
-            {/* And then the gate leaves the screen, and there is nothing left
-                for the opening to be an opening in. Lifting the mask at that
-                point is invisible; leaving it on keeps two soft vertical edges
-                tracking across the village all the way out. */}
-            <rect ref={openingRef} x="-3000" y="-3000" width="9000" height="9000" fill="#fff" opacity="0" />
-          </mask>
-        </defs>
+          {/* The tower — the one thing in the village taller than a roof. */}
+          <g>
+            <path d="M440,410 L472,410 L470,338 L442,338 Z" fill="#100E16" />
+            <path d="M436,338 L456,294 L476,338 Z" fill="#08070E" />
+            <Lit x="450" y="354" width="6" height="11" $offset={1.4} />
+            <Lit x="450" y="384" width="6" height="11" $offset={3.1} />
+          </g>
 
-        {/* --- palisade, behind everything -------------------------------- */}
-        {/* Barely edged: a lit outline turns stakes into a picket fence. */}
-        <g stroke="rgba(237,230,216,0.05)" strokeWidth="1" fill="url(#gateTimberDark)">
-          {PALISADE.map((stake) => (
-            <path
-              key={stake.x}
-              opacity={Math.max(0.18, stake.fade)}
-              d={`M${stake.x},${GROUND} L${stake.x},${stake.top + 14}
-                  L${stake.x + 9},${stake.top} L${stake.x + 18},${stake.top + 14}
-                  L${stake.x + 18},${GROUND} Z`}
-            />
-          ))}
-        </g>
-        {/* --- the village, seen only through the gap ---------------------- */}
-        <g mask="url(#throughGate)">
-          <Village ref={villageRef}>
-            {/* Drawn far past the opening on every side: the gap triples on
-                the way in, and blank canvas at the edge of the mask would end
-                the illusion in one frame. */}
-            <rect x="-700" y="-400" width="2400" height="1400" fill="url(#villageSky)" />
+          {/* Somebody is still trading, this late. */}
+          <g>
+            <path d="M582,502 L648,502 L636,478 L594,478 Z" fill="#15131C" />
+            <path d="M594,478 L615,469 L636,478 Z" fill="#0D0C14" />
+            <Lit x="604" y="486" width="22" height="9" $offset={0.6} />
+          </g>
 
-            {/* Far range, and something with towers on the last ridge that the
-                site never mentions again. */}
-            <path
-              d="M-700,372 L-700,318 C-400,300 -120,286 120,262 C300,244 372,308 470,300
-                 C560,292 606,244 674,252 C740,260 776,300 842,292
-                 C1000,272 1300,300 1700,286 L1700,372 Z"
-              fill="#080D18"
-            />
-            <g fill="#070B14">
-              <path d="M726,292 L726,250 L734,250 L734,262 L748,262 L748,242 L756,242 L756,262 L770,262 L770,254 L778,254 L778,296 Z" />
-              <path d="M748,242 L752,224 L756,242 Z" />
-            </g>
-
-            {/* Near ridge and treeline. */}
-            <path
-              d="M-700,372 L-700,352 C-300,346 -40,338 180,344 C330,348 372,314 452,322
-                 C532,330 566,352 640,346 C716,340 760,316 830,324
-                 C1100,352 1400,344 1700,338 L1700,372 Z"
-              fill="#050810"
-            />
-            <ellipse cx={CENTRE} cy="440" rx="330" ry="170" fill="url(#villageHearth)" />
-            <rect x="-700" y="336" width="2400" height="96" fill="url(#villageMist)" />
-
-            {/* The road, running out of the gate toward you. */}
-            <path
-              d={`M${roadEdge(HORIZON, -8)},${HORIZON} L${roadEdge(ROAD_END, -300)},${ROAD_END}
-                  L${roadEdge(ROAD_END, 300)},${ROAD_END} L${roadEdge(HORIZON, 8)},${HORIZON} Z`}
-              fill="url(#villageRoad)"
-            />
-            <g stroke="rgba(247,206,132,0.07)" strokeWidth="1" fill="none">
-              <path d={`M${roadEdge(HORIZON, -3)},${HORIZON} L${roadEdge(ROAD_END, -120)},${ROAD_END}`} />
-              <path d={`M${roadEdge(HORIZON, 3)},${HORIZON} L${roadEdge(ROAD_END, 120)},${ROAD_END}`} />
-            </g>
-            {/* Rain, some time before you got here. */}
-            <g fill="rgba(247,206,132,0.08)">
-              <ellipse cx="476" cy="470" rx="12" ry="2.6" />
-              <ellipse cx="534" cy="512" rx="17" ry="3.4" />
-              <ellipse cx="454" cy="552" rx="22" ry="4.2" />
-            </g>
-
-            {/* Further up the slope is further away, so it is dimmer: the one
-                cue that keeps six flat shapes from reading as one flat row. */}
-            {COTTAGES.map((cottage) => (
-              <g key={`${cottage.x}-${cottage.y}`} opacity={0.5 + (cottage.y - 420) / 190}>
-                <Cottage {...cottage} />
-              </g>
+          {/* Whatever else is burning down there. */}
+          <g>
+            {ROAD_LIGHTS.map(([x, y]) => (
+              <Spark key={`${x}-${y}`} cx={x} cy={y} r="2.6" $offset={(x % 9) * 0.4} />
             ))}
+          </g>
 
-            {/* The tower — the one thing in the village taller than a roof. */}
-            <g>
-              <path d="M440,410 L472,410 L470,338 L442,338 Z" fill="#100E16" />
-              <path d="M436,338 L456,294 L476,338 Z" fill="#08070E" />
-              <Lit x="450" y="354" width="6" height="11" $offset={1.4} />
-              <Lit x="450" y="384" width="6" height="11" $offset={3.1} />
-            </g>
-
-            {/* Somebody is still trading, this late. */}
-            <g>
-              <path d="M582,502 L648,502 L636,478 L594,478 Z" fill="#15131C" />
-              <path d="M594,478 L615,469 L636,478 Z" fill="#0D0C14" />
-              <Lit x="604" y="486" width="22" height="9" $offset={0.6} />
-            </g>
-
-            {/* Whatever else is burning down there. */}
-            <g>
-              {ROAD_LIGHTS.map(([x, y]) => (
-                <Spark key={`${x}-${y}`} cx={x} cy={y} r="2.6" $offset={(x % 9) * 0.4} />
-              ))}
-            </g>
-
-            {/* The far end of the road. Something is standing there. */}
-            <VanishingPoint cx={CENTRE} cy={HORIZON} r="3" />
-          </Village>
+          {/* The far end of the road. Something is standing there. */}
+          <VanishingPoint cx={CENTRE} cy={HORIZON} r="3" />
         </g>
+      </g>
 
-        {/* --- doors ------------------------------------------------------- */}
-        {/* Before the frame, so the posts close over the hinge edge. */}
-        <Door side="left" registry={leaves} />
-        <Door side="right" registry={leaves} />
+      {/* --- doors ------------------------------------------------------- */}
+      {/* Before the frame, so the posts close over the hinge edge. */}
+      <Door side="left" registry={leaves} />
+      <Door side="right" registry={leaves} />
 
-        {/* --- frame ------------------------------------------------------- */}
-        {/* Braces first, so the posts and the beam close over their ends. */}
-        <g fill="url(#gateTimber)" stroke="rgba(6,4,3,0.7)" strokeWidth="1.2">
-          {BRACES.map((brace) => (
-            <path key={brace} d={brace} />
-          ))}
-          <path d={LEFT_POST} />
-          <path d={RIGHT_POST} />
-        </g>
+      {/* --- frame ------------------------------------------------------- */}
+      {/* Braces first, so the posts and the beam close over their ends. */}
+      <g fill="url(#gateTimber)" stroke="rgba(6,4,3,0.7)" strokeWidth="1.2">
+        {BRACES.map((brace) => (
+          <path key={brace} d={brace} />
+        ))}
+        <path d={LEFT_POST} />
+        <path d={RIGHT_POST} />
+      </g>
 
-        {/* --- roof -------------------------------------------------------- */}
-        <g fill="url(#gateShingle)" stroke="rgba(5,4,2,0.55)" strokeWidth="1">
-          {ROOF_COURSES.map((course) => (
-            <path key={course} d={course} />
-          ))}
-        </g>
-        <path d={SHINGLE_TICKS} fill="none" stroke="rgba(5,4,2,0.45)" strokeWidth="1" />
-        <path d="M240,92 L760,92 L760,104 L240,104 Z" fill="#1B140D" stroke="rgba(5,4,2,0.7)" strokeWidth="1" />
+      {/* --- roof -------------------------------------------------------- */}
+      <g fill="url(#gateShingle)" stroke="rgba(5,4,2,0.55)" strokeWidth="1">
+        {ROOF_COURSES.map((course) => (
+          <path key={course} d={course} />
+        ))}
+      </g>
+      <path d={SHINGLE_TICKS} fill="none" stroke="rgba(5,4,2,0.45)" strokeWidth="1" />
+      <path d="M240,92 L760,92 L760,104 L240,104 Z" fill="#1B140D" stroke="rgba(5,4,2,0.7)" strokeWidth="1" />
 
-        <g fill="url(#gateTimber)" stroke="rgba(6,4,3,0.7)" strokeWidth="1.2">
-          {FINIALS.map((finial) => (
-            <path key={finial} d={finial} />
-          ))}
-          <path d={CROSSBEAM} />
-        </g>
+      <g fill="url(#gateTimber)" stroke="rgba(6,4,3,0.7)" strokeWidth="1.2">
+        {FINIALS.map((finial) => (
+          <path key={finial} d={finial} />
+        ))}
+        <path d={CROSSBEAM} />
+      </g>
 
-        {/* Grain, dim enough to read as wood rather than as a chart. */}
-        <g stroke="rgba(237,230,216,0.045)" strokeWidth="1" fill="none">
-          <path d="M266,118 Q262,340 268,556" />
-          <path d="M286,118 Q291,336 284,556" />
-          <path d="M300,118 Q296,344 302,556" />
-          <path d="M700,118 Q696,340 702,556" />
-          <path d="M720,118 Q725,336 718,556" />
-          <path d="M734,118 Q730,344 736,556" />
-          <path d="M222,182 Q500,187 780,180" />
-          <path d="M222,198 Q500,193 780,199" />
-        </g>
+      {/* Grain, dim enough to read as wood rather than as a chart. */}
+      <g stroke="rgba(237,230,216,0.045)" strokeWidth="1" fill="none">
+        <path d="M266,118 Q262,340 268,556" />
+        <path d="M286,118 Q291,336 284,556" />
+        <path d="M300,118 Q296,344 302,556" />
+        <path d="M700,118 Q696,340 702,556" />
+        <path d="M720,118 Q725,336 718,556" />
+        <path d="M734,118 Q730,344 736,556" />
+        <path d="M222,182 Q500,187 780,180" />
+        <path d="M222,198 Q500,193 780,199" />
+      </g>
 
-        {/* Iron where a hewn frame actually needs it: over the post heads and
-            at the ends of the beam. */}
-        <g fill="#140F0B" stroke="rgba(237,230,216,0.07)" strokeWidth="0.8">
-          <rect x="250" y="322" width="60" height="12" rx="1" />
-          <rect x="690" y="322" width="60" height="12" rx="1" />
-          <rect x="250" y="528" width="60" height="12" rx="1" />
-          <rect x="690" y="528" width="60" height="12" rx="1" />
-          <rect x="216" y="170" width="12" height="36" rx="1" />
-          <rect x="772" y="170" width="12" height="36" rx="1" />
-        </g>
-        <g fill="rgba(237,230,216,0.16)">
-          {[258, 302, 698, 742].map((x) => (
-            <React.Fragment key={x}>
-              <circle cx={x} cy="328" r="1.8" />
-              <circle cx={x} cy="534" r="1.8" />
-            </React.Fragment>
-          ))}
-        </g>
-
-        {/* Rim light up the inner faces, and the underside of the braces
-            catching the same glow off the road. */}
-        <g fill="none" stroke="url(#gateRim)" strokeWidth="1.8">
-          <path d="M311,560 L311,300" />
-          <path d="M689,560 L689,300" />
-        </g>
-        <g fill="none" stroke="rgba(247,206,132,0.08)" strokeWidth="1">
-          <path d="M326,312 L420,218" />
-          <path d="M674,312 L580,218" />
-        </g>
-
-        {/* Somebody has been marking the post. Five to a gate, and more than
-            one gate's worth. */}
-        <Tally d="M262,462 L262,494 M272,462 L272,494 M282,462 L282,494 M292,462 L292,494 M258,496 L296,459" />
-
-        {/* --- banners ----------------------------------------------------- */}
-        {BANNERS.map((left, index) => (
-          <React.Fragment key={left}>
-            <path d={`M${left - 10},210 L${left + 54},210`} stroke="#1B140D" strokeWidth="6" strokeLinecap="round" />
-            {/* Written at absolute coordinates rather than under a translate:
-                a CSS transform on an SVG element replaces its transform
-                attribute outright, and the sway would eat the placement. */}
-            <Banner $origin={left + 22} $delay={index * 1300}>
-              <path
-                d={`M${left},216 L${left + 44},216 L${left + 44},398 L${left + 22},378 L${left},398 Z`}
-                fill="url(#gateBanner)"
-                stroke="rgba(6,12,10,0.7)"
-                strokeWidth="1"
-              />
-              {/* The tree the village keeps on its cloth. Nobody explains it. */}
-              <g fill="rgba(180,214,202,0.3)">
-                <circle cx={left + 22} cy="268" r="15" />
-                <circle cx={left + 11} cy="279" r="10" />
-                <circle cx={left + 33} cy="279" r="10" />
-              </g>
-              <g stroke="rgba(180,214,202,0.36)" strokeWidth="1.6" fill="none" strokeLinecap="round">
-                <path d={`M${left + 22},312 L${left + 22},276`} />
-                <path d={`M${left + 22},294 L${left + 13},285M${left + 22},300 L${left + 31},291`} />
-              </g>
-            </Banner>
+      {/* Iron where a hewn frame actually needs it: over the post heads and
+          at the ends of the beam. */}
+      <g fill="#140F0B" stroke="rgba(237,230,216,0.07)" strokeWidth="0.8">
+        <rect x="250" y="322" width="60" height="12" rx="1" />
+        <rect x="690" y="322" width="60" height="12" rx="1" />
+        <rect x="250" y="528" width="60" height="12" rx="1" />
+        <rect x="690" y="528" width="60" height="12" rx="1" />
+        <rect x="216" y="170" width="12" height="36" rx="1" />
+        <rect x="772" y="170" width="12" height="36" rx="1" />
+      </g>
+      <g fill="rgba(237,230,216,0.16)">
+        {[258, 302, 698, 742].map((x) => (
+          <React.Fragment key={x}>
+            <circle cx={x} cy="328" r="1.8" />
+            <circle cx={x} cy="534" r="1.8" />
           </React.Fragment>
         ))}
+      </g>
 
-        {/* --- sign -------------------------------------------------------- */}
-        {/* Glow before the board, so the lantern light sits behind and under it
-            rather than washing over the letters. */}
-        <ellipse cx={CENTRE} cy="292" rx="210" ry="120" fill="url(#signGlow)" />
+      {/* Rim light up the inner faces, and the underside of the braces
+          catching the same glow off the road. */}
+      <g fill="none" stroke="url(#gateRim)" strokeWidth="1.8">
+        <path d="M311,560 L311,300" />
+        <path d="M689,560 L689,300" />
+      </g>
+      <g fill="none" stroke="rgba(247,206,132,0.08)" strokeWidth="1">
+        <path d="M326,312 L420,218" />
+        <path d="M674,312 L580,218" />
+      </g>
 
-        <SignRig>
-          <g stroke="#16100B" strokeWidth="3.4" fill="none">
-            <path d="M396,204 L390,242M398,204 L404,242" />
-            <path d="M604,204 L598,242M606,204 L612,242" />
-          </g>
-          <path d={SIGN} fill="url(#signBoard)" stroke="rgba(6,4,3,0.8)" strokeWidth="1.6" />
-          <g stroke="rgba(237,230,216,0.04)" strokeWidth="1" fill="none">
-            <path d="M354,252 Q500,243 650,254" />
-            <path d="M352,322 Q500,338 654,320" />
-          </g>
+      {/* Somebody has been marking the post. Five to a gate, and more than
+          one gate's worth. */}
+      <Tally d="M262,462 L262,494 M272,462 L272,494 M282,462 L282,494 M292,462 L292,494 M258,496 L296,459" />
 
-          {/* A compass rose, cut small above the name. Four ways out of a
-              village that only has one road. */}
-          <g stroke="rgba(232,163,61,0.42)" strokeWidth="1.3" fill="none">
-            <path d="M500,250 L503,262 L515,265 L503,268 L500,280 L497,268 L485,265 L497,262 Z" />
-            <path d="M489,254 L494,259M511,254 L506,259M489,276 L494,271M511,276 L506,271" />
-          </g>
-
-          {/* Cut into the board, then the face of the cut catching the fire. */}
-          <SignCut x={CENTRE} y="325" textAnchor="middle">{GAME_NAME}</SignCut>
-          <SignFace x={CENTRE} y="322" textAnchor="middle">{GAME_NAME}</SignFace>
-        </SignRig>
-
-        {/* --- lanterns on their brackets ---------------------------------- */}
-        {[
-          { x: 208, from: 250 },
-          { x: 792, from: 750 },
-        ].map((lantern, index) => (
-          <g key={lantern.x}>
-            <circle cx={lantern.x} cy="250" r="44" fill="url(#fireGlow)" />
+      {/* --- banners ----------------------------------------------------- */}
+      {BANNERS.map((left, index) => (
+        <React.Fragment key={left}>
+          <path d={`M${left - 10},210 L${left + 54},210`} stroke="#1B140D" strokeWidth="6" strokeLinecap="round" />
+          {/* Written at absolute coordinates rather than under a translate:
+              a CSS transform on an SVG element replaces its transform
+              attribute outright, and the sway would eat the placement. */}
+          <Banner $origin={left + 22} $delay={index * 1300}>
             <path
-              d={`M${lantern.from},196 C${(lantern.from + lantern.x) / 2},186 ${lantern.x},188 ${lantern.x},212`}
-              stroke="#1B140D"
-              strokeWidth="3.4"
-              fill="none"
+              d={`M${left},216 L${left + 44},216 L${left + 44},398 L${left + 22},378 L${left},398 Z`}
+              fill="url(#gateBanner)"
+              stroke="rgba(6,12,10,0.7)"
+              strokeWidth="1"
             />
-            <Lantern $delay={index * 900} style={{ transformOrigin: `${lantern.x}px 210px` }}>
-              <path d={`M${lantern.x},210 L${lantern.x},222`} stroke="#241A12" strokeWidth="1.8" fill="none" />
-              <path d={`M${lantern.x - 13},228 L${lantern.x + 13},228 L${lantern.x + 10},266 L${lantern.x - 10},266 Z`}
-                fill="#150F0A" stroke="#33261A" strokeWidth="1.4" />
-              <path d={`M${lantern.x - 16},228 L${lantern.x + 16},228 L${lantern.x + 8},220 L${lantern.x - 8},220 Z`}
-                fill="#1E160F" stroke="#33261A" strokeWidth="1.2" />
-              <Flame $delay={index * 520}
-                d={`M${lantern.x},232 Q${lantern.x + 7},248 ${lantern.x + 4.5},258
-                    Q${lantern.x},263 ${lantern.x - 4.5},258 Q${lantern.x - 7},248 ${lantern.x},232 Z`} />
-              <FlameCore $delay={index * 520 + 210}
-                d={`M${lantern.x},240 Q${lantern.x + 3.5},250 ${lantern.x + 2},257
-                    Q${lantern.x},260 ${lantern.x - 2},257 Q${lantern.x - 3.5},250 ${lantern.x},240 Z`} />
-            </Lantern>
-          </g>
-        ))}
-
-        {/* --- what is lying about outside the gate ------------------------ */}
-        <g fill="#0F0B07" stroke="rgba(237,230,216,0.055)" strokeWidth="1">
-          <path d="M158,502 C150,516 150,542 158,556 L206,556 C214,542 214,516 206,502 Z" />
-          <path d="M96,518 L146,518 L146,558 L96,558 Z" />
-          <path d="M786,498 C778,514 778,542 786,558 L838,558 C846,542 846,514 838,498 Z" />
-        </g>
-        <g stroke="rgba(237,230,216,0.07)" strokeWidth="1.4" fill="none">
-          <path d="M152,516 L212,516M152,540 L212,540" />
-          <path d="M780,514 L844,514M780,540 L844,540" />
-          <path d="M96,532 L146,532" />
-          {/* The wheel, leaned against the fence. */}
-          <circle cx="900" cy="512" r="44" />
-          <circle cx="900" cy="512" r="12" />
-          <path d="M900,468 L900,556M856,512 L944,512M869,481 L931,543M931,481 L869,543" />
-        </g>
-
-        {/* A raven on the fence, minding its own business. */}
-        <g fill="#07070A">
-          <path d="M200,378 C190,378 184,370 186,362 C188,354 196,350 204,352 C210,354 214,360 214,366 L226,362 L216,372 C214,376 208,378 200,378 Z" />
-          <path d="M186,362 L176,358 L184,356 Z" />
-        </g>
-        <g stroke="#07070A" strokeWidth="1.6" fill="none">
-          <path d="M198,378 L196,388M206,378 L206,388" />
-        </g>
-
-        {/* --- braziers on the road ---------------------------------------- */}
-        {[336, 664].map((x, index) => (
-          <g key={x}>
-            <circle cx={x} cy="500" r="54" fill="url(#fireGlow)" />
-            <g stroke="#241A12" strokeWidth="2.6" strokeLinecap="round" fill="none">
-              <path d={`M${x - 14},${GROUND} L${x},512`} />
-              <path d={`M${x + 14},${GROUND} L${x},512`} />
-              <path d={`M${x},${GROUND} L${x},512`} />
+            {/* The tree the village keeps on its cloth. Nobody explains it. */}
+            <g fill="rgba(180,214,202,0.3)">
+              <circle cx={left + 22} cy="268" r="15" />
+              <circle cx={left + 11} cy="279" r="10" />
+              <circle cx={left + 33} cy="279" r="10" />
             </g>
-            <path d={`M${x - 18},492 L${x + 18},492 L${x + 11},518 L${x - 11},518 Z`}
-              fill="#150F0A" stroke="#33261A" strokeWidth="1.4" />
-            <Flame $delay={index * 700}
-              d={`M${x},446 Q${x + 12},472 ${x + 8},492 Q${x},502 ${x - 8},492 Q${x - 12},472 ${x},446 Z`} />
-            <FlameCore $delay={index * 700 + 260}
-              d={`M${x},468 Q${x + 5},482 ${x + 3},491 Q${x},496 ${x - 3},491 Q${x - 5},482 ${x},468 Z`} />
-          </g>
-        ))}
+            <g stroke="rgba(180,214,202,0.36)" strokeWidth="1.6" fill="none" strokeLinecap="round">
+              <path d={`M${left + 22},312 L${left + 22},276`} />
+              <path d={`M${left + 22},294 L${left + 13},285M${left + 22},300 L${left + 31},291`} />
+            </g>
+          </Banner>
+        </React.Fragment>
+      ))}
 
-        {/* Grass, and the ground it is standing in. No rect over the top: one
-            spanning the viewBox would make the svg's alpha a solid rectangle,
-            and anything filtering it would cast a rectangle instead of a gate. */}
-        <g stroke="rgba(237,230,216,0.07)" strokeWidth="1.2" fill="none" strokeLinecap="round">
-          {[54, 122, 238, 262, 742, 776, 866, 958].map((x) => (
-            <path key={x} d={`M${x},${GROUND} q3,-12 8,-17M${x + 6},${GROUND} q-2,-14 -6,-20`} />
-          ))}
+      {/* --- sign -------------------------------------------------------- */}
+      {/* Glow before the board, so the lantern light sits behind and under it
+          rather than washing over the letters. */}
+      <ellipse cx={CENTRE} cy="292" rx="210" ry="120" fill="url(#signGlow)" />
+
+      <SignRig>
+        <g stroke="#16100B" strokeWidth="3.4" fill="none">
+          <path d="M396,204 L390,242M398,204 L404,242" />
+          <path d="M604,204 L598,242M606,204 L612,242" />
         </g>
-        <line x1="0" y1={GROUND} x2="1000" y2={GROUND} stroke="url(#groundLine)" strokeWidth="1" />
-      </Svg>
-    </Scene>
+        <path d={SIGN} fill="url(#signBoard)" stroke="rgba(6,4,3,0.8)" strokeWidth="1.6" />
+        <g stroke="rgba(237,230,216,0.04)" strokeWidth="1" fill="none">
+          <path d="M354,252 Q500,243 650,254" />
+          <path d="M352,322 Q500,338 654,320" />
+        </g>
+
+        {/* A compass rose, cut small above the name. Four ways out of a
+            village that only has one road. */}
+        <g stroke="rgba(232,163,61,0.42)" strokeWidth="1.3" fill="none">
+          <path d="M500,250 L503,262 L515,265 L503,268 L500,280 L497,268 L485,265 L497,262 Z" />
+          <path d="M489,254 L494,259M511,254 L506,259M489,276 L494,271M511,276 L506,271" />
+        </g>
+
+        {/* Cut into the board, then the face of the cut catching the fire. */}
+        <SignCut x={CENTRE} y="325" textAnchor="middle">{GAME_NAME}</SignCut>
+        <SignFace x={CENTRE} y="322" textAnchor="middle">{GAME_NAME}</SignFace>
+      </SignRig>
+
+      {/* --- lanterns on their brackets ---------------------------------- */}
+      {[
+        { x: 208, from: 250 },
+        { x: 792, from: 750 },
+      ].map((lantern, index) => (
+        <g key={lantern.x}>
+          <circle cx={lantern.x} cy="250" r="44" fill="url(#fireGlow)" />
+          <path
+            d={`M${lantern.from},196 C${(lantern.from + lantern.x) / 2},186 ${lantern.x},188 ${lantern.x},212`}
+            stroke="#1B140D"
+            strokeWidth="3.4"
+            fill="none"
+          />
+          <Lantern $delay={index * 900} style={{ transformOrigin: `${lantern.x}px 210px` }}>
+            <path d={`M${lantern.x},210 L${lantern.x},222`} stroke="#241A12" strokeWidth="1.8" fill="none" />
+            <path d={`M${lantern.x - 13},228 L${lantern.x + 13},228 L${lantern.x + 10},266 L${lantern.x - 10},266 Z`}
+              fill="#150F0A" stroke="#33261A" strokeWidth="1.4" />
+            <path d={`M${lantern.x - 16},228 L${lantern.x + 16},228 L${lantern.x + 8},220 L${lantern.x - 8},220 Z`}
+              fill="#1E160F" stroke="#33261A" strokeWidth="1.2" />
+            <Flame $delay={index * 520}
+              d={`M${lantern.x},232 Q${lantern.x + 7},248 ${lantern.x + 4.5},258
+                  Q${lantern.x},263 ${lantern.x - 4.5},258 Q${lantern.x - 7},248 ${lantern.x},232 Z`} />
+            <FlameCore $delay={index * 520 + 210}
+              d={`M${lantern.x},240 Q${lantern.x + 3.5},250 ${lantern.x + 2},257
+                  Q${lantern.x},260 ${lantern.x - 2},257 Q${lantern.x - 3.5},250 ${lantern.x},240 Z`} />
+          </Lantern>
+        </g>
+      ))}
+
+      {/* --- what is lying about outside the gate ------------------------ */}
+      <g fill="#0F0B07" stroke="rgba(237,230,216,0.055)" strokeWidth="1">
+        <path d="M158,502 C150,516 150,542 158,556 L206,556 C214,542 214,516 206,502 Z" />
+        <path d="M96,518 L146,518 L146,558 L96,558 Z" />
+        <path d="M786,498 C778,514 778,542 786,558 L838,558 C846,542 846,514 838,498 Z" />
+      </g>
+      <g stroke="rgba(237,230,216,0.07)" strokeWidth="1.4" fill="none">
+        <path d="M152,516 L212,516M152,540 L212,540" />
+        <path d="M780,514 L844,514M780,540 L844,540" />
+        <path d="M96,532 L146,532" />
+        {/* The wheel, leaned against the fence. */}
+        <circle cx="900" cy="512" r="44" />
+        <circle cx="900" cy="512" r="12" />
+        <path d="M900,468 L900,556M856,512 L944,512M869,481 L931,543M931,481 L869,543" />
+      </g>
+
+      {/* A raven on the fence, minding its own business. */}
+      <g fill="#07070A">
+        <path d="M200,378 C190,378 184,370 186,362 C188,354 196,350 204,352 C210,354 214,360 214,366 L226,362 L216,372 C214,376 208,378 200,378 Z" />
+        <path d="M186,362 L176,358 L184,356 Z" />
+      </g>
+      <g stroke="#07070A" strokeWidth="1.6" fill="none">
+        <path d="M198,378 L196,388M206,378 L206,388" />
+      </g>
+
+      {/* --- braziers on the road ---------------------------------------- */}
+      {[336, 664].map((x, index) => (
+        <g key={x}>
+          <circle cx={x} cy="500" r="54" fill="url(#fireGlow)" />
+          <g stroke="#241A12" strokeWidth="2.6" strokeLinecap="round" fill="none">
+            <path d={`M${x - 14},${GROUND} L${x},512`} />
+            <path d={`M${x + 14},${GROUND} L${x},512`} />
+            <path d={`M${x},${GROUND} L${x},512`} />
+          </g>
+          <path d={`M${x - 18},492 L${x + 18},492 L${x + 11},518 L${x - 11},518 Z`}
+            fill="#150F0A" stroke="#33261A" strokeWidth="1.4" />
+          <Flame $delay={index * 700}
+            d={`M${x},446 Q${x + 12},472 ${x + 8},492 Q${x},502 ${x - 8},492 Q${x - 12},472 ${x},446 Z`} />
+          <FlameCore $delay={index * 700 + 260}
+            d={`M${x},468 Q${x + 5},482 ${x + 3},491 Q${x},496 ${x - 3},491 Q${x - 5},482 ${x},468 Z`} />
+        </g>
+      ))}
+
+      {/* Grass, and the ground it is standing in. No rect over the top: one
+          spanning the viewBox would make the svg's alpha a solid rectangle,
+          and anything filtering it would cast a rectangle instead of a gate. */}
+      <g stroke="rgba(237,230,216,0.07)" strokeWidth="1.2" fill="none" strokeLinecap="round">
+        {[54, 122, 238, 262, 742, 776, 866, 958].map((x) => (
+          <path key={x} d={`M${x},${GROUND} q3,-12 8,-17M${x + 6},${GROUND} q-2,-14 -6,-20`} />
+        ))}
+      </g>
+      <line x1="0" y1={GROUND} x2="1000" y2={GROUND} stroke="url(#groundLine)" strokeWidth="1" />
+    </Svg>
   );
 });
 
@@ -737,12 +737,6 @@ function Cottage({ x, y, w, h, smoke }) {
 
 /* --- styles --------------------------------------------------------------- */
 
-const Scene = styled.div`
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-`;
-
 /* The origin sits low, near the road rather than at the middle of the picture.
    Scaling about a point below the sign is what carries the sign up and over
    your head on the way in; scaling about the centre walks you face-first into
@@ -754,12 +748,9 @@ const Svg = styled.svg`
   height: 100%;
   display: block;
   overflow: visible;
+  pointer-events: none;
   transform-origin: 50% 70%;
   will-change: transform, opacity;
-`;
-
-const Village = styled.g`
-  opacity: 0.16;
 `;
 
 /* The name, in the display face, so the board and the wordmark elsewhere on the

@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
-import { Link } from "react-scroll";
 // Components
 import Gate from "../Elements/Gate";
 import EmberField from "../Elements/EmberField";
+import ScrollCue from "../Elements/ScrollCue";
 // Hooks
 import useMediaQuery from "../../hooks/useMediaQuery";
 import useReducedMotion from "../../hooks/useReducedMotion";
 // Config
-import { STACKED } from "../../config/breakpoints";
+import { STACK_BREAKPOINT, STACKED } from "../../config/breakpoints";
 import { GATE_KICKER, GATE_BEATS, GATE_CUE } from "../../config/links";
 
 /* The second beat of the page: you scroll, the doors open, and the site walks
@@ -63,6 +63,12 @@ const AT_REST = {
 const clamp01 = (value) => (value < 0 ? 0 : value > 1 ? 1 : value);
 const span = (value, from, to) => clamp01((value - from) / (to - from));
 const ease = (t) => t * t * (3 - 2 * t);
+
+/* Chase the pointer, and land on it. An asymptotic lerp gets close and then
+   spends several hundred frames not arriving, which is several hundred frames
+   the scene cannot tell it has nothing left to do. */
+const settle = (current, target) =>
+  (Math.abs(target - current) < 0.0004 ? target : current + (target - current) * 0.06);
 
 export default function Threshold() {
   const reduced = useReducedMotion();
@@ -119,6 +125,7 @@ export default function Threshold() {
     let pointerY = 0;
     let driftX = 0;
     let driftY = 0;
+    let painted = null;
 
     const paint = () => {
       const rect = track.getBoundingClientRect();
@@ -126,6 +133,17 @@ export default function Threshold() {
       // travel is the whole of 0..1 and the scene lands at 1 as it unpins.
       const travel = rect.height - window.innerHeight;
       const progress = travel <= 0 ? 0 : clamp01(-rect.top / travel);
+
+      /* A pinned scene sits still for as long as the reader is still, and
+         redrawing it into the same position is the most common thing it will
+         ever be asked to do. Two door leaves get re-projected and ten
+         attributes get written per frame, so it is worth one comparison to
+         find out that none of them would change. */
+      if (painted && painted.progress === progress
+        && painted.driftX === driftX && painted.driftY === driftY) {
+        return;
+      }
+      painted = { progress, driftX, driftY };
 
       const open = ease(span(progress, OPEN[0], OPEN[1]));
       const push = ease(span(progress, PUSH[0], PUSH[1]));
@@ -148,8 +166,8 @@ export default function Threshold() {
     };
 
     const tick = () => {
-      driftX += (pointerX - driftX) * 0.06;
-      driftY += (pointerY - driftY) * 0.06;
+      driftX = settle(driftX, pointerX);
+      driftY = settle(driftY, pointerY);
       paint();
       frame = window.requestAnimationFrame(tick);
     };
@@ -192,7 +210,11 @@ export default function Threshold() {
       window.removeEventListener("pointermove", onPointerMove);
       if (observer) observer.disconnect();
     };
-  }, [reduced, narrow]);
+    /* `narrow` is deliberately not a dependency. It changes the viewBox, which
+       is Gate's own business — the handle here is stable and reads the door
+       nodes fresh each frame, so tearing the loop and the observer down at a
+       breakpoint would buy nothing. */
+  }, [reduced]);
 
   return (
     <Track ref={trackRef} id="gate">
@@ -226,10 +248,7 @@ export default function Threshold() {
             </Beats>
 
             <Cue ref={cueRef}>
-              <Link to="game" smooth offset={-80} className="pointer">
-                <CueLabel>{GATE_CUE}</CueLabel>
-                <CueLine />
-              </Link>
+              <ScrollCue to="game" label={GATE_CUE} length={44} />
             </Cue>
           </Foot>
         </Copy>
@@ -246,7 +265,7 @@ const Track = styled.div`
   position: relative;
   height: 250vh;
 
-  @media (max-width: 860px) {
+  @media (max-width: ${STACK_BREAKPOINT}px) {
     height: 210vh;
   }
 
@@ -365,45 +384,5 @@ const Cue = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 10px;
-  }
-`;
-
-const CueLabel = styled.span`
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--bone-faint);
-  transition: color 0.3s var(--ease-soft);
-
-  a:hover & {
-    color: var(--ember);
-  }
-`;
-
-/* A line that keeps falling toward the road. */
-const CueLine = styled.span`
-  display: block;
-  width: 1px;
-  height: 44px;
-  background: linear-gradient(180deg, transparent, var(--ember));
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 40%;
-    background: linear-gradient(180deg, transparent, var(--ember-hot));
-    animation: cueFall 2.6s ease-in-out infinite;
-  }
-
-  @keyframes cueFall {
-    0% { transform: translateY(-100%); opacity: 0; }
-    30% { opacity: 1; }
-    100% { transform: translateY(250%); opacity: 0; }
   }
 `;

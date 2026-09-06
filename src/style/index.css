@@ -23,10 +23,16 @@ summary, time, mark, audio, video {
    and a scroll container between the viewport and a `position: sticky` element
    is what the sticky then sticks to — which pins the gate scene to a box that
    never moves and kills the whole thing. `clip` cuts the overflow without
-   creating that container. */
+   creating that container.
+
+   Both are declared. Anything that does not know `clip` drops that line and
+   keeps `hidden`, which is what it had before: the gate scene scrolls past
+   instead of pinning, and nothing else on the page notices. Dropping `hidden`
+   would have traded a degraded scene for a horizontal scrollbar. */
 html,
 body {
   width: auto !important;
+  overflow-x: hidden !important;
   overflow-x: clip !important;
 }
 
@@ -155,6 +161,7 @@ body {
   background: var(--ink);
   color: var(--bone);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
   overflow-x: clip;
   font-size: 16px;
   font-weight: 400;

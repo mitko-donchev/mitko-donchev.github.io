@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
-import { Link } from "react-scroll";
 // Components
 import FullButton from "../Buttons/FullButton";
 import WishlistButton from "../Buttons/WishlistButton";
 import EmberField from "../Elements/EmberField";
+import ScrollCue from "../Elements/ScrollCue";
 // Assets
 import LogoFull from "../../assets/img/logo-full.png";
 // Hooks
@@ -183,12 +183,9 @@ export default function Hero() {
         </Inner>
       </Content>
 
-      <ScrollCue>
-        <Link to="gate" smooth offset={-80} className="pointer" aria-label="Go to the village gate">
-          <CueLabel>The road in</CueLabel>
-          <CueLine $still={reduced} />
-        </Link>
-      </ScrollCue>
+      <CueSlot>
+        <ScrollCue to="gate" label="The road in" ariaLabel="Go to the village gate" />
+      </CueSlot>
     </Wrapper>
   );
 }
@@ -443,7 +440,7 @@ const Dot = styled.span`
   }
 `;
 
-const ScrollCue = styled.div`
+const CueSlot = styled.div`
   position: absolute;
   bottom: 34px;
   left: 50%;
@@ -465,41 +462,5 @@ const ScrollCue = styled.div`
 
   @media (max-height: 700px) {
     display: none;
-  }
-`;
-
-const CueLabel = styled.span`
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--bone-faint);
-`;
-
-/* A line that keeps falling toward the section below. */
-const CueLine = styled.span`
-  display: block;
-  width: 1px;
-  height: 54px;
-  background: linear-gradient(180deg, transparent, var(--ember));
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 100%);
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 40%;
-    background: linear-gradient(180deg, transparent, var(--ember-hot));
-    animation: ${(props) => (props.$still ? "none" : "cueFall 2.6s ease-in-out infinite")};
-  }
-
-  @keyframes cueFall {
-    0% { transform: translateY(-100%); opacity: 0; }
-    30% { opacity: 1; }
-    100% { transform: translateY(250%); opacity: 0; }
   }
 `;

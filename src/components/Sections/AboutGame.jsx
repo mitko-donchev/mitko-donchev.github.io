@@ -7,6 +7,7 @@ import CursedPath from "./CursedPath";
 import Bestiary from "./Bestiary";
 import Book from "../Elements/Book";
 // Config
+import { STACK_BREAKPOINT } from "../../config/breakpoints";
 import {
   GAME_NAME,
   GAME_GENRE,
@@ -146,7 +147,7 @@ const Synopsis = styled.div`
   gap: 4px 70px;
   margin-top: 34px;
 
-  @media (max-width: 860px) {
+  @media (max-width: ${STACK_BREAKPOINT}px) {
     grid-template-columns: 1fr;
     gap: 0;
   }
