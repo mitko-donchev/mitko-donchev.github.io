@@ -184,7 +184,7 @@ export default function Hero() {
       </Content>
 
       <ScrollCue>
-        <Link to="game" smooth offset={-80} className="pointer" aria-label="Read about the game">
+        <Link to="gate" smooth offset={-80} className="pointer" aria-label="Go to the village gate">
           <CueLabel>The road in</CueLabel>
           <CueLine $still={reduced} />
         </Link>
