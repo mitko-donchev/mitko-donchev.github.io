@@ -34,28 +34,27 @@ export default function WishlistButton({ label = CTA_WISHLIST, href = STEAM_URL 
   );
 }
 
-/* Drawn in the same thin line-work as the waypoint glyphs rather than dropped
-   in as an image, so it sits in the page's hand: the planet, the valve wheel,
-   and the thing on the end of the lever. */
+/* The official Steam mark, unaltered.
+
+   This used to be a redraw in the site's thin line-work, which was the nicer
+   idea and the wrong call twice over. It did not read — the valve wheel broke
+   the outer rim, so at 14-18px it came out as two overlapping bubbles and the
+   word STEAM in the label was doing all the work. And Valve's brand guidelines
+   ask for the logo to be used as supplied, which a hand redraw is not.
+
+   So: the real geometry, filled rather than stroked, taking `currentColor` so
+   it still sits on ink for the gold plate and on ember for the navbar. The
+   path is the shape as published; do not tidy it. */
 export function SteamMark({ size = 18 }) {
   return (
     <Mark
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
+      fill="currentColor"
       aria-hidden="true"
     >
-      {/* The planet */}
-      <circle cx="11.6" cy="12.4" r="9.9" strokeWidth="1.5" />
-      {/* The lever, drawn only where it shows between the two ends */}
-      <line x1="9.4" y1="14.6" x2="13.2" y2="10.9" strokeWidth="1.5" />
-      {/* The valve wheel — big enough to read, and it breaks the planet's rim */}
-      <circle cx="16.5" cy="7.7" r="4.5" strokeWidth="1.9" />
-      {/* And the thing on the other end */}
-      <circle cx="7.4" cy="16.6" r="3" fill="currentColor" stroke="none" />
+      <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z" />
     </Mark>
   );
 }
