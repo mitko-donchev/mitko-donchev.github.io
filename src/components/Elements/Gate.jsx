@@ -12,6 +12,10 @@ import useReducedMotion from "../../hooks/useReducedMotion";
    show through the hole.
 
    The road inside runs *toward* the viewer. You are always arriving. */
+/* Chosen to sit between the road rungs behind them (288, 321, 361, 410, 470),
+   so the eye never joins a course to a rung across the opening. */
+const COURSES = [214, 262, 306, 344, 388, 438];
+
 export default function Gate() {
   const reduced = useReducedMotion();
 
@@ -30,10 +34,21 @@ export default function Gate() {
           </linearGradient>
 
           <linearGradient id="gateStone" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#232B3C" />
-            <stop offset="52%" stopColor="#141A26" />
-            <stop offset="100%" stopColor="#0A0E16" />
+            <stop offset="0%" stopColor="#1A2130" />
+            <stop offset="52%" stopColor="#111722" />
+            <stop offset="100%" stopColor="#080B12" />
           </linearGradient>
+
+          {/* Darkens the outer rim so the arch has no hard silhouette against
+              the page — it falls off into the same dark it stands in. */}
+          <radialGradient id="gateFalloff" cx="0.5" cy="0.68" r="0.58">
+            <stop offset="45%" stopColor="#05070B" stopOpacity="0" />
+            <stop offset="100%" stopColor="#05070B" stopOpacity="0.85" />
+          </radialGradient>
+
+          <clipPath id="gateStoneShape">
+            <path d="M46,486 L46,196 A154,154 0 0 1 354,196 L354,486 Z" />
+          </clipPath>
 
           <linearGradient id="gateRim" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#5FB6A8" stopOpacity="0.5" />
@@ -106,17 +121,23 @@ export default function Gate() {
           d="M112,486 L112,206 A88,88 0 0 1 288,206 L288,486"
         />
 
-        {/* Courses in the stone — enough to read as masonry, not so many that
-            it becomes a texture. */}
-        <g stroke="rgba(237,230,216,0.1)" strokeWidth="1">
-          {[250, 300, 350, 400, 450].map((y) => (
+        {/* Courses in the stone. Dim, and broken by staggered joints — a run
+            of unbroken lines reads as a chart, not as a wall. */}
+        <g stroke="rgba(237,230,216,0.055)" strokeWidth="1">
+          {COURSES.map((y, row) => (
             <React.Fragment key={y}>
               <line x1="46" y1={y} x2="112" y2={y} />
               <line x1="288" y1={y} x2="354" y2={y} />
+              {/* Joints alternate each row, the way courses are laid. */}
+              <line x1={row % 2 ? 79 : 62} y1={y} x2={row % 2 ? 79 : 62} y2={y + 34} />
+              <line x1={row % 2 ? 321 : 338} y1={y} x2={row % 2 ? 321 : 338} y2={y + 34} />
             </React.Fragment>
           ))}
-          <line x1="46" y1="200" x2="112" y2="200" />
-          <line x1="288" y1="200" x2="354" y2="200" />
+        </g>
+
+        {/* Falloff, last so it sits over the stone and the courses. */}
+        <g clipPath="url(#gateStoneShape)">
+          <rect x="0" y="0" width="400" height="500" fill="url(#gateFalloff)" />
         </g>
 
         {/* Keystone */}
@@ -126,9 +147,10 @@ export default function Gate() {
           stroke="rgba(232,163,61,0.3)"
           strokeWidth="1"
         />
-        <Rune x="200" y="86" textAnchor="middle" $still={reduced}>
-          ᛟ
-        </Rune>
+        <Rune
+          d="M200,66 L210,76 L200,86 L190,76 Z M200,86 L192,96 M200,86 L208,96"
+          $still={reduced}
+        />
 
         {/* Ground */}
         <line x1="10" y1="486" x2="390" y2="486" stroke="rgba(237,230,216,0.1)" strokeWidth="1" />
@@ -190,10 +212,12 @@ const Shimmer = styled.rect`
   }
 `;
 
-const Rune = styled.text`
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 26px;
-  fill: var(--ember);
+const Rune = styled.path`
+  fill: none;
+  stroke: var(--ember);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   animation: ${(props) => (props.$still ? "none" : "runeGlow 5.5s ease-in-out infinite")};
 
   @keyframes runeGlow {

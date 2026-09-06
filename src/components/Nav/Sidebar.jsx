@@ -14,9 +14,9 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }) {
       <SidebarHeader className="flexSpaceCenter">
         <div className="flexNullCenter">
           <LogoIcon />
-          <h1 className="whiteColor font20 displayFont" style={{ marginLeft: "15px" }}>
+          <span className="whiteColor font20 displayFont" style={{ marginLeft: "15px" }}>
             Epic Millennium
-          </h1>
+          </span>
         </div>
         <CloseBtn onClick={() => toggleSidebar(!sidebarOpen)} className="animate pointer">
           <CloseIcon />

@@ -166,7 +166,7 @@ export default function Bestiary() {
   return (
     <Wrapper ref={ref}>
       <Head>
-        <span className="hudLabel">What walks it</span>
+        <SectionLabel className="hudLabel">What walks it</SectionLabel>
         <Intro className="font18">{BESTIARY_INTRO}</Intro>
       </Head>
 
@@ -294,6 +294,12 @@ const Wrapper = styled.div`
 const Head = styled.div`
   max-width: 620px;
   margin-bottom: 60px;
+`;
+
+/* The kicker is this section's title, so it is a heading and not a loose
+   span — otherwise the whole line-up is absent from the document outline. */
+const SectionLabel = styled.h3`
+  display: block;
 `;
 
 const Intro = styled.p`

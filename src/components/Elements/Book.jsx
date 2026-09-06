@@ -82,12 +82,21 @@ export default function Book() {
         {!reduced && inView && (
           <Nib r="2.6" fill="#F7CE84">
             <animateMotion
-              dur="4.6s"
+              dur="11s"
               repeatCount="indefinite"
               keyPoints="0;1;1"
-              keyTimes="0;0.62;1"
+              keyTimes="0;0.3;1"
               calcMode="linear"
               path={SIGNATURE}
+            />
+            {/* Off the page for the long hold, so there is no bright dot
+                parked at the end of the stroke. */}
+            <animate
+              attributeName="opacity"
+              dur="11s"
+              repeatCount="indefinite"
+              values="1;1;0;0"
+              keyTimes="0;0.3;0.34;1"
             />
           </Nib>
         )}
@@ -118,7 +127,12 @@ const Svg = styled.svg`
   filter: drop-shadow(0 36px 60px rgba(0, 0, 0, 0.6));
 `;
 
-/* Draws, holds, and fades so it can draw again — the book does not finish. */
+/* Draws, holds a long time, fades, and waits before starting again.
+
+   This used to run on a 4.6s loop. Next to a column of body copy that is
+   movement in the reader's periphery every few seconds, which pulls the eye
+   off the sentence they are on. Most of the eleven seconds is now the held
+   state — the idea survives, the distraction does not. */
 const Hand = styled.path.attrs({ pathLength: 1 })`
   fill: none;
   stroke: #8A5A1E;
@@ -133,14 +147,15 @@ const Hand = styled.path.attrs({ pathLength: 1 })`
     props.$still
       ? ""
       : props.$in
-      ? "animation: write 4.6s var(--ease-soft) infinite;"
+      ? "animation: write 11s var(--ease-soft) infinite;"
       : ""}
 
   @keyframes write {
     0% { stroke-dashoffset: 1; opacity: 1; }
-    62% { stroke-dashoffset: 0; opacity: 1; }
-    86% { stroke-dashoffset: 0; opacity: 1; }
-    100% { stroke-dashoffset: 0; opacity: 0; }
+    30% { stroke-dashoffset: 0; opacity: 1; }
+    82% { stroke-dashoffset: 0; opacity: 1; }
+    92% { stroke-dashoffset: 0; opacity: 0; }
+    100% { stroke-dashoffset: 1; opacity: 0; }
   }
 `;
 
