@@ -1,12 +1,12 @@
 import React, { useCallback, useRef } from "react";
 import styled from "styled-components";
 // Components
-import FullButton from "../Buttons/FullButton";
+import WishlistButton from "../Buttons/WishlistButton";
 import Reveal from "../Elements/Reveal";
 // Hooks
 import useReducedMotion from "../../hooks/useReducedMotion";
 // Config
-import { STEAM_URL, CTA_WISHLIST, GAME_NAME } from "../../config/links";
+import { GAME_NAME } from "../../config/links";
 
 /* Four claims, each one traceable to something that actually exists in the
    build. Nothing here describes the road's real trick — that is the game's to
@@ -14,9 +14,9 @@ import { STEAM_URL, CTA_WISHLIST, GAME_NAME } from "../../config/links";
 const FEATURES = [
   {
     icon: "book",
-    title: "A book with your name in it",
+    title: "A book you did not write",
     body:
-      "Taken off a dead man on the path. It keeps the record — every day walked, every thing killed, every name you were given by someone with no business knowing it — and a forecast nobody has explained yet.",
+      "The game is named after it, and you carry it. It keeps a record of the days and the road behind you, and it keeps something that reads like a forecast. Nobody has explained the handwriting.",
   },
   {
     icon: "bow",
@@ -73,10 +73,6 @@ const ICONS = {
 };
 
 export default function Features() {
-  const handleWishlistClick = () => {
-    window.open(STEAM_URL, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <Wrapper id="features" className="container">
       <hr className="divider" />
@@ -102,13 +98,13 @@ export default function Features() {
 
       <Reveal>
         <Teaser>
-          <TeaserTitle className="displayFont">Built by gamers. Made for gamers.</TeaserTitle>
+          <TeaserTitle className="displayFont">Follow the road from here.</TeaserTitle>
           <TeaserBody className="font18">
-            {GAME_NAME} has no date yet, and we would rather tell you that than invent one.
+            {GAME_NAME} has no date yet, and we would rather say so than invent one.
             Wishlist it and you will hear the moment the demo is real.
           </TeaserBody>
           <TeaserAction>
-            <FullButton title={CTA_WISHLIST} action={handleWishlistClick} glow />
+            <WishlistButton />
           </TeaserAction>
         </Teaser>
       </Reveal>

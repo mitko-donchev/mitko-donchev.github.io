@@ -36,14 +36,15 @@ export const STUDIO_TEAM = [
 export const GAME_NAME = "Waybound";
 // The title is the book's title, and it is meant to be read three ways at
 // once: bound for somewhere, bound to a way, and a bound book.
-export const GAME_SUBTITLE = "It knew your name before you did.";
+export const GAME_SUBTITLE = "Something out here is keeping count.";
 export const GAME_GENRE = "Action RPG · Roguelike";
 
-// Atmospheric teaser copy.
+// Atmospheric teaser copy. It sells the road and the fight. It does not tell
+// the story — see the COPY RULE below.
 export const GAME_SYNOPSIS = [
-  "You wake in the woods at night with no name and no memory of arriving. There is a path. Further along it there is a dead man, and he is carrying a bow, a hood, and a book — and when you open the book, it writes your name on the first page while you watch.",
-  "Past the treeline there is a village that is on no map you have ever seen. The people there talk to you as though you are expected. The gate stands open. There is one road out of it, and nothing at all is stopping you from taking it.",
-  "Explore a handcrafted world with fast, readable bow combat, a leap that buys you room, and runs that reshape themselves every time you fall. Part action-RPG, part roguelike — each attempt teaches you something the last one charged you for.",
+  "There is a village, and there is one road out of it. The gate stands open and nobody is guarding it. Take the road and find out what that is worth.",
+  "Fast, readable bow combat: nock, loose, and a leap that buys back the distance you just gave away. Skeletons come in pairs, the narrows give you nowhere to stand, and the thing at the far end does not flinch when you chip it.",
+  "Part action-RPG, part roguelike. Runs reshape themselves every time you fall, and each attempt teaches you something the last one charged you for.",
   "Built from the ground up in Godot with GDScript by a small team making the game we always wanted to play — in the open, with the players who care about it as much as we do.",
 ];
 
@@ -76,26 +77,31 @@ export const CTA_DEMO_BADGE = "Demo coming soon";
 export const SITE_URL = "https://www.epicmillennium.com";
 export const SITE_TITLE = "Epic Millennium — Waybound";
 export const SITE_DESCRIPTION =
-  "Waybound is an action-RPG roguelike set around a village that is on no map. Take the one road out — through woods, narrows and a skeleton camp — with fast bow combat and runs that reshape each time you fall. Built in Godot by indie studio Epic Millennium. Wishlist on Steam.";
+  "Waybound is an action-RPG roguelike built around one road out of a village — woods, narrows and a skeleton camp — with fast bow combat, a leap that buys you room, and runs that reshape every time you fall. Made in Godot by indie studio Epic Millennium. Wishlist on Steam.";
 
 // --- The Cursed Path ---------------------------------------------------------
 // The first playable arena, presented as a surveyed map. Every figure is the
 // real one from the level's design doc — walked distances, not marketing
 // numbers — so the map on the site and the arena in the build cannot drift.
 //
-// COPY RULE: this section hints, it does not explain. What the road actually
-// does is the game's first real surprise and the site must not spend it.
-// Deja vu, unease and things that do not quite add up are in bounds; saying
-// the quiet part out loud is not.
+// COPY RULE — applies to every string in this file, not just this section.
+//
+// The site sells the road, the fight and the craft. It does not tell the
+// story. No opening scene, no how-you-got-here, no what-the-book-turns-out-
+// to-be: those are the game's to spend and it only gets to spend them once.
+//
+// In bounds: mechanics we have actually built, real numbers from the design
+// docs, atmosphere, unease, deja vu, and questions left unanswered.
+// Out of bounds: anything a player would rather have found out themselves.
 
 export const BOOK_KICKER = "The book";
-export const BOOK_TITLE = "It was already writing.";
+export const BOOK_TITLE = "Bound in something that is not quite leather.";
 export const BOOK_BODY = [
-  "The dead man had a bow, a hood, and a book bound in something that was not quite leather. The bow and the hood were useful. The book was worse than useful — it was expecting you.",
-  "It keeps the record: every day, every road walked, every thing killed, every name you were given by someone who had no business knowing it. And it keeps a forecast, which is the part nobody has been able to explain.",
+  "The game is named after it. It is a real object you will be carrying, not a menu, and it keeps a record — of the days, of the road behind you, of everything on it that stopped moving.",
+  "It also keeps something that reads like a forecast. What that is for, you will find out in the order the game gives it to you.",
 ];
-// The one line that names the open question without answering it.
-export const BOOK_QUESTION = "Nobody has yet established who the dead man was.";
+// One open question, asked and left alone.
+export const BOOK_QUESTION = "Nobody has explained the handwriting.";
 
 export const PATH_TITLE = "The Cursed Path";
 export const PATH_KICKER = "Arena 01";
@@ -140,8 +146,8 @@ export const PATH_WAYPOINTS = [
     icon: "gate",
     name: "The Far Gate",
     distance: "74 m",
-    lore: "The road ends at a gate. You are almost sure you have seen its ironwork somewhere before, and you have not been here long enough to have seen anything twice. Something is standing in it.",
-    intel: ["Gate Boss · 240 HP", "Not the way out"],
+    lore: "The road ends at a gate. You are almost sure you have seen its ironwork somewhere before. Something is standing in it.",
+    intel: ["Gate Boss · 240 HP", "End of the survey"],
   },
 ];
 

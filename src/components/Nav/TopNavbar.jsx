@@ -8,6 +8,7 @@ import Backdrop from "../Elements/Backdrop";
 import LogoIcon from "../../assets/svg/Logo";
 import BurgerIcon from "../../assets/svg/BurgerIcon";
 // Config
+import { SteamMark } from "../Buttons/WishlistButton";
 import { CTA_WISHLIST, STEAM_URL } from "../../config/links";
 
 export default function TopNavbar() {
@@ -74,6 +75,7 @@ export default function TopNavbar() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <SteamMark size={14} />
                 {CTA_WISHLIST}
               </NavCTA>
             </li>
@@ -159,8 +161,10 @@ const UlWrapperRight = styled.ul`
 `;
 
 const NavCTA = styled.a`
-  display: inline-block;
-  padding: 11px 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 18px;
   font-family: 'Inter', sans-serif;
   font-size: 0.68rem;
   font-weight: 600;

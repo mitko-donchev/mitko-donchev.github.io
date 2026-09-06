@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Link } from "react-scroll";
 // Components
 import FullButton from "../Buttons/FullButton";
+import WishlistButton from "../Buttons/WishlistButton";
 import EmberField from "../Elements/EmberField";
 // Assets
 import LogoFull from "../../assets/img/logo-full.png";
@@ -10,11 +11,9 @@ import LogoFull from "../../assets/img/logo-full.png";
 import useReducedMotion from "../../hooks/useReducedMotion";
 // Config
 import {
-  STEAM_URL,
   TRAILER_URL,
   GAME_NAME,
   GAME_GENRE,
-  CTA_WISHLIST,
   CTA_TRAILER,
   CTA_DEMO_BADGE,
 } from "../../config/links";
@@ -22,7 +21,7 @@ import {
 /* The cold open, not the premise. It is stranger, it is specific, and it
    leaves the first real surprise for the game to spend. */
 const TAGLINE =
-  "You wake in the woods with no name. The dead man on the path is carrying a bow, a hood, and a book — and the book already knows what to call you.";
+  "One road out of the village, walked with a bow. It is never quite the road you walked last time.";
 
 export default function Hero() {
   const reduced = useReducedMotion();
@@ -30,7 +29,6 @@ export default function Hero() {
   const ridgeRef = useRef(null);
   const contentRef = useRef(null);
 
-  const openWishlist = () => window.open(STEAM_URL, "_blank", "noopener,noreferrer");
   const openTrailer = () => window.open(TRAILER_URL, "_blank", "noopener,noreferrer");
 
   // The trailer link is still a placeholder. A button that opens a blank tab
@@ -169,7 +167,7 @@ export default function Hero() {
 
           <Actions>
             <ActionSlot>
-              <FullButton title={CTA_WISHLIST} action={openWishlist} glow />
+              <WishlistButton />
             </ActionSlot>
             {hasTrailer && (
               <ActionSlot>

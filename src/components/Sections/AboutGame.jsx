@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 // Components
-import FullButton from "../Buttons/FullButton";
+import WishlistButton from "../Buttons/WishlistButton";
 import Reveal from "../Elements/Reveal";
 import CursedPath from "./CursedPath";
 import Bestiary from "./Bestiary";
@@ -9,7 +9,6 @@ import Gate from "../Elements/Gate";
 import Book from "../Elements/Book";
 // Config
 import {
-  STEAM_URL,
   GAME_NAME,
   GAME_GENRE,
   GAME_SUBTITLE,
@@ -25,7 +24,6 @@ import {
   GAME_DEMO,
   GAME_PLATFORM,
   GAME_ENGINE,
-  CTA_WISHLIST,
 } from "../../config/links";
 
 const STATS = [
@@ -36,10 +34,6 @@ const STATS = [
 ];
 
 export default function AboutGame() {
-  const handleWishlistClick = () => {
-    window.open(STEAM_URL, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <Wrapper id="game" className="container">
       <hr className="divider" />
@@ -129,7 +123,7 @@ export default function AboutGame() {
             </Stat>
           ))}
           <StatAction>
-            <FullButton title={CTA_WISHLIST} action={handleWishlistClick} glow />
+            <WishlistButton />
           </StatAction>
         </StatusRow>
       </Reveal>

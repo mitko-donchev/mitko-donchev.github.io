@@ -5,6 +5,7 @@ import { Link } from "react-scroll";
 import CloseIcon from "../../assets/svg/CloseIcon";
 import LogoIcon from "../../assets/svg/Logo";
 // Config
+import { SteamMark } from "../Buttons/WishlistButton";
 import { CTA_WISHLIST, STEAM_URL } from "../../config/links";
 
 export default function Sidebar({ sidebarOpen, toggleSidebar }) {
@@ -75,6 +76,7 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }) {
       <UlStyle className="Center">
         <li className="pointer">
           <SidebarCta href={STEAM_URL} target="_blank" rel="noopener noreferrer">
+            <SteamMark size={15} />
             {CTA_WISHLIST}
           </SidebarCta>
         </li>
@@ -122,7 +124,10 @@ const NavList = styled(UlStyle)`
 /* The same button the page uses, not the template's white-on-amber one —
    white on ember lands at about 2:1, which is not readable. */
 const SidebarCta = styled.a`
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   width: 100%;
   padding: 15px 18px;
   text-align: center;
