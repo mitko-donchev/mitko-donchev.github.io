@@ -10,6 +10,14 @@ import {
   TWITTER_URL,
   YOUTUBE_URL,
 } from "../../config/links";
+// Assets — GitHub profile photos, keyed by the team member's `id`.
+import MitkoImg from "../../assets/img/team-mitko.jpg";
+import DimitarImg from "../../assets/img/team-dimitar.png";
+
+const AVATARS = {
+  mitko: MitkoImg,
+  dimitar: DimitarImg,
+};
 
 const SOCIALS = [
   { href: DISCORD_URL, label: "Discord", aria: "Join our Discord", Icon: DiscordIcon },
@@ -32,9 +40,18 @@ export default function Studio() {
       <TeamSection className="textCenter">
         <p className="font15" style={{ color: "var(--text-muted)" }}>{STUDIO_TEAM_BLURB}</p>
         <TeamRow className="flexCenter">
-          {STUDIO_TEAM.map(({ name, role }) => (
-            <TeamMember key={name} className="flexCenter flexColumn">
-              <Avatar aria-hidden="true" />
+          {STUDIO_TEAM.map(({ id, name, role, github }) => (
+            <TeamMember
+              key={name}
+              className="flexCenter flexColumn animate"
+              href={github}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${name} on GitHub`}
+            >
+              <Avatar>
+                <AvatarImg src={AVATARS[id]} alt="" loading="lazy" />
+              </Avatar>
               <NameLabel className="font15 semiBold">{name}</NameLabel>
               <RoleLabel className="font13">{role}</RoleLabel>
             </TeamMember>
@@ -114,19 +131,34 @@ const TeamRow = styled.div`
   flex-wrap: wrap;
 `;
 
-const TeamMember = styled.div`
+/* Whole member card links to the person's GitHub profile. */
+const TeamMember = styled.a`
   gap: 12px;
+  text-decoration: none;
+  color: inherit !important;
+  :hover img {
+    transform: scale(1.06);
+  }
 `;
 
-/* Frameless avatar: a soft gradient orb with a glow ring, no hard box. */
+/* Frameless avatar: the photo inside a soft gradient orb, no hard box. */
 const Avatar = styled.div`
   width: 76px;
   height: 76px;
   border-radius: 50%;
+  overflow: hidden;
   background:
     radial-gradient(circle at 35% 30%, rgba(34, 211, 238, 0.5), transparent 60%),
     radial-gradient(circle at 70% 75%, rgba(124, 58, 237, 0.6), transparent 62%);
   box-shadow: 0 0 24px var(--accent-glow);
+`;
+
+const AvatarImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
 `;
 
 const NameLabel = styled.span`

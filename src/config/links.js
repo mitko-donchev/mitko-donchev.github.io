@@ -16,9 +16,20 @@ export const STUDIO_TAGLINE = "Built by gamers. Made for gamers.";
 export const STUDIO_MISSION =
   "Epic Millennium is an independent studio building the games we always wanted to play. No publishers dictating the vision, no compromises — just games crafted by players, for players.";
 export const STUDIO_TEAM_BLURB = "A small, independent team.";
+// `id` keys the avatar image imported in the Studio section.
 export const STUDIO_TEAM = [
-  { name: "Dimitar Petrov", role: "Game Developer" },
-  { name: "Mitko Donchev", role: "Game Developer" },
+  {
+    id: "dimitar",
+    name: "Dimitar Petrov",
+    role: "Game Developer",
+    github: "https://github.com/dvp-petrov",
+  },
+  {
+    id: "mitko",
+    name: "Mitko Donchev",
+    role: "Game Developer",
+    github: "https://github.com/mitko-donchev",
+  },
 ];
 
 // --- Game ---
