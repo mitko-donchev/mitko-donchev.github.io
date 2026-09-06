@@ -204,7 +204,16 @@ const Wrapper = styled.section`
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 120px 0 100px 0;
+
+  /* The bottom padding has to clear the scroll cue, which is absolutely
+     positioned and so takes no space of its own — it sits from 34px to about
+     116px off the bottom. At 100px the demo badge landed on top of it on any
+     900px-tall screen, which is most laptops. */
+  padding: 120px 0 150px 0;
+
+  @media (max-height: 700px) {
+    padding: 96px 0 132px 0;
+  }
 `;
 
 const Sky = styled.div`
@@ -260,7 +269,7 @@ const Ridge = styled.div`
   mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 100%);
 
   /* Whatever is burning in the village, seen from the far side of the hill. */
-  ::before {
+  &::before {
     content: "";
     position: absolute;
     left: 10%;
@@ -474,7 +483,7 @@ const CueLine = styled.span`
   position: relative;
   overflow: hidden;
 
-  ::after {
+  &::after {
     content: "";
     position: absolute;
     left: 0;

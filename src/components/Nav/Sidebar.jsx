@@ -158,7 +158,7 @@ const SidebarCta = styled.a`
   box-shadow: 0 0 28px rgba(232, 163, 61, 0.28);
   transition: background 0.3s var(--ease-soft), box-shadow 0.3s var(--ease-soft);
 
-  :hover {
+  &:hover {
     background: var(--ember-hot);
     border-color: var(--ember-hot);
     box-shadow: 0 0 38px rgba(232, 163, 61, 0.42);

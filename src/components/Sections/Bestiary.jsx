@@ -396,8 +396,8 @@ const FigureGroup = styled.g`
       ? `drop-shadow(0 0 14px ${props.$friendly ? "rgba(95,182,168,0.55)" : "rgba(232,163,61,0.5)"})`
       : "none"};
 
-  :focus-visible path,
-  :focus-visible circle {
+  &:focus-visible path,
+  &:focus-visible circle {
     stroke: var(--ember-hot);
   }
 

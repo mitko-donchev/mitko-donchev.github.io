@@ -185,7 +185,7 @@ const NavCTA = styled.a`
   background: transparent;
   transition: 0.35s var(--ease-soft);
 
-  :hover {
+  &:hover {
     color: #20160A !important;
     background: var(--ember);
     border-color: var(--ember);

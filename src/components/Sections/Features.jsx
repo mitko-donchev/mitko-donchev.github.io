@@ -220,7 +220,7 @@ const Plate = styled.div`
   overflow: hidden;
 
   /* The light the pointer carries. */
-  ::before {
+  &::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -231,11 +231,11 @@ const Plate = styled.div`
     pointer-events: none;
   }
 
-  :hover {
+  &:hover {
     border-color: rgba(232, 163, 61, 0.28);
   }
 
-  :hover::before {
+  &:hover::before {
     opacity: 1;
   }
 

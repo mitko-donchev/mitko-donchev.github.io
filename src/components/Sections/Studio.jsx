@@ -337,7 +337,18 @@ const SocialLink = styled.a`
   text-transform: uppercase;
   transition: color 0.3s var(--ease-soft);
 
-  ::after {
+  /* Touch target. The visible link is 30px tall; a fingertip needs 44. */
+  &::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 44px;
+  }
+
+  &::after {
     content: "";
     position: absolute;
     left: 0;
@@ -350,11 +361,11 @@ const SocialLink = styled.a`
     transition: transform 0.4s var(--ease-out);
   }
 
-  :hover {
+  &:hover {
     color: var(--ember) !important;
   }
 
-  :hover::after {
+  &:hover::after {
     transform: scaleX(1);
   }
 `;

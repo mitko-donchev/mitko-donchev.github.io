@@ -73,22 +73,22 @@ const Layer = styled.div`
 const Mist = styled(Layer)`
   will-change: transform;
 
-  ::before,
-  ::after {
+  &::before,
+  &::after {
     content: "";
     position: absolute;
     inset: -20%;
     background-repeat: no-repeat;
   }
 
-  ::before {
+  &::before {
     background-image:
       radial-gradient(38% 26% at 22% 32%, rgba(95, 182, 168, 0.11), transparent 70%),
       radial-gradient(46% 30% at 74% 62%, rgba(232, 163, 61, 0.10), transparent 72%);
     animation: ${(props) => (props.$still ? "none" : "mistA 46s ease-in-out infinite alternate")};
   }
 
-  ::after {
+  &::after {
     background-image:
       radial-gradient(52% 34% at 60% 20%, rgba(76, 92, 148, 0.13), transparent 74%),
       radial-gradient(40% 28% at 30% 82%, rgba(232, 163, 61, 0.07), transparent 70%);

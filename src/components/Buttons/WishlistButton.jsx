@@ -206,13 +206,13 @@ const Plate = styled.a`
     box-shadow 0.4s var(--ease-soft),
     transform 0.35s var(--ease-out);
 
-  :focus-visible {
+  &:focus-visible {
     /* The global ring is ember, which is invisible against this. */
     outline: 2px solid var(--bone);
     outline-offset: 3px;
   }
 
-  :active {
+  &:active {
     transform: translateY(0);
     box-shadow:
       inset 0 2px 5px rgba(74, 42, 6, 0.4),
@@ -236,19 +236,19 @@ const Frame = styled.div`
   position: relative;
   width: 100%;
 
-  :hover {
+  &:hover {
     --tick: 4px;
   }
 
-  :hover ${Halo} {
+  &:hover ${Halo} {
     opacity: 0.85;
   }
 
-  :hover ${Tick} {
+  &:hover ${Tick} {
     opacity: 1;
   }
 
-  :hover ${Plate} {
+  &:hover ${Plate} {
     background-position: 88% 50%;
     transform: translateY(-2px);
     box-shadow:
@@ -259,7 +259,7 @@ const Frame = styled.div`
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :hover ${Plate} {
+    &:hover ${Plate} {
       transform: none;
       background-position: 12% 50%;
     }

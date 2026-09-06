@@ -46,7 +46,7 @@ const Wrapper = styled.button`
     transform 0.35s var(--ease-out);
 
   /* A light that crosses the face on hover — the same sheen as the gate. */
-  ::before {
+  &::before {
     content: "";
     position: absolute;
     top: 0;
@@ -63,7 +63,7 @@ const Wrapper = styled.button`
     transition: left 0.62s var(--ease-out);
   }
 
-  :hover {
+  &:hover {
     transform: translateY(-1px);
     border-color: var(--ember);
     background: ${(props) => (props.$border ? "rgba(232, 163, 61, 0.07)" : "var(--ember-hot)")};
@@ -74,17 +74,17 @@ const Wrapper = styled.button`
         : "0 8px 38px rgba(232, 163, 61, 0.42)"};
   }
 
-  :hover::before {
+  &:hover::before {
     left: 115%;
   }
 
-  :active {
+  &:active {
     transform: translateY(0);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    ::before { display: none; }
-    :hover { transform: none; }
+    &::before { display: none; }
+    &:hover { transform: none; }
   }
 `;
 

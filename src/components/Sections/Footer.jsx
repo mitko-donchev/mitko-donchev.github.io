@@ -63,7 +63,7 @@ const Brand = styled(Link)`
   color: var(--bone);
   transition: color 0.3s var(--ease-soft);
 
-  :hover {
+  &:hover {
     color: var(--ember);
   }
 `;
@@ -105,6 +105,7 @@ const Arrow = styled.svg`
 `;
 
 const TopLink = styled(Link)`
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -115,11 +116,24 @@ const TopLink = styled(Link)`
   text-transform: uppercase;
   transition: color 0.3s var(--ease-soft);
 
-  :hover {
+  /* Touch target — same reason as the studio socials, the text is 17px tall.
+     Nested rules go after the plain declarations: anything written after a
+     nested block gets swallowed by it. */
+  &::before {
+    content: "";
+    position: absolute;
+    left: -10px;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 44px;
+  }
+
+  &:hover {
     color: var(--ember);
   }
 
-  :hover ${Arrow} {
+  &:hover ${Arrow} {
     transform: translateY(-3px);
   }
 `;

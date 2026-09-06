@@ -439,7 +439,7 @@ const MapFrame = styled.div`
 
   /* A pool of ember light under the road, so the map sits in the world
      rather than floating on the page. */
-  ::before {
+  &::before {
     content: "";
     position: absolute;
     left: 4%;
@@ -500,7 +500,7 @@ const Node = styled.g`
      wisp arrives. Everything that reacts to a pass reads it from here. */
   --flare: 0;
 
-  :focus-visible circle:nth-of-type(3) {
+  &:focus-visible circle:nth-of-type(3) {
     stroke: var(--ember-hot);
   }
 `;
