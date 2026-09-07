@@ -13,15 +13,13 @@ export default function App() {
         <meta name="description" content={SITE_DESCRIPTION} />
         <meta name="theme-color" content="#0B0E14" />
 
-        {/* Google Fonts. Cormorant Garamond is the voice of the world —
-            high-contrast and carved, for headings and lore. Inter is the voice
-            of the interface. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
+        {/* The fonts are NOT here. Helmet writes its tags after React mounts,
+            so a stylesheet declared in this file cannot begin downloading
+            until the whole bundle has arrived and run — measured at ~2s into
+            a cold load, with the preconnect hints arriving too late to have
+            warmed anything. Cormorant Garamond and Inter are requested from
+            public/index.html instead, where the parser finds them in the
+            first packet. Anything else render-blocking belongs there too. */}
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />

@@ -7,6 +7,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0B0E14" />
 
+    <!-- Fonts and the hero logo are requested from here, not from <Helmet>.
+
+         They used to live in App.js, which meant React had to mount before
+         the browser learned they existed: the font stylesheet request began
+         121ms after main.js finished parsing, roughly two seconds into the
+         load, and the preconnect hints landed in the same instant as the
+         stylesheet they exist to warm up — so they warmed nothing. Every one
+         of these is now discoverable in the first packet of HTML, in
+         parallel with the bundle rather than behind it.
+
+         The font list is exactly what the rendered page resolves to: walking
+         every element with text in it turns up seven faces, against the
+         thirteen that used to be requested. Dropped weight 300 (used
+         nowhere), 700, and italic at 300 and 500. If you add a weight to the
+         CSS, add it here too or the browser will synthesise it. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap"
+    />
+
+    <!-- The LCP element. Kept in public/ rather than imported through the
+         bundle so it has a stable path to preload — an imported asset gets a
+         content hash that this file cannot know. The query string must match
+         the <img> in Hero.jsx exactly or the browser fetches it twice. -->
+    <link rel="preload" as="image" href="%PUBLIC_URL%/logo-full.png?v=1" fetchpriority="high" />
+
     <!-- These live here, not only in <Helmet>, because no social scraper runs
          our JavaScript. Facebook, Discord, Slack, iMessage and X all read the
          static document, so anything they need has to be in it. Keep this in
