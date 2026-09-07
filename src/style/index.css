@@ -275,6 +275,23 @@ h1, h2, h3, h4, h5, h6 {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+
+  /* Room for the descenders to be painted in.
+
+     Cormorant's content area is 1.22em, but headings are set at 1.12 and the
+     display title at 1.0 — so on the last line the tails of g, y and p hang
+     below the element's box. Ordinary text does not care, because a glyph is
+     free to overflow its box. Gradient text does: background-clip cannot paint
+     outside the box, so the tail is not drawn short, it is simply absent, and
+     "gamers." reads as if it were guillotined.
+
+     Padding is the only lever — the box has to grow. background-size does not
+     help; the clip is the box, not the gradient's extent. No negative margin
+     to take it back either: half these headings set margin with the shorthand,
+     which would win and leave the compensation applying to some and not
+     others. The space is filled by the ink that was missing from it, so it
+     costs nothing to look at. */
+  padding-bottom: 0.16em;
 }
 
 .textGlow {
