@@ -1,10 +1,10 @@
 # Handover — Waybound marketing site
 
 Working tree: `/Users/md/development/mitko-donchev.github.io` (macOS)
-Branch: `website-improvements` → **PR #27**, open, 17 commits ahead of `origin/main`, everything pushed
+Branch: `website-improvements` → **PR #27**, open, 20 commits ahead of `origin/main`, everything pushed
 Stack: React 18 + CRA (`react-scripts` 5.0.1), styled-components **v6**, react-scroll, react-helmet
 Dev server: `npm start` (has been running on http://localhost:3001)
-Build: `CI=false npx react-scripts build` — last run compiled clean, 113.05 kB gz JS / 8.81 kB gz CSS
+Build: `CI=false npx react-scripts build` — last run compiled clean, 114.33 kB gz JS / 8.82 kB gz CSS
 
 > Note: local `main` is 3 commits behind `origin/main`. Compare against `origin/main`, not `main`.
 
@@ -12,9 +12,12 @@ Build: `CI=false npx react-scripts build` — last run compiled clean, 113.05 kB
 
 ## 1. There is no open task
 
-The last request — "verify spacing and alignment, check different screen sizes as well as
-mobile" — is finished, committed and pushed. The tree is clean. Nothing is half-done, and
-nothing is waiting on a decision except the items in §6, none of which have been assigned.
+The last request — retune the page's spacing so the end stopped reading as empty — is
+finished, committed and pushed. The tree is clean. Nothing is half-done, and nothing is
+waiting on a decision except the items in §6, none of which have been assigned.
+
+If the next request is more visual polish, read §4 first: the rhythm was just rebuilt on
+measured evidence, and the numbers look "too small" if you only read them on paper.
 
 **Start by asking the user what they want next.** Do not pick something from §6 and begin.
 
@@ -189,18 +192,35 @@ that are meant to move together.)
 three fluid steps, no breakpoint jump:
 
 ```
---space-section: clamp(58px,  9vw, 110px)   between numbered sections
---space-block:   clamp(52px, 10vw, 130px)   between blocks inside a section
---space-group:   clamp(26px,  5vw,  60px)   between a heading and what it introduces
+--space-section: clamp(40px, 4.8vw, 58px)   HALF the gap between numbered sections
+--space-block:   clamp(40px, 5.6vw, 72px)   between blocks inside a section
+--space-group:   clamp(26px, 3.6vw, 44px)   between a heading and what it introduces
+--space-rule:    clamp(24px, 3.2vw, 38px)   below a separating hairline
 ```
 
-Measured on desktop: every section is 110 top and bottom, heading→content 60, block→block 130.
-The system is doing exactly what it claims.
+On desktop that gives group 44, block 72, ruled boundary 82, seam 116. Read `--space-section`
+carefully: sections abut and all three set it as *both* `padding-top` and `padding-bottom`, so a
+seam is worth **twice** the token. That doubling is deliberate now and documented at the
+declaration; it was not before, which is how seams ended up at 220px.
 
-**One caveat worth knowing:** `--space-section` is applied as *both* `padding-top` and
-`padding-bottom` on every section, so the realised gap where two sections meet is **220px**,
-double what the variable's comment implies. It is consistent everywhere, so it reads as
-coherent rather than broken — but if the user ever says the page feels airy, that is the knob.
+**The reasoning is in `index.css` and is worth reading before changing any of these.** The short
+version: a fixed gap is not a fixed amount of air, because air is judged against what it
+separates. The gaps were constant while the blocks got shorter down the page, so the empty share
+of each section climbed — game 16%, features 25%, studio 35%. The end of the page was twice as
+empty as the middle with no value having changed. Tightening the tokens costs nothing between a
+1166px map and an 805px line-up and fixes the tail, which is where it was needed. After the
+change: game 12%, features 22%, studio 26%, and the page is 1100px shorter.
+
+Two traps that follow from this:
+
+- **Floors are higher than the vw ramp wants at phone widths, on purpose.** On a phone the blocks
+  invert — the map is 1429px tall at 390px wide — so the natural ramp value put 34px between
+  thousand-pixel blocks. Do not "fix" the floors to match the ceilings' ratio.
+- **A ruled boundary is not a block gap plus a rule.** Six blocks across four sections close
+  themselves with `margin-top / padding-top / border-top`. The padding below the rule used to be
+  a literal, and a different one each time (30, 34, 36, 46×3), stacked on top of a full block
+  step — 118px in the studio. It is now `--space-group` above and `--space-rule` below. The rule
+  does the dividing, so the whitespace does not have to.
 
 ### Note: the map and bestiary no longer scroll sideways
 
@@ -264,13 +284,14 @@ Surfaced to the user; each is waiting on their word. Ask before starting any of 
 1. **The `.font11`–`.font60` ladder** in `src/style/index.css` is the last stepped type scale,
    still snapping at 860 while everything around it eases via `clamp()`. Flagged repeatedly,
    never assigned.
-2. **PR #27's title and body** still read "Website improvements" with an empty description,
-   from before any of this work. Offered a rewrite; no answer yet.
-3. **14 dependabot vulnerabilities** on the default branch (12 high, 2 moderate). Pre-existing,
+2. **14 dependabot vulnerabilities** on the default branch (12 high, 2 moderate). Pre-existing,
    not introduced by this branch.
-4. **Section seams are 220px** on desktop — see §4. A design call, not a defect.
-5. **Map waypoint labels have an 18.7px ragged left edge** on mobile (118.0 → 136.7), because
+3. **Map waypoint labels have an 18.7px ragged left edge** on mobile (118.0 → 136.7), because
    each label hangs off a node that follows the curving road. Arguably intentional.
+4. **`.divider` is very faint at wide viewports** — a gradient that is transparent at both ends
+   and never stronger than 0.34 alpha. It reads as almost nothing at 1440px, which is part of
+   why the space around it used to look like void rather than punctuation. The spacing pass
+   left it alone deliberately; nudging its opacity is a separate aesthetic call.
 
 ---
 

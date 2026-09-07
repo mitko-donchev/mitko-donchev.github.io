@@ -81,24 +81,76 @@ button { font-family: inherit; }
   /* ------------------------------------------------------------------------
      Vertical rhythm
 
-     Three steps, fluid rather than stepped. The page used to carry the same
-     110-130px between every block at every width, which is generous on a
-     desktop and absurd on a phone — it put roughly 330px of nothing between
-     a call to action and the next heading. clamp() lets the same rule read
+     Three steps, fluid rather than stepped. clamp() lets the same rule read
      as air on a wide screen and as a gap on a narrow one, with no breakpoint
      for the layout to jump at.
 
-     --space-section  between one numbered section and the next
+     --space-section  HALF the gap between one numbered section and the next
      --space-block    between major blocks inside a section
      --space-group    between a heading and the thing it introduces
 
-     Each ramp reaches its ceiling by 1300px, so every common desktop width
-     gets exactly the value it had before. At 8.5vw the block step was still
-     climbing at 1440px and quietly cost that width 8px.
+     Read --space-section carefully: sections abut, and all three of them set
+     it as *both* padding-top and padding-bottom, so a seam is worth twice the
+     token. It used to be 110, which made every seam 220 — plus the divider's
+     own 8px and the 60 before the next label, that was 289px of near-empty
+     page between the last line of one section and the heading of the next,
+     against 130 between blocks inside a section. The end of the page was
+     mostly gap. The token is now the half-value it always implicitly was.
+
+     What the three are worth on a wide screen, and why they read as a scale:
+
+       group    44    a heading and its paragraph are one thing
+       block    72    1.6x the group — a clear break, still the same section
+       seam    116    2.6x the group — a new chapter, and it carries a rule
+
+     These are smaller than they look like they should be on paper, and the
+     reason is that a fixed gap does not read as a fixed amount of air. Air is
+     judged against what it separates. Measured down the page, the gaps were
+     constant while the blocks got shorter, so the share of each section that
+     was empty climbed the further you read:
+
+       game      avg block 510px    16% air
+       features  avg block 253px    25% air
+       studio    avg block 177px    35% air
+
+     The end of the page was twice as empty as the middle without a single
+     value changing. A big block separates itself — between a 1166px map and
+     an 805px line-up nobody can tell 92 from 72 — so the cost of tightening
+     falls almost entirely where it was needed. Do not "restore" these to
+     rounder numbers without re-measuring that table.
+
+     Each ramp still reaches its ceiling by ~1300px, so every common desktop
+     width gets the ceiling value rather than a fraction of it.
+
+     The floors sit higher than the vw term wants at phone widths, and on
+     purpose. The argument above is about air measured against the block it
+     separates — and on a phone the blocks invert, because the same content
+     reflows into a single tall column. The map is 1429px tall at 390px wide.
+     Letting the ramp run to its natural value there put 34px between blocks
+     a thousand pixels tall, which is not tight, it is missing.
      ------------------------------------------------------------------------ */
-  --space-section: clamp(58px, 9vw, 110px);
-  --space-block: clamp(52px, 10vw, 130px);
-  --space-group: clamp(26px, 5vw, 60px);
+  --space-section: clamp(40px, 4.8vw, 58px);
+  --space-block: clamp(40px, 5.6vw, 72px);
+  --space-group: clamp(26px, 3.6vw, 44px);
+
+  /* ------------------------------------------------------------------------
+     Air below a separating hairline.
+
+     Six blocks across four sections close themselves with
+     `margin-top / padding-top / border-top` — a rule with air either side.
+     The air below it was a literal every time, and a different literal each
+     time: 30, 34, 36, and 46 three times. Worse, it stacked on top of a full
+     block step above, so a ruled boundary in the studio was 72 + 46 = 118px
+     between blocks that are themselves only 177px tall. That is most of why
+     the end of the page read as empty.
+
+     The rule is what does the dividing, so the whitespace does not have to.
+     A ruled boundary is now a group step above and this below — 82px, which
+     still sits above the plain 72px block step, so the hierarchy holds and
+     the emphasis comes from the line rather than from the void. Slightly
+     more above than below, so the rule reads as belonging to what follows.
+     ------------------------------------------------------------------------ */
+  --space-rule: clamp(24px, 3.2vw, 38px);
 
   /* ------------------------------------------------------------------------
      Type scale

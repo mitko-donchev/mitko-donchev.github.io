@@ -178,8 +178,8 @@ const Creed = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 46px;
-  margin-top: var(--space-block);
-  padding-top: 46px;
+  margin-top: var(--space-group);
+  padding-top: var(--space-rule);
   border-top: 1px solid var(--hairline);
 
   @media (max-width: ${STACK_BREAKPOINT}px) {
@@ -218,8 +218,8 @@ const TenetBody = styled.p`
 `;
 
 const Team = styled.div`
-  margin-top: var(--space-block);
-  padding-top: 46px;
+  margin-top: var(--space-group);
+  padding-top: var(--space-rule);
   border-top: 1px solid var(--hairline);
   text-align: center;
 `;
@@ -315,8 +315,8 @@ const SocialRow = styled.div`
   display: flex;
   justify-content: center;
   gap: 44px;
-  margin-top: var(--space-block);
-  padding-top: 46px;
+  margin-top: var(--space-group);
+  padding-top: var(--space-rule);
   border-top: 1px solid var(--hairline);
   flex-wrap: wrap;
 `;

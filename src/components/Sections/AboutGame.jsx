@@ -270,8 +270,8 @@ const StatusRow = styled.div`
   display: flex;
   align-items: flex-end;
   gap: 56px;
-  margin-top: var(--space-block);
-  padding-top: 36px;
+  margin-top: var(--space-group);
+  padding-top: var(--space-rule);
   border-top: 1px solid var(--hairline);
   flex-wrap: wrap;
 `;

@@ -613,7 +613,7 @@ const Card = styled.div`
   gap: 26px;
   align-items: flex-start;
   margin-top: var(--space-group);
-  padding: 30px 0 0 0;
+  padding: var(--space-rule) 0 0 0;
   border-top: 1px solid var(--hairline);
   min-height: 178px;
 
@@ -694,7 +694,7 @@ const Facts = styled.div`
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-top: var(--space-group);
-  padding-top: 34px;
+  padding-top: var(--space-rule);
   border-top: 1px solid var(--hairline);
 
   @media (max-width: 720px) {

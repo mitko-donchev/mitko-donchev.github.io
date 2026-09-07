@@ -205,8 +205,10 @@ const Wrapper = styled.section`
   /* The bottom padding has to clear the scroll cue, which is absolutely
      positioned and so takes no space of its own — it sits from 34px to about
      116px off the bottom. At 100px the demo badge landed on top of it on any
-     900px-tall screen, which is most laptops. */
-  padding: clamp(76px, 11vw, 120px) 0 clamp(112px, 14vw, 150px) 0;
+     900px-tall screen, which is most laptops. 132 is the floor that keeps a
+     usable margin over the cue; it is not free to shrink with the rest of the
+     rhythm, which is why this is a literal and not var(--space-section). */
+  padding: clamp(76px, 11vw, 120px) 0 clamp(116px, 13vw, 132px) 0;
 
   /* Short laptops only. Without the width bound this also caught small
      phones, which then took the stepped padding instead of the clamp above -
