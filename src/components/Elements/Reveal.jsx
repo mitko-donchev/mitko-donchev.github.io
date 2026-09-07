@@ -38,10 +38,25 @@ export default function Reveal({
   );
 }
 
+/* `none`, not the zero-valued function.
+ *
+ * `filter: blur(0px)` and `transform: translate3d(0, 0, 0)` both look like
+ * "off" and are not: a filter of any value forces a filter pass, and a 3D
+ * transform of any value promotes the element to its own compositing layer.
+ * Because this component is one-shot, every element it has ever revealed kept
+ * both, for the life of the page. Counted on the live site after one scroll
+ * to the bottom: 33 elements holding a no-op filter over 2.65 million CSS
+ * pixels, which is ~10MB of layer memory at 2x and 33 filter passes a frame
+ * that could not change anything.
+ *
+ * Both properties still animate. Interpolating to `none` is defined as
+ * interpolating to the identity for that function, so the blur still eases
+ * out and the rise still lands — the layer is simply dropped at the end
+ * instead of being kept forever. */
 const Shell = styled.div`
   opacity: ${(props) => (props.$in ? 1 : 0)};
-  transform: translate3d(0, ${(props) => (props.$in ? 0 : props.$y)}px, 0);
-  filter: ${(props) => (props.$blur && !props.$in ? "blur(6px)" : "blur(0px)")};
+  transform: ${(props) => (props.$in ? "none" : `translate3d(0, ${props.$y}px, 0)`)};
+  filter: ${(props) => (props.$blur && !props.$in ? "blur(6px)" : "none")};
   transition:
     opacity 0.9s var(--ease-out) ${(props) => props.$delay}ms,
     transform 1.05s var(--ease-out) ${(props) => props.$delay}ms,

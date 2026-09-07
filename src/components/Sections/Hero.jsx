@@ -5,8 +5,6 @@ import FullButton from "../Buttons/FullButton";
 import WishlistButton from "../Buttons/WishlistButton";
 import EmberField from "../Elements/EmberField";
 import ScrollCue from "../Elements/ScrollCue";
-// Assets
-import LogoFull from "../../assets/img/logo-full.png";
 // Hooks
 import useReducedMotion from "../../hooks/useReducedMotion";
 // Config
@@ -17,6 +15,17 @@ import {
   CTA_TRAILER,
   CTA_DEMO_BADGE,
 } from "../../config/links";
+
+/* Served from public/ rather than imported, so index.html can preload it by a
+   stable path — an imported asset gets a content hash the static HTML cannot
+   know. It is the LCP element, and it used to be discovered only after the
+   bundle had mounted React, at ~2s. The query string must stay in step with
+   the preload in public/index.html or the browser fetches the file twice.
+
+   It is also no longer 822 kB. It was a 900x900 PNG rendered into a 210px
+   slot; at 480x480 it never upscales on any real device — 210 at 2x is 420,
+   158 at 3x is 474 — and weighs 173 kB. */
+const LOGO_FULL = `${process.env.PUBLIC_URL}/logo-full.png?v=1`;
 
 /* The cold open, not the premise. It is stranger, it is specific, and it
    leaves the first real surprise for the game to spend. */
@@ -196,7 +205,10 @@ export default function Hero() {
       {/* --- the lockup --- */}
       <Content ref={contentRef} className="container">
         <Inner>
-          <Brand src={LogoFull} alt="Epic Millennium" />
+          {/* width/height are the intrinsic pixels, not the display size.
+              They give the box an aspect ratio to reserve before the file
+              arrives, which is what stops the lockup jumping as it loads. */}
+          <Brand src={LOGO_FULL} alt="Epic Millennium" width="480" height="480" />
 
           <Kicker>
             <span className="hudLabel">Debut Title</span>
