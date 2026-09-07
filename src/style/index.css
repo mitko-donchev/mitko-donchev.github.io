@@ -1,637 +1,487 @@
- html,
- body,
- div,
- span,
- applet,
- object,
- iframe,
- h1,
- h2,
- h3,
- h4,
- h5,
- h6,
- p,
- blockquote,
- pre,
- a,
- abbr,
- acronym,
- address,
- big,
- cite,
- code,
- del,
- dfn,
- em,
- img,
- ins,
- kbd,
- q,
- s,
- samp,
- small,
- strike,
- strong,
- sub,
- sup,
- tt,
- var,
- b,
- u,
- i,
- center,
- dl,
- dt,
- dd,
- ol,
- ul,
- li,
- fieldset,
- form,
- label,
- legend,
- table,
- caption,
- tbody,
- tfoot,
- thead,
- tr,
- th,
- td,
- article,
- aside,
- canvas,
- details,
- embed,
- figure,
- figcaption,
- footer,
- header,
- hgroup,
- menu,
- nav,
- output,
- ruby,
- section,
- summary,
- time,
- mark,
- audio,
- video {
-   margin: 0;
-   padding: 0;
-   border: 0;
-   vertical-align: baseline;
-   box-sizing: border-box;
- }
-
- html,
- body {
-   width: auto !important;
-   overflow-x: hidden !important
- }
-
- /* HTML5 display-role reset for older browsers */
- article,
- aside,
- details,
- figcaption,
- figure,
- footer,
- header,
- hgroup,
- menu,
- nav,
- section {
-   display: block;
- }
-
- ol,
- ul {
-   list-style: none;
- }
-
- blockquote,
- q {
-   quotes: none;
- }
-
- blockquote:before,
- blockquote:after,
- q:before,
- q:after {
-   content: '';
-   content: none;
- }
-
- table {
-   border-collapse: collapse;
-   border-spacing: 0;
- }
-
- /* DESIGN TOKENS — Dark Neon / Cyber theme */
- :root {
-   --bg: #0A0A0F;
-   --bg-elevated: #14141C;
-   --bg-alt: #1B1B27;
-   --text: #F5F5FA;
-   --text-muted: #A0A0B8;
-   --accent: #7C3AED;
-   --accent-2: #22D3EE;
-   --accent-glow: rgba(124, 58, 237, 0.45);
-   --border: rgba(255, 255, 255, 0.08);
- }
-
- a {
-   text-decoration: none !important;
-   color: var(--text);
- }
-
- a:hover {
-   color: var(--accent-2);
- }
-
- input:-webkit-autofill,
- input:-webkit-autofill:hover,
- input:-webkit-autofill:focus,
- textarea:-webkit-autofill {
-   -webkit-box-shadow: 0 0 0 50px var(--bg) inset;
-   box-shadow: 0 0 0 50px var(--bg) inset;
-   -webkit-text-fill-color: var(--text);
- }
-
- body {
-   background: var(--bg);
-   color: var(--text);
-   font-family: 'Rajdhani', 'Inter', sans-serif;
-   overflow-x: hidden;
-   font-size: 16px;
-   font-weight: 400;
-   position: relative;
- }
-
- /* ONE unified ambient background for the whole page.
-    A fixed layer behind all content: deep radial glows + a faint cyber grid.
-    No per-section boxes/bands — every section sits on this single surface. */
- body::before {
-   content: "";
-   position: fixed;
-   inset: 0;
-   z-index: -2;
-   pointer-events: none;
-   background:
-     radial-gradient(900px circle at 15% 0%, rgba(124, 58, 237, 0.22), transparent 55%),
-     radial-gradient(1000px circle at 85% 20%, rgba(34, 211, 238, 0.14), transparent 55%),
-     radial-gradient(1200px circle at 50% 100%, rgba(124, 58, 237, 0.16), transparent 60%),
-     var(--bg);
- }
-
- /* Fixed cyber-grid overlay with a slow parallax drift (motion-gated below). */
- body::after {
-   content: "";
-   position: fixed;
-   inset: -80px;
-   z-index: -1;
-   pointer-events: none;
-   background-image:
-     linear-gradient(rgba(124, 58, 237, 0.05) 1px, transparent 1px),
-     linear-gradient(90deg, rgba(124, 58, 237, 0.05) 1px, transparent 1px);
-   background-size: 44px 44px;
-   -webkit-mask-image: radial-gradient(circle at 50% 40%, #000 55%, transparent 100%);
-   mask-image: radial-gradient(circle at 50% 40%, #000 55%, transparent 100%);
-   animation: gridDrift 24s linear infinite;
- }
-
- @keyframes gridDrift {
-   from { transform: translate3d(0, 0, 0); }
-   to { transform: translate3d(0, 44px, 0); }
- }
-
- /* Visible keyboard focus for all interactive elements */
- a:focus-visible,
- button:focus-visible,
- input:focus-visible,
- textarea:focus-visible,
- [tabindex]:focus-visible {
-   outline: 2px solid var(--accent-2);
-   outline-offset: 2px;
- }
-
- h1, h2, h3, h4, h5, h6 {
-   font-family: 'Orbitron', 'Rajdhani', sans-serif;
-   letter-spacing: 0.02em;
- }
-
- .displayFont {
-   font-family: 'Orbitron', 'Rajdhani', sans-serif !important;
- }
-
- .container {
-   width: 100%;
-   max-width: 1220px;
-   margin: 0 auto;
-   /* Longhand so a section's `padding-top/bottom` can't wipe the side gutters
-      (styled-components inject after this sheet, so shorthand would lose). */
-   padding-left: 30px;
-   padding-right: 30px;
- }
-
- @media only screen and (max-width: 859px) {
-   .container {
-     padding-left: 24px;
-     padding-right: 24px;
-   }
- }
-
- @media only screen and (max-width: 400px) {
-   .container {
-     padding-left: 18px;
-     padding-right: 18px;
-   }
- }
-
- .regular {
-   font-weight: 400 !important;
- }
-
- .semiBold {
-   font-weight: 600 !important;
- }
-
- .extraBold {
-   font-weight: 800 !important;
- }
-
- /* HELLPERS */
- .textCenter {
-   text-align: center
- }
-
- .animate {
-   transition: 0.3s ease;
- }
-
- .pointer {
-   cursor: pointer;
- }
-
- .relative {
-   position: relative;
- }
-
- .textCenter {
-   text-align: center;
- }
-
- .textLeft {
-   text-align: left;
- }
-
- .textRight {
-   text-align: right;
- }
-
- .x100 {
-   width: 100%;
- }
-
- .active {
-   border-bottom: 2px solid var(--accent-2);
-   color: var(--accent-2);
- }
-
- .tag {
-   padding: 5px 10px;
-   margin: 10px 0;
- }
-
- .shadow {
-   box-shadow: 0 0 11px rgba(0, 0, 0, 0.5);
-   -webkit-box-shadow: 0 0 11px rgba(0, 0, 0, 0.5);
-   -moz-box-shadow: 0 0 11px rgba(0, 0, 0, 0.5);
- }
-
- /* NEON / CYBER UTILITIES */
- .glow {
-   box-shadow: 0 0 24px var(--accent-glow);
- }
-
- .textGradient {
-   background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
-   -webkit-background-clip: text;
-   background-clip: text;
-   -webkit-text-fill-color: transparent;
-   color: transparent;
- }
-
- .neonBorder {
-   border: 1px solid var(--border);
-   box-shadow: inset 0 0 12px rgba(124, 58, 237, 0.15);
- }
-
- /* Neon text glow for headlines (futuristic display feel) */
- .textGlow {
-   text-shadow: 0 0 18px var(--accent-glow), 0 0 40px rgba(34, 211, 238, 0.25);
- }
-
- /* HUD kicker label — small, tracked-out, cyan, with a leading tick */
- .hudLabel {
-   display: inline-flex;
-   align-items: center;
-   gap: 10px;
-   color: var(--accent-2);
-   font-family: 'Orbitron', sans-serif;
-   font-size: 0.7rem;
-   letter-spacing: 0.32em;
-   text-transform: uppercase;
- }
- .hudLabel::before,
- .hudLabel::after {
-   content: "";
-   width: 26px;
-   height: 1px;
- }
- .hudLabel::before {
-   background: linear-gradient(90deg, transparent, var(--accent-2));
- }
- .hudLabel::after {
-   background: linear-gradient(90deg, var(--accent-2), transparent);
- }
-
- /* Full-width gradient hairline used to separate sections instead of boxes */
- .divider {
-   width: 100%;
-   height: 1px;
-   border: 0;
-   background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent-2) 70%, transparent);
-   opacity: 0.4;
- }
-
- /* Corner-bracket frame — a frameless HUD accent (no solid box) */
- .brackets {
-   position: relative;
- }
- .brackets::before,
- .brackets::after {
-   content: "";
-   position: absolute;
-   width: 22px;
-   height: 22px;
-   pointer-events: none;
- }
- .brackets::before {
-   top: 0;
-   left: 0;
-   border-top: 2px solid var(--accent-2);
-   border-left: 2px solid var(--accent-2);
- }
- .brackets::after {
-   bottom: 0;
-   right: 0;
-   border-bottom: 2px solid var(--accent-2);
-   border-right: 2px solid var(--accent-2);
- }
-
- /* Cyber grid background (for the hero) */
- .gridBg {
-   background-color: var(--bg);
-   background-image:
-     linear-gradient(rgba(124, 58, 237, 0.06) 1px, transparent 1px),
-     linear-gradient(90deg, rgba(124, 58, 237, 0.06) 1px, transparent 1px);
-   background-size: 40px 40px;
- }
-
- /* Optional faint scanline overlay */
- .scanlines {
-   position: relative;
- }
-
- .scanlines::after {
-   content: "";
-   position: absolute;
-   inset: 0;
-   pointer-events: none;
-   background: repeating-linear-gradient(
-     to bottom,
-     rgba(255, 255, 255, 0.03) 0px,
-     rgba(255, 255, 255, 0.03) 1px,
-     transparent 1px,
-     transparent 3px
-   );
- }
-
- /* Respect users who prefer reduced motion */
- @media (prefers-reduced-motion: reduce) {
-   .animate {
-     transition: none !important;
-   }
-
-   *,
-   *::before,
-   *::after {
-     animation-duration: 0.001ms !important;
-     animation-iteration-count: 1 !important;
-   }
- }
-
- /* FLEXBOX */
- .flex {
-   display: flex;
- }
-
- .flexSpaceCenter {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
- }
-
- .flexNullCenter {
-   display: flex;
-   align-items: center;
- }
-
- .flexColumn {
-   flex-direction: column;
- }
-
- .flexCenter {
-   display: flex;
-   justify-content: center;
-   align-items: center;
- }
-
- .flexSpaceNull {
-   display: flex;
-   justify-content: space-between;
- }
-
- /* FONT SIZES */
- .font11 {
-   font-size: 0.688rem;
- }
-
- .font12 {
-   font-size: 0.75rem;
- }
-
- .font13 {
-   font-size: 0.813rem;
- }
-
- .font14 {
-   font-size: 0.875rem;
- }
-
- .font15 {
-   font-size: 0.938rem;
- }
-
- .font18 {
-   font-size: 1.125rem;
- }
-
- .font20 {
-   font-size: 1.25rem;
- }
-
- .font25 {
-   font-size: 1.563rem;
- }
-
- .font30 {
-   font-size: 1.875rem;
- }
-
- .font40 {
-   font-size: 2.5rem;
- }
-
- .font60 {
-   font-size: 3.75rem;
-   line-height: 4.5rem;
- }
-
- @media only screen and (max-width: 859px) {
-   .font11 {
-     font-size: 0.688rem;
-   }
-
-   .font12 {
-     font-size: 0.688rem;
-   }
-
-   .font13 {
-     font-size: 0.75rem;
-   }
-
-   .font14 {
-     font-size: 0.813rem;
-   }
-
-   .font15 {
-     font-size: 0.813rem;
-   }
-
-   .font18 {
-     font-size: 0.938rem;
-   }
-
-   .font20 {
-     font-size: 1.125rem;
-   }
-
-   .font25 {
-     font-size: 1.25rem;
-   }
-
-   .font30 {
-     font-size: 1.5rem;
-   }
-
-   .font40 {
-     font-size: 1.875rem;
-   }
-
-   .font60 {
-     font-size: 2.8rem;
-   }
- }
-
- /* BORDER RADIUS */
- .radius8 {
-   border-radius: 1rem;
- }
-
- .radius6 {
-   border-radius: 0.6rem;
- }
-
- /* COLORS */
- .darkColor {
-   color: var(--text);
- }
-
- .purpleColor {
-   color: var(--accent);
- }
-
- .orangeColor {
-   color: var(--accent-2);
- }
-
- .lightColor {
-   color: var(--text-muted);
- }
-
- .coralColor {
-   color: var(--accent-2);
- }
-
- .greenColor {
-   color: #49CB86;
- }
-
- .greyColor {
-   color: var(--text-muted);
- }
-
- .whiteColor {
-   color: #fff;
- }
-
- /* BACKGROUNDS
-    The page now has ONE unified ambient background (body::before/::after).
-    Section-level bg helpers are transparent so nothing reads as a band/box.
-    Solid accents kept for the few elements that truly need fills. */
- .darkBg {
-   background-color: transparent;
- }
-
- .purpleBg {
-   background-color: var(--accent);
- }
-
- .orangeBg {
-   background-color: var(--accent-2);
- }
-
- .lightBg {
-   background-color: transparent;
- }
-
- .coralBg {
-   background-color: transparent;
- }
-
- .greenBg {
-   background-color: #49CB86;
- }
-
- .greyBg {
-   background-color: transparent;
- }
-
- .whiteBg {
-   background-color: transparent;
- }
+/* ============================================================================
+   Reset
+   ========================================================================== */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var, b, u, i, center,
+dl, dt, dd, ol, ul, li, fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, figure, figcaption,
+footer, header, hgroup, menu, nav, output, ruby, section,
+summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: auto !important;
+  overflow-x: hidden !important;
+}
+
+article, aside, details, figcaption, figure, footer,
+header, hgroup, menu, nav, section {
+  display: block;
+}
+
+ol, ul { list-style: none; }
+blockquote, q { quotes: none; }
+blockquote:before, blockquote:after,
+q:before, q:after { content: ''; content: none; }
+table { border-collapse: collapse; border-spacing: 0; }
+img { max-width: 100%; }
+button { font-family: inherit; }
+
+/* ============================================================================
+   WAYBOUND — arcane design system
+
+   The palette and type follow the game's decided art direction (medieval
+   fantasy; mysterious, magical and slightly uncanny — explicitly NOT grimdark
+   and NOT horror). Ember light is the warm invitation, verdigris the cold
+   uncanny counterweight, and the ground is a blue hour rather than a black
+   one so the page reads as dusk rather than as a void.
+   ========================================================================== */
+
+:root {
+  /* Ground */
+  --ink: #0B0E14;
+  --ink-deep: #06080D;
+  --ink-raised: #131926;
+  --ink-veil: rgba(11, 14, 20, 0.72);
+
+  /* Light */
+  --ember: #E8A33D;
+  --ember-hot: #F7CE84;
+  --ember-deep: #B9741F;
+  --verdigris: #5FB6A8;
+  --verdigris-hot: #8FD8CC;
+
+  /* Text — parchment, never pure white */
+  --bone: #EDE6D8;
+  --bone-dim: #9C9689;
+  /* 4.8:1 on --ink. The quietest tier still has to be readable text. */
+  --bone-faint: #827E73;
+
+  /* Glows + hairlines */
+  --ember-glow: rgba(232, 163, 61, 0.38);
+  --verdigris-glow: rgba(95, 182, 168, 0.32);
+  --hairline: rgba(237, 230, 216, 0.10);
+  --hairline-strong: rgba(237, 230, 216, 0.18);
+
+  /* Motion — one ease for entrances, one for interface response */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ------------------------------------------------------------------------
+     Vertical rhythm
+
+     Three steps, fluid rather than stepped. clamp() lets the same rule read
+     as air on a wide screen and as a gap on a narrow one, with no breakpoint
+     for the layout to jump at.
+
+     --space-section  HALF the gap between one numbered section and the next
+     --space-block    between major blocks inside a section
+     --space-group    between a heading and the thing it introduces
+
+     Read --space-section carefully: sections abut, and all three of them set
+     it as *both* padding-top and padding-bottom, so a seam is worth twice the
+     token. It used to be 110, which made every seam 220 — plus the divider's
+     own 8px and the 60 before the next label, that was 289px of near-empty
+     page between the last line of one section and the heading of the next,
+     against 130 between blocks inside a section. The end of the page was
+     mostly gap. The token is now the half-value it always implicitly was.
+
+     What the three are worth on a wide screen, and why they read as a scale:
+
+       group    44    a heading and its paragraph are one thing
+       block    72    1.6x the group — a clear break, still the same section
+       seam    116    2.6x the group — a new chapter, and it carries a rule
+
+     These are smaller than they look like they should be on paper, and the
+     reason is that a fixed gap does not read as a fixed amount of air. Air is
+     judged against what it separates. Measured down the page, the gaps were
+     constant while the blocks got shorter, so the share of each section that
+     was empty climbed the further you read:
+
+       game      avg block 510px    16% air
+       features  avg block 253px    25% air
+       studio    avg block 177px    35% air
+
+     The end of the page was twice as empty as the middle without a single
+     value changing. A big block separates itself — between a 1166px map and
+     an 805px line-up nobody can tell 92 from 72 — so the cost of tightening
+     falls almost entirely where it was needed. Do not "restore" these to
+     rounder numbers without re-measuring that table.
+
+     Each ramp still reaches its ceiling by ~1300px, so every common desktop
+     width gets the ceiling value rather than a fraction of it.
+
+     The floors sit higher than the vw term wants at phone widths, and on
+     purpose. The argument above is about air measured against the block it
+     separates — and on a phone the blocks invert, because the same content
+     reflows into a single tall column. The map is 1429px tall at 390px wide.
+     Letting the ramp run to its natural value there put 34px between blocks
+     a thousand pixels tall, which is not tight, it is missing.
+     ------------------------------------------------------------------------ */
+  --space-section: clamp(40px, 4.8vw, 58px);
+  --space-block: clamp(40px, 5.6vw, 72px);
+  --space-group: clamp(26px, 3.6vw, 44px);
+
+  /* ------------------------------------------------------------------------
+     Air below a separating hairline.
+
+     Six blocks across four sections close themselves with
+     `margin-top / padding-top / border-top` — a rule with air either side.
+     The air below it was a literal every time, and a different literal each
+     time: 30, 34, 36, and 46 three times. Worse, it stacked on top of a full
+     block step above, so a ruled boundary in the studio was 72 + 46 = 118px
+     between blocks that are themselves only 177px tall. That is most of why
+     the end of the page read as empty.
+
+     The rule is what does the dividing, so the whitespace does not have to.
+     A ruled boundary is now a group step above and this below — 82px, which
+     still sits above the plain 72px block step, so the hierarchy holds and
+     the emphasis comes from the line rather than from the void. Slightly
+     more above than below, so the rule reads as belonging to what follows.
+     ------------------------------------------------------------------------ */
+  --space-rule: clamp(24px, 3.2vw, 38px);
+
+  /* ------------------------------------------------------------------------
+     Type scale
+
+     Same argument. Every display size below was written twice — once for
+     desktop and once inside a max-width query — so headings snapped a whole
+     rem at the breakpoint and were sized for 760px at 390px. The preferred
+     term is in vw so the heading tracks the measure it sits on. The hero
+     title has always been written this way; this is the rest of the page
+     catching up with it.
+
+     Floors are set so a 390px phone lands on roughly the size the old
+     max-width query gave it — the point is to remove the jump, not to shrink
+     the headings. Ceilings are each heading's existing desktop size, so
+     nothing above 760px moves at all.
+     ------------------------------------------------------------------------ */
+  /* The families, named once. SVG <text> cannot take the .displayFont class
+     without leaning on its !important, so the stack needs to be a token. */
+  --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --type-display: clamp(2.6rem, 11vw, 4.6rem);
+  --type-title: clamp(2.3rem, 8vw, 3.6rem);
+  --type-subtitle: clamp(2rem, 6.4vw, 2.8rem);
+  --type-heading: clamp(1.6rem, 4.6vw, 2rem);
+  --type-numeral: clamp(1.9rem, 5.4vw, 2.6rem);
+
+  /* Legacy aliases. Older markup still names these; mapped rather than
+     deleted so nothing renders unstyled. */
+  --bg: var(--ink);
+  --bg-elevated: var(--ink-raised);
+  --bg-alt: var(--ink-raised);
+  --text: var(--bone);
+  --text-muted: var(--bone-dim);
+  --accent: var(--ember);
+  --accent-2: var(--verdigris);
+  --accent-glow: var(--ember-glow);
+  --border: var(--hairline);
+}
+
+a {
+  text-decoration: none !important;
+  color: var(--bone);
+}
+
+a:hover { color: var(--ember); }
+
+body {
+  background: var(--ink);
+  color: var(--bone);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* The base sky. One fixed layer behind everything: cold indigo overhead, a
+   warm ember horizon low and centre — the village you keep returning to,
+   always just over there. Mist, grain and vignette layer on top of this in
+   <Atmosphere />, which needs JS for the parallax. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 50% 118%, rgba(232, 163, 61, 0.22) 0%, rgba(185, 116, 31, 0.07) 34%, transparent 62%),
+    radial-gradient(90% 60% at 12% 4%, rgba(95, 182, 168, 0.10), transparent 58%),
+    radial-gradient(80% 55% at 88% 14%, rgba(76, 92, 148, 0.14), transparent 60%),
+    linear-gradient(180deg, #0A0D16 0%, var(--ink) 46%, #0C1017 100%);
+}
+
+/* Focus: an ember ring, never the UA blue */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: rgba(232, 163, 61, 0.28);
+  color: var(--bone);
+}
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--ink-deep); }
+::-webkit-scrollbar-thumb {
+  background: rgba(232, 163, 61, 0.22);
+  border-radius: 6px;
+  border: 2px solid var(--ink-deep);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(232, 163, 61, 0.42); }
+
+/* --- Type -------------------------------------------------------------------
+   Two families with distinct jobs. Cormorant Garamond is the voice of the
+   world — high contrast, carved, elven; it takes headings and lore. Inter is
+   the voice of the interface — labels, body copy, buttons. */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1.12;
+}
+
+.displayFont {
+  font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif !important;
+  letter-spacing: 0.01em;
+}
+
+/* In-world text — the verse, waypoint flavour, anything the village says. */
+.loreFont {
+  font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif !important;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.012em;
+}
+
+.container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  /* Longhand so a section's padding-top/bottom can't wipe the side gutters
+     (styled-components inject after this sheet, so shorthand would lose). */
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+/* 860, matching STACK_BREAKPOINT in src/config/breakpoints.js. This was 859
+   while the JS said 860, so a viewport of exactly 860px took the stacked SVGs
+   and the desktop gutters at the same time. */
+@media only screen and (max-width: 860px) {
+  .container { padding-left: 24px; padding-right: 24px; }
+}
+
+@media only screen and (max-width: 400px) {
+  .container { padding-left: 18px; padding-right: 18px; }
+}
+
+.regular { font-weight: 400 !important; }
+.semiBold { font-weight: 600 !important; }
+.extraBold { font-weight: 700 !important; }
+
+/* HELPERS */
+.textCenter { text-align: center; }
+.textLeft { text-align: left; }
+.textRight { text-align: right; }
+.animate { transition: 0.32s var(--ease-soft); }
+.pointer { cursor: pointer; }
+.relative { position: relative; }
+.x100 { width: 100%; }
+.active { color: var(--ember); }
+.tag { padding: 5px 10px; margin: 10px 0; }
+.shadow { box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55); }
+
+/* --- Arcane utilities ------------------------------------------------------ */
+
+.glow { box-shadow: 0 0 34px var(--ember-glow); }
+
+/* Gilded text — leafed gold rather than a flat neon ramp. */
+.textGradient {
+  background: linear-gradient(96deg, #C98A2E 0%, var(--ember-hot) 34%, #FBE7BC 52%, var(--ember) 72%, #A9691C 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  /* Room for the descenders to be painted in.
+
+     Cormorant's content area is 1.22em, but headings are set at 1.12 and the
+     display title at 1.0 — so on the last line the tails of g, y and p hang
+     below the element's box. Ordinary text does not care, because a glyph is
+     free to overflow its box. Gradient text does: background-clip cannot paint
+     outside the box, so the tail is not drawn short, it is simply absent, and
+     "gamers." reads as if it were guillotined.
+
+     Padding is the only lever — the box has to grow. background-size does not
+     help; the clip is the box, not the gradient's extent. No negative margin
+     to take it back either: half these headings set margin with the shorthand,
+     which would win and leave the compensation applying to some and not
+     others. The space is filled by the ink that was missing from it, so it
+     costs nothing to look at. */
+  padding-bottom: 0.16em;
+}
+
+.textGlow {
+  text-shadow: 0 0 44px rgba(232, 163, 61, 0.32), 0 2px 30px rgba(0, 0, 0, 0.5);
+}
+
+.neonBorder {
+  border: 1px solid var(--hairline);
+  box-shadow: inset 0 1px 0 rgba(237, 230, 216, 0.05);
+}
+
+/* Section eyebrow — small caps, widely tracked, an ember tick either side.
+   (Class name kept from the previous system; the look is new.) */
+.hudLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ember);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+}
+.hudLabel::before,
+.hudLabel::after {
+  content: "";
+  width: 22px;
+  height: 1px;
+  opacity: 0.8;
+}
+.hudLabel::before { background: linear-gradient(90deg, transparent, var(--ember)); }
+.hudLabel::after { background: linear-gradient(90deg, var(--ember), transparent); }
+
+/* Section rule — a hairline that catches the light in the middle. */
+.divider {
+  width: 100%;
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, rgba(232, 163, 61, 0.34) 32%, rgba(95, 182, 168, 0.28) 68%, transparent);
+  opacity: 0.75;
+}
+
+/* Corner marks — a frameless accent, like a plate mounted at four points. */
+.brackets { position: relative; }
+.brackets::before,
+.brackets::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+.brackets::before {
+  top: 0;
+  left: 0;
+  border-top: 1px solid var(--ember);
+  border-left: 1px solid var(--ember);
+}
+.brackets::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 1px solid var(--ember);
+  border-right: 1px solid var(--ember);
+}
+
+.gridBg { background-color: transparent; }
+.scanlines { position: relative; }
+
+/* Respect users who prefer reduced motion. Components also read this via
+   useReducedMotion() so they can render a still frame rather than a blank. */
+@media (prefers-reduced-motion: reduce) {
+  .animate { transition: none !important; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* FLEXBOX */
+.flex { display: flex; }
+.flexSpaceCenter { display: flex; justify-content: space-between; align-items: center; }
+.flexNullCenter { display: flex; align-items: center; }
+.flexColumn { flex-direction: column; }
+.flexCenter { display: flex; justify-content: center; align-items: center; }
+.flexSpaceNull { display: flex; justify-content: space-between; }
+
+/* FONT SIZES */
+.font11 { font-size: 0.688rem; }
+.font12 { font-size: 0.75rem; }
+.font13 { font-size: 0.813rem; }
+.font14 { font-size: 0.875rem; }
+.font15 { font-size: 0.938rem; }
+.font18 { font-size: 1.125rem; }
+.font20 { font-size: 1.25rem; }
+.font25 { font-size: 1.563rem; }
+.font30 { font-size: 1.875rem; }
+.font40 { font-size: 2.75rem; }
+.font60 { font-size: 3.75rem; line-height: 4.2rem; }
+
+@media only screen and (max-width: 860px) {
+  .font11 { font-size: 0.688rem; }
+  .font12 { font-size: 0.688rem; }
+  .font13 { font-size: 0.75rem; }
+  .font14 { font-size: 0.813rem; }
+  .font15 { font-size: 0.875rem; }
+  .font18 { font-size: 1rem; }
+  .font20 { font-size: 1.125rem; }
+  .font25 { font-size: 1.25rem; }
+  .font30 { font-size: 1.5rem; }
+  .font40 { font-size: 2rem; }
+  .font60 { font-size: 2.8rem; }
+}
+
+/* BORDER RADIUS — the world is carved, not rounded. */
+.radius8 { border-radius: 2px; }
+.radius6 { border-radius: 2px; }
+
+/* COLORS */
+.darkColor { color: var(--bone); }
+.purpleColor { color: var(--ember); }
+.orangeColor { color: var(--ember); }
+.lightColor { color: var(--bone-dim); }
+.coralColor { color: var(--verdigris); }
+.greenColor { color: var(--verdigris); }
+.greyColor { color: var(--bone-dim); }
+.whiteColor { color: var(--bone); }
+
+/* BACKGROUNDS — the page carries one atmosphere; sections never box. */
+.darkBg { background-color: transparent; }
+.purpleBg { background-color: var(--ember); }
+.orangeBg { background-color: var(--ember); }
+.lightBg { background-color: transparent; }
+.greyBg { background-color: transparent; }
+.whiteBg { background-color: transparent; }

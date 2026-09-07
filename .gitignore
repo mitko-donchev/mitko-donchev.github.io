@@ -24,3 +24,11 @@ yarn-error.log*
 
 # local env
 .env
+
+# Fonts cached by scripts/make-og-image.py
+.cache/
+
+# Working notes for whoever picks the site up next. Local to this machine on
+# purpose — it is a scratchpad about the state of the work, not part of it,
+# and it does not belong in a pull request.
+HANDOVER.md
