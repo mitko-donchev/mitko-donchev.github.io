@@ -13,13 +13,37 @@ import { CTA_WISHLIST, STEAM_URL } from "../../config/links";
 import { STACK_BREAKPOINT } from "../../config/breakpoints";
 
 export default function TopNavbar() {
-  const [y, setY] = useState(window.scrollY);
+  const [scrolled, setScrolled] = useState(() => window.scrollY > 100);
   const [sidebarOpen, toggleSidebar] = useState(false);
 
+  /* The bar only cares whether you are past 100px, so that is what goes in
+     state. It used to hold the raw scrollY, which meant a re-render of this
+     component and everything under it — the drawer, the backdrop, the logo,
+     four react-scroll links and the CTA — on every scroll event. Measured
+     over one read of the page that was 105 updates producing 1 change.
+
+     Coalescing into a rAF on top of that caps it at one check per frame, so
+     a trackpad firing faster than the display cannot outpace the render. */
   useEffect(() => {
-    const onScroll = () => setY(window.scrollY);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    let frame = 0;
+    let queued = false;
+
+    const update = () => {
+      queued = false;
+      setScrolled(window.scrollY > 100);
+    };
+
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      frame = window.requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   // react-scroll only recomputes the active link on a scroll event, so on first
@@ -33,11 +57,10 @@ export default function TopNavbar() {
     <>
       <Sidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       {sidebarOpen && <Backdrop toggleSidebar={toggleSidebar} />}
-      <Wrapper
-        className="flexCenter animate"
-        $scrolled={y > 100}
-        style={y > 100 ? { height: "60px" } : { height: "80px" }}
-      >
+      {/* Height lives in the styled component rather than an inline style, so
+          a render does not have to allocate a fresh object to say the same
+          thing twice. */}
+      <Wrapper className="flexCenter animate" $scrolled={scrolled}>
         <NavInner className="container flexSpaceCenter">
           <Link className="pointer flexNullCenter" href="#home"
             to="home" smooth={true}>
@@ -103,6 +126,7 @@ const Wrapper = styled.nav`
   top: 0;
   left: 0;
   z-index: 999;
+  height: ${(props) => (props.$scrolled ? "60px" : "80px")};
   background-color: transparent;
   border-bottom: 1px solid transparent;
   ${(props) =>

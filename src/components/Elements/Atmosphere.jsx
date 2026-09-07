@@ -25,27 +25,49 @@ export default function Atmosphere() {
     if (!node) return undefined;
 
     let frame = 0;
+    let running = false;
     let targetX = 0;
     let targetY = 0;
     let currentX = 0;
     let currentY = 0;
 
-    const onPointerMove = (event) => {
-      // -1..1 from the centre of the viewport, scaled to a few pixels.
-      targetX = (event.clientX / window.innerWidth - 0.5) * 26;
-      targetY = (event.clientY / window.innerHeight - 0.5) * 18;
-    };
+    /* Below this the lerp is writing sub-pixel changes nobody can see. */
+    const SETTLED = 0.01;
 
     const tick = () => {
       // Critically damped enough to feel like weight rather than lag.
       currentX += (targetX - currentX) * 0.045;
       currentY += (targetY - currentY) * 0.045;
       node.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+
+      /* Stop once it has caught up, rather than rescheduling forever. The
+         loop used to run for the life of the page writing an identical
+         transform 60 times a second — and on a touch device, where
+         pointermove never fires at all, that was the entire lifetime. */
+      if (
+        Math.abs(targetX - currentX) < SETTLED &&
+        Math.abs(targetY - currentY) < SETTLED
+      ) {
+        running = false;
+        return;
+      }
       frame = window.requestAnimationFrame(tick);
     };
 
+    const wake = () => {
+      if (running) return;
+      running = true;
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    const onPointerMove = (event) => {
+      // -1..1 from the centre of the viewport, scaled to a few pixels.
+      targetX = (event.clientX / window.innerWidth - 0.5) * 26;
+      targetY = (event.clientY / window.innerHeight - 0.5) * 18;
+      wake();
+    };
+
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    frame = window.requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("pointermove", onPointerMove);

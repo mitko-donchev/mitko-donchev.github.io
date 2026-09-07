@@ -1,8 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import "./style/flexboxgrid.min.css";
+/* No slick and no flexboxgrid. Both were left over from the agency template:
+   ~15.6kB of raw CSS shipped in every bundle for a carousel that does not
+   exist and a grid whose class names appear nowhere outside its own file.
+   The layout is styled-components and a handful of helpers in index.css. */
 import './style/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';

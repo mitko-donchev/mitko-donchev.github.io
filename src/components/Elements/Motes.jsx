@@ -120,9 +120,13 @@ export default function Motes({ density = 1 }) {
     };
 
     const resize = () => {
+      const nextWidth = window.innerWidth;
+      const nextHeight = window.innerHeight;
+      if (nextWidth === width && nextHeight === height) return;
+
+      width = nextWidth;
+      height = nextHeight;
       const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
-      width = window.innerWidth;
-      height = window.innerHeight;
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -130,7 +134,14 @@ export default function Motes({ density = 1 }) {
       // Tied to area, so a phone is never asked to draw a desktop field.
       const count = Math.round(((width * height) / 20000) * density);
       const target = Math.max(14, Math.min(80, count));
-      motes = Array.from({ length: target }, () => spawn(true));
+
+      /* Adjust the population rather than rebuilding it. On a phone the URL
+         bar collapsing as you scroll is a resize — innerHeight changes by
+         ~60px — and rebuilding here threw every mote to a new random
+         position each time it did, so the field visibly scrambled mid-scroll
+         on exactly the gesture it is meant to respond to. */
+      while (motes.length < target) motes.push(spawn(true));
+      if (motes.length > target) motes.length = target;
     };
 
     const draw = (now) => {

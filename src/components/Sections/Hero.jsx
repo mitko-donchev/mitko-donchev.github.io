@@ -45,14 +45,22 @@ export default function Hero() {
     if (reduced) return undefined;
 
     let frame = 0;
+    let running = false;
+    let onScreen = true;
+    let lastScroll = -1;
     let targetX = 0;
     let targetY = 0;
     let currentX = 0;
     let currentY = 0;
 
+    /* currentX/Y are fractions of the viewport, so this is the point where
+       the largest multiplier (46px) is moving under a fiftieth of a pixel. */
+    const SETTLED = 0.0005;
+
     const onPointerMove = (event) => {
       targetX = event.clientX / window.innerWidth - 0.5;
       targetY = event.clientY / window.innerHeight - 0.5;
+      wake();
     };
 
     const tick = () => {
@@ -65,23 +73,70 @@ export default function Hero() {
       if (ridgeRef.current) {
         ridgeRef.current.style.transform = `translate3d(${currentX * -46}px, ${currentY * -10}px, 0)`;
       }
+      const scrolled = window.scrollY;
       if (contentRef.current) {
-        const scrolled = window.scrollY;
         const fade = Math.max(0, 1 - scrolled / (window.innerHeight * 0.62));
         contentRef.current.style.transform =
           `translate3d(${currentX * 12}px, ${currentY * 8 - scrolled * 0.16}px, 0)`;
         contentRef.current.style.opacity = String(fade);
       }
 
+      /* Idle out rather than rescheduling forever. There is nothing left to
+         do once the pointer lerp has caught up and the scroll has not moved,
+         and this loop used to run for the whole life of the page — writing
+         three transforms a frame long after the hero was off-screen, and on
+         a touch device, where pointermove never fires, doing it for nothing
+         from the very first frame. */
+      const stillMoving =
+        Math.abs(targetX - currentX) >= SETTLED ||
+        Math.abs(targetY - currentY) >= SETTLED ||
+        scrolled !== lastScroll;
+      lastScroll = scrolled;
+
+      if (!stillMoving) {
+        running = false;
+        return;
+      }
       frame = window.requestAnimationFrame(tick);
     };
 
+    function wake() {
+      if (running || !onScreen) return;
+      running = true;
+      frame = window.requestAnimationFrame(tick);
+    }
+
+    const onScroll = () => wake();
+
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    frame = window.requestAnimationFrame(tick);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    /* Once the hero has left the screen its parallax is invisible, so the
+       loop should not merely idle — it should be unwakeable. */
+    let observer;
+    const wrapper = document.getElementById("home");
+    if (wrapper && typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          onScreen = entry.isIntersecting;
+          if (onScreen) wake();
+          else {
+            running = false;
+            window.cancelAnimationFrame(frame);
+          }
+        },
+        { threshold: 0 }
+      );
+      observer.observe(wrapper);
+    }
+
+    wake();
 
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("scroll", onScroll);
       window.cancelAnimationFrame(frame);
+      if (observer) observer.disconnect();
     };
   }, [reduced]);
 

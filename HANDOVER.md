@@ -1,10 +1,10 @@
 # Handover — Waybound marketing site
 
 Working tree: `/Users/md/development/mitko-donchev.github.io` (macOS)
-Branch: `website-improvements` → **PR #27**, open, 20 commits ahead of `origin/main`, everything pushed
+Branch: `website-improvements` → **PR #27**, open, 21 commits ahead of `origin/main`, everything pushed
 Stack: React 18 + CRA (`react-scripts` 5.0.1), styled-components **v6**, react-scroll, react-helmet
 Dev server: `npm start` (has been running on http://localhost:3001)
-Build: `CI=false npx react-scripts build` — last run compiled clean, 114.33 kB gz JS / 8.82 kB gz CSS
+Build: `CI=false npx react-scripts build` — last run compiled clean, 114.56 kB gz JS / **2.73 kB gz CSS**
 
 > Note: local `main` is 3 commits behind `origin/main`. Compare against `origin/main`, not `main`.
 
@@ -12,8 +12,8 @@ Build: `CI=false npx react-scripts build` — last run compiled clean, 114.33 kB
 
 ## 1. There is no open task
 
-The last request — retune the page's spacing so the end stopped reading as empty — is
-finished, committed and pushed. The tree is clean. Nothing is half-done, and nothing is
+The last request — a polish and stability/performance pass — is finished, committed and
+pushed. The tree is clean. Nothing is half-done, and nothing is
 waiting on a decision except the items in §6, none of which have been assigned.
 
 If the next request is more visual polish, read §4 first: the rhythm was just rebuilt on
@@ -134,6 +134,28 @@ raised three false "small tap target" findings before switching methods.
 
 ### Performance
 
+- **A rAF loop that reschedules unconditionally runs for the life of the page.** Both pointer
+  parallaxes did — `Atmosphere` and `Hero` — writing identical transforms 60 times a second
+  forever, and on a touch device, where `pointermove` never fires, doing it for nothing from the
+  first frame. Both now idle out when the lerp has caught up and wake on input; `Hero` also
+  suspends on an IntersectionObserver, because its parallax is invisible once the hero scrolls
+  away. Idle went from three continuous loops to two at the top of the page and one at the
+  bottom. Measure this by wrapping `requestAnimationFrame` in an init script and counting.
+- **Do not put a scroll position in React state.** `TopNavbar` held raw `scrollY` and used it
+  only as `y > 100`, so every scroll event re-rendered the bar, the drawer, the backdrop, the
+  logo, four links and the CTA. Over one read of the page that measured 105 updates producing
+  1 change — 99% waste. It now stores the boolean and coalesces into a rAF.
+- **A resize handler that rebuilds state fires constantly on mobile.** The URL bar collapsing
+  during scroll changes `innerHeight` by ~60px. `Motes` rebuilt its whole field on that, which
+  scrambled every mote mid-scroll; it now adjusts the population and keeps the field.
+- **The CSS bundle was 69% dead template.** `src/index.js` imported slick-carousel's two
+  stylesheets and `flexboxgrid.min.css` — ~15.6kB of raw CSS for a carousel that does not exist
+  and a grid whose class names appear nowhere outside its own file. Removing them took the CSS
+  bundle from 8.82kB gz to **2.73kB gz**. `emailjs-com`, `react-google-recaptcha-v3`,
+  `react-slick` and `slick-carousel` were also uninstalled — they had no imports, so this is
+  install weight only, not bundle. Note it did **not** move the advisory count: all 11 come from
+  `react-scripts` and its dev-server chain (`webpack-dev-server`, `resolve-url-loader`,
+  `postcss`, `express`), none from the packages removed.
 - A canvas whose CSS size can change without the window resizing needs a **ResizeObserver**, not
   just a `window.resize` listener. `EmberField` had only the latter, and the hero grows ~100px
   taller after mount once the display face loads — so its backing store stayed measured against
