@@ -304,11 +304,37 @@ const Moon = styled.div`
   }
 `;
 
+/* The skyline overhangs the hero on all three sides it can, which is free —
+   the wrapper clips it — and closes three ways it used to come unstuck from
+   its own edges. The parallax is the reason all three exist: it moves this
+   element in pixels while the insets were written in percent, so the slack
+   ran out on small screens.
+
+   Sides. Travel is currentX * -46, bounded at 23px because currentX is
+   clientX / innerWidth - 0.5. Against that, 3% is only 9.6px at 320 wide, so
+   under 768px the ridge slid clear of the viewport and left bare sky beside
+   it — 13.1px at 320, 8.4px at 480, 3.7px at 640, nothing from 768 up. The
+   26px floor beats the travel everywhere and leaves the roomier percentage
+   in charge on wide screens.
+
+   Bottom, first reason. Travel is currentY * -10, bounded at 5px the same
+   way. Point at the lower half of the screen and the ridge lifted that far
+   off the bottom of the hero, opening a band of sky above the next section.
+   Measured 4.9px at every width from 320 to 1920.
+
+   Bottom, second reason. The hero's height lands on a fraction at most sizes
+   — 779.50 at 320x720, 986.94 at 1440x900 — which left the last device-pixel
+   row only half covered, and the sky showed through it as a hairline. It was
+   absent at exactly the sizes where the height came out whole (844, 1080).
+
+   Kept out of the template on purpose: CSS comments inside a styled template
+   are string data, so terser leaves them in and every visitor downloads
+   them. JS comments out here cost nothing. */
 const Ridge = styled.div`
   position: absolute;
-  left: -3%;
-  right: -3%;
-  bottom: 0;
+  left: min(-3%, -26px);
+  right: min(-3%, -26px);
+  bottom: -8px;
   height: 42vh;
   min-height: 240px;
   pointer-events: none;

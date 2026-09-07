@@ -8,6 +8,7 @@ import Studio from "../components/Sections/Studio";
 import Footer from "../components/Sections/Footer";
 // Elements
 import Atmosphere from "../components/Elements/Atmosphere";
+import Horizon from "../components/Elements/Horizon";
 import ScrollProgress from "../components/Elements/ScrollProgress";
 
 export default function Landing() {
@@ -20,6 +21,9 @@ export default function Landing() {
       <TopNavbar />
       <main>
         <Hero />
+        {/* The hero clips itself, so its light has to be carried across the
+            seam by hand. Sits between the two on purpose — see Horizon. */}
+        <Horizon />
         <AboutGame />
         <Features />
         <Studio />

@@ -1,10 +1,10 @@
 # Handover — Waybound marketing site
 
 Working tree: `/Users/md/development/mitko-donchev.github.io` (macOS)
-Branch: `website-improvements` → **PR #27**, open, 21 commits ahead of `origin/main`, everything pushed
+Branch: `website-improvements` → **PR #27**, open, 22 commits ahead of `origin/main`, everything pushed
 Stack: React 18 + CRA (`react-scripts` 5.0.1), styled-components **v6**, react-scroll, react-helmet
 Dev server: `npm start` (has been running on http://localhost:3001)
-Build: `CI=false npx react-scripts build` — last run compiled clean, 114.56 kB gz JS / **2.73 kB gz CSS**
+Build: `CI=false npx react-scripts build` — last run compiled clean, 114.71 kB gz JS / **2.73 kB gz CSS**
 
 > Note: local `main` is 3 commits behind `origin/main`. Compare against `origin/main`, not `main`.
 
@@ -12,9 +12,9 @@ Build: `CI=false npx react-scripts build` — last run compiled clean, 114.56 kB
 
 ## 1. There is no open task
 
-The last request — a polish and stability/performance pass — is finished, committed and
-pushed. The tree is clean. Nothing is half-done, and nothing is
-waiting on a decision except the items in §6, none of which have been assigned.
+The last request — soften the colour transition between the landing screen and the rest of
+the page — is finished, committed and pushed. The tree is clean. Nothing is half-done, and
+nothing is waiting on a decision except the items in §6, none of which have been assigned.
 
 If the next request is more visual polish, read §4 first: the rhythm was just rebuilt on
 measured evidence, and the numbers look "too small" if you only read them on paper.
@@ -174,6 +174,39 @@ raised three false "small tap target" findings before switching methods.
   in an amended commit message. If the question is "does this feel smooth", it has to be
   measured on the user's machine — the browser extension is the right tool, not Playwright.
 
+### CSS comments inside a styled template are shipped to every visitor
+
+Terser strips JS comments. It does **not** strip comments inside a styled-components
+template literal, because that is string data, not code. Verified by grepping the built
+bundle: prose written inside `styled.div\`…\`` was present, the same prose moved above the
+component was gone. Moving the explanations for one small component out of its template
+took 812 B off `main.js`.
+
+This matters here because the house style is long explanatory comments. Keep them — just
+put them **above** the styled component, not inside the backticks. Leave only short
+pointers inline. Nobody has swept the existing components for this; it is not assigned,
+but it is probably worth a few kB.
+
+### A percentage inset cannot cover a pixel-sized parallax
+
+Anything that leans on the pointer moves by a fixed number of pixels while its inset is
+usually written in percent, so the slack runs out as the viewport narrows and the layer
+slides clear of its own container. `Hero`'s `Ridge` had this on three edges at once:
+travel is `currentX * -46` (bounded at 23px) and `currentY * -10` (bounded at 5px), against
+a `-3%` side inset that is only 9.6px at 320 wide and `bottom: 0`, which is no slack at all.
+It exposed 13.1px of bare sky beside the skyline under 768px, and 4.9px under it whenever
+the pointer sat in the lower half of the screen.
+
+The fix is a pixel floor — `left: min(-3%, -26px)` — and a negative `bottom`. Both are free
+inside `overflow: hidden`. **If you add a parallax, work out its pixel bound from the
+formula and check the inset beats it at 320px wide**, rather than at the width you happen to
+have the window open at.
+
+Related: a section whose height lands on a fraction (779.50 at 320×720, 986.94 at 1440×900 —
+most sizes, in practice) leaves its last device-pixel row half-covered, and whatever is
+behind shows through as a hairline. It disappears at exactly the sizes where the height
+comes out whole, which is what makes it look like a phantom. Overhang, do not butt-join.
+
 ### Other one-line traps
 
 - Transient props must be `$`-prefixed or React warns about unknown DOM attributes.
@@ -255,10 +288,13 @@ vertical road.
 
 ## 5. What is on this branch
 
-Full list: `git log --oneline origin/main..HEAD` (17 commits). The recent ones:
+Full list: `git log --oneline origin/main..HEAD` (22 commits). The recent ones:
 
 | commit | what |
 |---|---|
+| `59cceba` | Stop the page working when nothing is happening |
+| `7c22c91` | Tighten the rhythm where the page had gone hollow |
+| `2d8814b` | Let ash fall down the whole page |
 | `f30ccd6` | Collapse the top bar before it runs out of room |
 | `8d2806d` | Give the gilded headings room for their descenders |
 | `c2c4847` | Put the gate back beside the copy, and stop scaling it |
@@ -277,6 +313,14 @@ Worth knowing:
   `scaleX`, so they form a real trapezoid.
 - **`src/components/Elements/ScrollCue.jsx`** — the shared scroll cue used by the hero. Passes
   `href` so it is focusable.
+- **`src/components/Elements/Horizon.jsx`** — carries the hero's light across the seam into
+  section 01. The hero has to clip itself, so everything it paints used to stop on one straight
+  line the full width of the page (measured `#03050A` → `#0B0E14` in a single pixel row, with the
+  village bloom at its brightest right on the cut). This is a **zero-height marker rendered
+  between `<Hero />` and `<AboutGame />` in `Landing.jsx`** — not a band inside either section —
+  so it stays welded to the seam whatever the hero's height resolves to, with nothing to keep in
+  sync. It sits at `z-index: -2`, under the ash rather than over it. Worst step across the
+  boundary is now 2.2–3.7/255 at every width from 320 to 1920, down from 25.2.
 - **`src/components/Elements/Motes.jsx`** — ash falling down the whole page, mounted by
   `Atmosphere.jsx` as its fourth layer (mist, grain, motes, vignette). Fixed to the viewport, so
   its cost does not grow with the document; scroll-coupled through a decaying gust. It is
