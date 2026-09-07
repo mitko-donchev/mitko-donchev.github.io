@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import useInView from "../../hooks/useInView";
 import useReducedMotion from "../../hooks/useReducedMotion";
+import { useLedger } from "../../hooks/useLedger";
+import { stageFor, stageName, forecastFor, shortDate } from "../../lib/ledger";
 
 /* The book, open, mid-sentence.
 
@@ -19,6 +21,31 @@ const SIGNATURE =
 export default function Book() {
   const [ref, inView] = useInView({ threshold: 0.3 });
   const reduced = useReducedMotion();
+  const record = useLedger();
+
+  /* The three ruled lines below the signature are drawn empty and described
+     in this file as "waiting". This is what they were waiting for. BOOK_BODY
+     says the book keeps a record of the days and of the road behind you, and
+     until now nothing on the site kept a record of anything.
+
+     Entries are built here rather than in the ledger so the drawing decides
+     what fits: the ruled line is 154 units wide, which is about twenty
+     characters of the italic at this size.
+
+     Nothing appears on a first visit except the date, because that is all
+     the book honestly knows yet. */
+  const entries = [];
+  let forecast = null;
+  if (record) {
+    entries.push(["first walked", shortDate(record.first)]);
+    if (record.visits > 1) {
+      entries.push(["returned", record.visits === 2 ? "once" : `${record.visits - 1} times`]);
+    }
+    if (record.deepest > 0) {
+      entries.push(["reached", stageName(stageFor(record.deepest))]);
+      forecast = forecastFor(record.deepest);
+    }
+  }
 
   return (
     <Frame ref={ref}>
@@ -76,7 +103,13 @@ export default function Book() {
         {/* Right page: the first line is a heading rule, and then the hand. */}
         <line x1="292" y1="124" x2="452" y2="118" stroke="#6A5B41" strokeWidth="2" opacity="0.3" />
 
-        <Hand d={SIGNATURE} $in={inView} $still={reduced} />
+        {/* Lifted clear of the ruled lines. The signature was authored when
+            nothing was written under it and sat straight across the first two
+            rules; now that the book keeps a record, the hand belongs at the
+            head of the entry rather than through it. The nib rides the same
+            group so it cannot come adrift from the stroke. */}
+        <g transform="translate(0 -26)">
+          <Hand d={SIGNATURE} $in={inView} $still={reduced} />
 
         {/* The nib, riding the end of the stroke. */}
         {!reduced && inView && (
@@ -100,13 +133,27 @@ export default function Book() {
             />
           </Nib>
         )}
+        </g>
 
-        {/* Lines below it, waiting. */}
+        {/* Lines below it, waiting — and, once there is a record, written on. */}
         <g stroke="#6A5B41" strokeWidth="2" strokeLinecap="round" opacity="0.2">
           {[214, 240, 266].map((y) => (
             <line key={y} x1="292" y1={y} x2="446" y2={y - 3} />
           ))}
         </g>
+
+        {entries.map(([label, value], index) => {
+          const y = [214, 240, 266][index] - 6;
+          return (
+            <g key={label}>
+              <Entry x="292" y={y} $delay={index}>{label}</Entry>
+              <Entry x="446" y={y - 2} textAnchor="end" $delay={index}>{value}</Entry>
+            </g>
+          );
+        })}
+
+        {/* Written where there is no line for it. */}
+        {forecast && <Forecast x="446" y="296" textAnchor="end">{forecast}</Forecast>}
       </Svg>
     </Frame>
   );
@@ -161,4 +208,50 @@ const Hand = styled.path.attrs({ pathLength: 1 })`
 
 const Nib = styled.circle`
   filter: drop-shadow(0 0 8px rgba(247, 206, 132, 0.9));
+`;
+
+/* The same ink as the signature above it, in the serif the page already
+   loads — a handwriting face would be a second font request for six words,
+   and the italic at this size reads as a hand well enough on a drawn page.
+
+   Faded up rather than drawn: the signature is the thing that writes itself,
+   and two things writing on one page is one too many.
+
+   The keyframes have distinct names on purpose. A bare @keyframes inside a
+   styled template is a GLOBAL name, not a scoped one, so two components
+   declaring `inkIn` with different end states would fight over whichever was
+   injected last. */
+const Entry = styled.text`
+  font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  fill: #6B4A1C;
+  opacity: 0;
+  animation: inkIn 1.4s var(--ease-out) ${(props) => 900 + (props.$delay || 0) * 260}ms forwards;
+
+  @keyframes inkIn {
+    to { opacity: 0.82; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 0.82;
+    animation: none;
+  }
+`;
+
+/* One place further than they have been. Fainter than the record, because it
+   is not a record of anything. */
+const Forecast = styled(Entry)`
+  font-size: 13.5px;
+  fill: #8A5A1E;
+  animation: inkInFaint 1.6s var(--ease-out) 2100ms forwards;
+
+  @keyframes inkInFaint {
+    to { opacity: 0.42; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 0.42;
+    animation: none;
+  }
 `;

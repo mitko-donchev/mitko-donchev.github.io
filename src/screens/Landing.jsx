@@ -10,8 +10,18 @@ import Footer from "../components/Sections/Footer";
 import Atmosphere from "../components/Elements/Atmosphere";
 import Horizon from "../components/Elements/Horizon";
 import ScrollProgress from "../components/Elements/ScrollProgress";
+// Hooks
+import { useDepthRecorder } from "../hooks/useLedger";
+import useAwayTitle from "../hooks/useAwayTitle";
+// Config
+import { AWAY_TITLE, SITE_TITLE } from "../config/links";
 
 export default function Landing() {
+  /* How far down the road they got, for the book to record. Page level, not
+     inside the book — see useLedger. */
+  useDepthRecorder();
+  useAwayTitle(AWAY_TITLE, SITE_TITLE);
+
   return (
     <>
       {/* Mounted once, behind everything: the page has one sky, not one per

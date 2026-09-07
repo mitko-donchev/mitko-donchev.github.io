@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import useReducedMotion from "../../hooks/useReducedMotion";
+import useJourney from "../../hooks/useJourney";
 import Motes from "./Motes";
 
 /* The page's weather. Four fixed layers over the base sky (body::before):
@@ -17,6 +18,11 @@ import Motes from "./Motes";
 export default function Atmosphere() {
   const mistRef = useRef(null);
   const reduced = useReducedMotion();
+
+  /* Dims and lifts the two layers below as the visitor moves down the road.
+     Lives here because this component owns the sky; it adds nothing to the
+     tree and writes one custom property a handful of times per page. */
+  useJourney(!reduced);
 
   useEffect(() => {
     if (reduced) return undefined;
@@ -98,6 +104,13 @@ const Layer = styled.div`
 const Mist = styled(Layer)`
   will-change: transform;
 
+  /* The light of the road. --warmth is written by useJourney; the fallback
+     is the value the page had before that hook existed, so a visitor with no
+     JS, no IntersectionObserver or reduced motion sees the old atmosphere
+     rather than a dark one. */
+  opacity: var(--warmth, 1);
+  transition: opacity 1400ms var(--ease-soft);
+
   &::before,
   &::after {
     content: "";
@@ -140,7 +153,13 @@ const Grain = styled(Layer)`
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
 `;
 
+/* Moves the opposite way to the mist, by a fraction as much: the corners
+   close in a little on the road and open again at the end. Kept small — this
+   is the difference between "somewhere darker" and "something is wrong with
+   the monitor". */
 const Vignette = styled(Layer)`
   z-index: -1;
+  opacity: calc(1 - var(--warmth, 1) * 0.16);
+  transition: opacity 1400ms var(--ease-soft);
   background: radial-gradient(120% 84% at 50% 44%, transparent 42%, rgba(4, 6, 10, 0.5) 84%, rgba(4, 6, 10, 0.78) 100%);
 `;
