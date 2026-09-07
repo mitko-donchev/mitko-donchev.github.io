@@ -5,9 +5,9 @@ import WishlistButton from "../Buttons/WishlistButton";
 import Reveal from "../Elements/Reveal";
 import CursedPath from "./CursedPath";
 import Bestiary from "./Bestiary";
+import Gate from "../Elements/Gate";
 import Book from "../Elements/Book";
 // Config
-import { STACK_BREAKPOINT } from "../../config/breakpoints";
 import {
   GAME_NAME,
   GAME_GENRE,
@@ -39,29 +39,32 @@ export default function AboutGame() {
       <hr className="divider" />
 
       <Lede>
-        <Reveal>
-          <span className="hudLabel">01 — The Game</span>
-        </Reveal>
-        <Reveal delay={80}>
-          <Title className="displayFont textGradient">{GAME_NAME}</Title>
-        </Reveal>
-        <Reveal delay={140}>
-          <Genre>{GAME_GENRE}</Genre>
-        </Reveal>
-        <Reveal delay={170}>
-          <Subtitle className="loreFont">{GAME_SUBTITLE}</Subtitle>
-        </Reveal>
-      </Lede>
-
-      {/* The gate used to sit beside this copy. It has the whole screen above
-          now, so the synopsis takes the width instead of a column of it. */}
-      <Synopsis>
-        {GAME_SYNOPSIS.map((paragraph, index) => (
-          <Reveal key={paragraph.slice(0, 24)} delay={200 + index * 70}>
-            <SynopsisP className="font18">{paragraph}</SynopsisP>
+        <Copy>
+          <Reveal>
+            <span className="hudLabel">01 — The Game</span>
           </Reveal>
-        ))}
-      </Synopsis>
+          <Reveal delay={80}>
+            <Title className="displayFont textGradient">{GAME_NAME}</Title>
+          </Reveal>
+          <Reveal delay={140}>
+            <Genre>{GAME_GENRE}</Genre>
+          </Reveal>
+          <Reveal delay={170}>
+            <Subtitle className="loreFont">{GAME_SUBTITLE}</Subtitle>
+          </Reveal>
+          {GAME_SYNOPSIS.map((paragraph, index) => (
+            <Reveal key={paragraph.slice(0, 24)} delay={200 + index * 70}>
+              <SynopsisP className="font18">{paragraph}</SynopsisP>
+            </Reveal>
+          ))}
+        </Copy>
+
+        <GateColumn>
+          <Reveal delay={160} y={40}>
+            <Gate />
+          </Reveal>
+        </GateColumn>
+      </Lede>
 
       {/* The object the game is named after, and the reason it opens the way
           it does. */}
@@ -135,21 +138,26 @@ const Wrapper = styled.section`
 `;
 
 const Lede = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 70px;
+  align-items: center;
   margin-top: var(--space-group);
-  max-width: 760px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
 `;
 
-/* Two measures rather than one long one: four paragraphs stacked at 560px is
-   a column of text with a lot of empty page beside it. */
-const Synopsis = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 70px;
-  margin-top: 34px;
+const Copy = styled.div`
+  min-width: 0;
+`;
 
-  @media (max-width: ${STACK_BREAKPOINT}px) {
-    grid-template-columns: 1fr;
-    gap: 0;
+const GateColumn = styled.div`
+  min-width: 0;
+  @media (max-width: 960px) {
+    order: -1;
   }
 `;
 

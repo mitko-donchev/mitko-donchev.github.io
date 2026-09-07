@@ -103,19 +103,9 @@ export const BOOK_BODY = [
 // One open question, asked and left alone.
 export const BOOK_QUESTION = "Nobody has explained the handwriting.";
 
-// --- The threshold -----------------------------------------------------------
-// The gate gets the second beat of the page: you scroll, the doors open, and
-// the site walks you in. The three lines are timed to that — a fact, then
-// something slightly wrong with the fact, then a line the village says to you.
-// None of them explains anything; the last one is only allowed to be odd.
-export const GATE_KICKER = "The way in";
-export const GATE_BEATS = [
-  "Nobody is guarding it.",
-  "It opens before you touch it.",
-  "Mind how you came in.",
-];
-// Doubles as the affordance and as the way out for anyone not scrolling.
-export const GATE_CUE = "Enter the village";
+// The gate stands beside the synopsis and carries the name. Its label is the
+// only text in the drawing, and it has to describe the place without
+// describing what the place turns out to be.
 export const GATE_ALT =
   `A timber village gate under a shingled roof, its doors swung open beneath a hanging ${GAME_NAME} sign, with lit windows somewhere down the road beyond`;
 

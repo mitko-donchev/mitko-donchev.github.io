@@ -1,33 +1,42 @@
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
+// Components
+import EmberField from "./EmberField";
+// Hooks
+import useInView from "../../hooks/useInView";
+import useReducedMotion from "../../hooks/useReducedMotion";
+// Config
 import { GAME_NAME, GATE_ALT } from "../../config/links";
 
 /* The village gate, and what is on the other side of it.
 
-   One drawing, two rates. The frame comes at you as you push through it; the
-   village behind it barely grows. That gap is the whole illusion — a single
-   rate, any single rate, is a zoom on a photograph, and it never once reads as
-   walking.
+   Both live in one <svg> and the opening is cut from the same coordinate
+   system as the posts, so the view through the gate cannot come unstuck from
+   the gap it is seen through. The village behind is masked to that gap: the
+   only way to see any of it is through the doors.
 
-   Keeping both in the same <svg> is what makes it cheap: the opening and the
-   view through it are cut from the same coordinate system, so the mask cannot
-   drift off the gap between the posts no matter how far the camera has come.
-   The village then takes back the difference with a transform of its own, and
-   that subtraction is all the parallax there is.
-
-   Nothing here animates itself with scroll. The component exposes paint(), the
-   section above owns the choreography, and values arrive already eased — see
-   Threshold.jsx. The artwork stays ignorant of the page, and the page stays
-   ignorant of how a hinge works. */
+   The drawing never moves as a whole. It is rasterised once and then the only
+   things that change are the fire, a few lit windows, and — once, on arrival —
+   eight path attributes as the doors swing. That restraint is deliberate: an
+   earlier version scaled the whole svg on scroll, which forces the browser to
+   re-rasterise two hundred vector shapes at a new resolution on every frame,
+   with the flames animating inside it the whole time. It looked good and it
+   dropped frames. */
 
 const GROUND = 560;
 
-/* A phone cannot hold the palisade and the props as well as the gate, so it
-   does not try. The narrow crop keeps both posts and everything between them;
-   what it loses is scenery, and losing it is what stops the gate from being
-   390 pixels of picture with 450 pixels of nothing under it. */
-const WIDE_VIEW = "0 0 1000 620";
-const NARROW_VIEW = "244 44 512 560";
+/* Cropped in from the full drawing. The gate shares a column with the synopsis
+   rather than a screen, and uncropped it puts the posts at barely two hundred
+   pixels apart with scenery filling the rest — a picture of a gate a long way
+   off, when the point is to be standing at it. The crop spends the width on
+   the gate and lets the far palisade and the outer props go. */
+const VIEW = "160 34 680 566";
+
+/* How far a leaf swings when it is done, and how long it takes to get there.
+   Not all the way to SWING: leaves flat against the posts read as a gate with
+   no doors, and the point of the drawing is that it has doors and they opened. */
+const RESTING_OPEN = 0.85;
+const OPEN_MS = 1500;
 
 /* The eye-line. Everything that recedes — the door leaves, the road, the
    rooftops — converges here, so the gate and the village agree about where the
@@ -82,7 +91,7 @@ function doorPaths(side, radians) {
 }
 
 /* Rendered shut on the first frame, so the gate is a gate before any
-   JavaScript has run. paint() owns these four attributes from then on. */
+   JavaScript has run, and so the doors have somewhere to open from. */
 const CLOSED = { left: doorPaths("left", 0), right: doorPaths("right", 0) };
 
 /* --- the frame ------------------------------------------------------------ */
@@ -178,20 +187,25 @@ const ROAD_LIGHTS = [
 
 /* --- component ------------------------------------------------------------ */
 
-const Gate = forwardRef(function Gate({ narrow = false }, ref) {
+export default function Gate() {
+  const [frameRef, inView] = useInView({ threshold: 0.3 });
+  const reduced = useReducedMotion();
   const villageRef = useRef(null);
-  const sceneRef = useRef(null);
-  const openingRef = useRef(null);
   const leaves = useRef({ left: {}, right: {} });
 
-  useImperativeHandle(ref, () => ({
-    /* One write per frame per layer, straight to the DOM. A pinned scene
-       redraws on every pixel of scroll, and a setState per pixel would be a
-       React render per pixel. */
-    paint({ open, gateScale, gateFade, villageScale, villageFade, openingFade, driftX, driftY }) {
-      const radians = (SWING * open * Math.PI) / 180;
-      const turned = Math.sin(radians);
+  /* The doors open once, when the gate arrives, and then the drawing is done
+     moving for good.
 
+     This used to be driven by scroll position, which meant re-projecting the
+     leaves on every pixel of the page — and, worse, scaling the whole svg,
+     which makes the browser re-rasterise two hundred vector shapes at a new
+     resolution every frame while four flames and a dozen windows are already
+     animating inside it. That was the lag. Nothing here is scaled now, and the
+     only thing that ever changes is eight path attributes, for a second and a
+     half, once. */
+  useEffect(() => {
+    const paint = (open) => {
+      const radians = (SWING * open * Math.PI) / 180;
       ["left", "right"].forEach((side) => {
         const parts = leaves.current[side];
         if (!parts.leaf) return;
@@ -201,43 +215,43 @@ const Gate = forwardRef(function Gate({ narrow = false }, ref) {
         parts.boards.setAttribute("d", paths.boards);
         parts.iron.setAttribute("d", paths.iron);
         // A leaf turning away from the road loses the fire on its face.
-        parts.shade.style.opacity = String(0.55 * turned);
+        parts.shade.style.opacity = String(0.55 * Math.sin(radians));
       });
-
-      if (sceneRef.current) {
-        sceneRef.current.style.transform =
-          `translate3d(${driftX * -14}px, ${driftY * -9}px, 0) scale(${gateScale})`;
-        sceneRef.current.style.opacity = String(gateFade);
-      }
-
       if (villageRef.current) {
-        /* Everything in this svg, the opening included, is already travelling
-           at the frame's rate. Scaling the village by the ratio of the two
-           leaves it moving at its own — and because the subtraction happens
-           inside the same coordinate system, the view can never come unstuck
-           from the gap it is seen through. */
-        villageRef.current.setAttribute(
-          "transform",
-          `translate(${round(driftX * 30)} ${round(driftY * 18)}) ` +
-          `translate(${CENTRE} ${HORIZON}) scale(${round(villageScale / gateScale)}) ` +
-          `translate(${-CENTRE} ${-HORIZON})`
-        );
-        villageRef.current.style.opacity = String(villageFade);
+        // Barely there behind shut doors, and all the way up once they are not.
+        villageRef.current.style.opacity = String(0.16 + 0.84 * open);
       }
+    };
 
-      if (openingRef.current) {
-        openingRef.current.style.opacity = String(openingFade);
-      }
-    },
-  }), []);
+    if (reduced) {
+      paint(RESTING_OPEN);
+      return undefined;
+    }
+    if (!inView) return undefined;
+
+    let frame = 0;
+    let started = 0;
+
+    const step = (now) => {
+      if (!started) started = now;
+      const t = Math.min(1, (now - started) / OPEN_MS);
+      // Slow into the stop: a door has weight, and linear reads as a hinge
+      // being cranked rather than swung.
+      paint(RESTING_OPEN * (1 - (1 - t) * (1 - t) * (1 - t)));
+      if (t < 1) frame = window.requestAnimationFrame(step);
+    };
+
+    frame = window.requestAnimationFrame(step);
+    return () => window.cancelAnimationFrame(frame);
+  }, [inView, reduced]);
 
   return (
-    <Svg
-      ref={sceneRef}
-      viewBox={narrow ? NARROW_VIEW : WIDE_VIEW}
-      role="img"
-      aria-label={GATE_ALT}
-    >
+    <Frame ref={frameRef}>
+      <Embers aria-hidden="true">
+        <EmberField density={0.55} />
+      </Embers>
+
+      <Svg viewBox={VIEW} role="img" aria-label={GATE_ALT}>
       <defs>
         {/* One gradient in user space for every piece of timber, so posts,
             beam and braces take the same light and no joint shows a seam. */}
@@ -369,11 +383,6 @@ const Gate = forwardRef(function Gate({ narrow = false }, ref) {
           {/* Longer at the bottom, where nothing covers it: the road carries
               on out of the gate and fades into the ground you are standing on. */}
           <rect x="306" y="564" width="388" height="58" fill="url(#featherB)" />
-          {/* And then the gate leaves the screen, and there is nothing left
-              for the opening to be an opening in. Lifting the mask at that
-              point is invisible; leaving it on keeps two soft vertical edges
-              tracking across the village all the way out. */}
-          <rect ref={openingRef} x="-3000" y="-3000" width="9000" height="9000" fill="#fff" opacity="0" />
         </mask>
       </defs>
 
@@ -464,7 +473,7 @@ const Gate = forwardRef(function Gate({ narrow = false }, ref) {
           {/* Whatever else is burning down there. */}
           <g>
             {ROAD_LIGHTS.map(([x, y]) => (
-              <Spark key={`${x}-${y}`} cx={x} cy={y} r="2.6" $offset={(x % 9) * 0.4} />
+              <Spark key={`${x}-${y}`} cx={x} cy={y} r="3.4" $offset={(x % 9) * 0.4} />
             ))}
           </g>
 
@@ -687,14 +696,13 @@ const Gate = forwardRef(function Gate({ narrow = false }, ref) {
         ))}
       </g>
       <line x1="0" y1={GROUND} x2="1000" y2={GROUND} stroke="url(#groundLine)" strokeWidth="1" />
-    </Svg>
+      </Svg>
+    </Frame>
   );
-});
+}
 
-export default Gate;
-
-/* A leaf. React renders it shut and never touches `d` again — paint() owns
-   those four attributes from the first frame on. */
+/* A leaf. React renders it shut and never touches `d` again; the opening
+   animation owns those four attributes from the first frame on. */
 function Door({ side, registry }) {
   const keep = (part) => (node) => {
     registry.current[side][part] = node;
@@ -714,7 +722,7 @@ function Door({ side, registry }) {
 
 function Cottage({ x, y, w, h, smoke }) {
   const eave = 14 + h * 0.5;
-  const lamp = Math.max(4, w * 0.12);
+  const lamp = Math.max(6, w * 0.17);
   return (
     <g transform={`translate(${x} ${y})`}>
       <path d={`M0,0 L${w},0 L${w},${h} L0,${h} Z`} fill="#110F16" />
@@ -737,20 +745,49 @@ function Cottage({ x, y, w, h, smoke }) {
 
 /* --- styles --------------------------------------------------------------- */
 
-/* The origin sits low, near the road rather than at the middle of the picture.
-   Scaling about a point below the sign is what carries the sign up and over
-   your head on the way in; scaling about the centre walks you face-first into
-   the board. */
-const Svg = styled.svg`
-  position: absolute;
-  inset: 0;
+const Frame = styled.div`
+  position: relative;
   width: 100%;
-  height: 100%;
-  display: block;
-  overflow: visible;
+  max-width: 560px;
+  margin: 0 auto;
+
+  /* The pool of light the gate stands in. This is what a drop-shadow on the
+     svg used to do, except a gradient on a div is painted once and a filter on
+     the svg is re-run every time a flame moves. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -16% -10%;
+    background: radial-gradient(58% 54% at 50% 60%, rgba(232, 163, 61, 0.11), transparent 72%);
+    pointer-events: none;
+  }
+`;
+
+const Embers = styled.div`
+  position: absolute;
+  inset: -6% -12% 0 -12%;
   pointer-events: none;
-  transform-origin: 50% 70%;
-  will-change: transform, opacity;
+
+  /* Once the gate has the full column the bleed would carry embers off the
+     page, so below the breakpoint it stays inside its own box. */
+  @media (max-width: 960px) {
+    inset: -6% 0 0 0;
+  }
+`;
+
+/* Never transformed, and never filtered.
+
+   A drop-shadow on the root has to re-run over the whole drawing every time
+   anything inside it changes, and four flames flicker in here continuously —
+   so the filter would cost a full re-composite of two hundred shapes, forever,
+   for a shadow nobody is looking at. `overflow: hidden` clips to the viewBox,
+   which is where the road under the gate is meant to fade out anyway. */
+const Svg = styled.svg`
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
 `;
 
 /* The name, in the display face, so the board and the wordmark elsewhere on the

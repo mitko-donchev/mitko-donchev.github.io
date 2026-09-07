@@ -184,7 +184,7 @@ export default function Hero() {
       </Content>
 
       <CueSlot>
-        <ScrollCue to="gate" label="The road in" ariaLabel="Go to the village gate" />
+        <ScrollCue to="game" label="The road in" ariaLabel="Read about the game" />
       </CueSlot>
     </Wrapper>
   );
