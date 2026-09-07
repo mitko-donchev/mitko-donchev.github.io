@@ -10,6 +10,7 @@ import BurgerIcon from "../../assets/svg/BurgerIcon";
 // Config
 import { SteamMark } from "../Buttons/WishlistButton";
 import { CTA_WISHLIST, STEAM_URL } from "../../config/links";
+import { STACK_BREAKPOINT } from "../../config/breakpoints";
 
 export default function TopNavbar() {
   const [y, setY] = useState(window.scrollY);
@@ -135,7 +136,20 @@ const BurderWrapper = styled.button`
   display: none;
   color: var(--accent);
   filter: drop-shadow(0 0 8px var(--accent-glow));
-  @media (max-width: 760px) {
+
+  /* The three groups below — logo, links, CTA — measure 740.8px laid out on
+     one line, so with the narrow 24px gutters the bar needs 788.8px to hold
+     them. The burger used to arrive at 760, which left 761-788 rendering a
+     two-line navbar with "Epic / Millennium" and "Wishlist on / Steam" both
+     broken in half. iPad portrait is 768, i.e. the middle of that band.
+
+     Collapsing on STACK_BREAKPOINT instead of a hand-picked number just above
+     788 buys real slack: the sum is Inter at 0.2em tracking, which measures
+     differently on Windows and Android, and a few percent of drift there
+     would reopen the gap. It also matches the page — below 860 the gutters
+     have already narrowed and the bestiary and map have already stacked, so
+     the bar was the last thing still pretending to be a desktop. */
+  @media (max-width: ${STACK_BREAKPOINT}px) {
     display: block;
   }
 `;
@@ -159,13 +173,13 @@ const UlWrapper = styled.ul`
     color: var(--ember);
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: ${STACK_BREAKPOINT}px) {
     display: none;
   }
 `;
 
 const UlWrapperRight = styled.ul`
-  @media (max-width: 760px) {
+  @media (max-width: ${STACK_BREAKPOINT}px) {
     display: none;
   }
 `;
