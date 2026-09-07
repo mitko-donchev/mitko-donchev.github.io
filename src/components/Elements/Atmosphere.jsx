@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import useReducedMotion from "../../hooks/useReducedMotion";
+import Motes from "./Motes";
 
-/* The page's weather. Three fixed layers over the base sky (body::before):
+/* The page's weather. Four fixed layers over the base sky (body::before):
 
      mist    two slow, huge, blurred banks that drift against each other
      grain   a static film grain, so the dark never looks like flat #000
+     motes   ash coming down the whole page, driven by the scroll
      vignette corners pulled down, keeping the eye centre-screen
 
    The mist also leans a few pixels against the pointer. It is deliberately
@@ -55,6 +57,7 @@ export default function Atmosphere() {
     <>
       <Mist ref={mistRef} aria-hidden="true" $still={reduced} />
       <Grain aria-hidden="true" />
+      <Motes />
       <Vignette aria-hidden="true" />
     </>
   );

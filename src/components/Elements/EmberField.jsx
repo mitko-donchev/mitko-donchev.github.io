@@ -56,7 +56,20 @@ export default function EmberField({ density = 1, className }) {
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const nextRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+      /* Bail on a no-op. The ResizeObserver below fires for changes that do
+         not move these numbers, and re-seeding on each one would restart the
+         field in front of the user. */
+      if (
+        Math.abs(rect.width - width) < 1 &&
+        Math.abs(rect.height - height) < 1 &&
+        nextRatio === ratio
+      ) {
+        return;
+      }
+
+      ratio = nextRatio;
       width = rect.width;
       height = rect.height;
       canvas.width = Math.round(width * ratio);
@@ -137,6 +150,18 @@ export default function EmberField({ density = 1, className }) {
     window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisibility);
 
+    /* The element can change size without the window doing so — the hero grows
+       a hundred pixels taller once the display face has loaded and the
+       entrance transforms have settled. Watching only `window.resize` left the
+       backing store measured against the old height, and the canvas was
+       stretched to fit: the hero's embers were rendering 11.7% too tall,
+       which on a circular mote is visible as an oval. */
+    let sizeObserver;
+    if (typeof ResizeObserver !== "undefined") {
+      sizeObserver = new ResizeObserver(() => resize());
+      sizeObserver.observe(canvas);
+    }
+
     // Suspend entirely once the field scrolls away.
     let observer;
     if (typeof IntersectionObserver !== "undefined") {
@@ -151,6 +176,7 @@ export default function EmberField({ density = 1, className }) {
       stop();
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
+      if (sizeObserver) sizeObserver.disconnect();
       if (observer) observer.disconnect();
     };
   }, [density, reduced]);

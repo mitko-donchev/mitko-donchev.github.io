@@ -131,6 +131,11 @@ raised three false "small tap target" findings before switching methods.
 
 ### Performance
 
+- A canvas whose CSS size can change without the window resizing needs a **ResizeObserver**, not
+  just a `window.resize` listener. `EmberField` had only the latter, and the hero grows ~100px
+  taller after mount once the display face loads — so its backing store stayed measured against
+  the old height and the canvas was stretched to fit, rendering the hero's embers 11.7% too tall.
+  Guard the resize handler against no-op calls or the observer re-seeds the field on every tick.
 - Scaling a ~200-element SVG re-rasterises all of it every frame, and sibling animations
   (flames, windows) defeat any raster cache. A scroll-driven gate that scaled the whole drawing
   was built and then **reverted for lag** — see `c2c4847`. Do not reintroduce a per-frame
@@ -230,6 +235,14 @@ Worth knowing:
   `scaleX`, so they form a real trapezoid.
 - **`src/components/Elements/ScrollCue.jsx`** — the shared scroll cue used by the hero. Passes
   `href` so it is focusable.
+- **`src/components/Elements/Motes.jsx`** — ash falling down the whole page, mounted by
+  `Atmosphere.jsx` as its fourth layer (mist, grain, motes, vignette). Fixed to the viewport, so
+  its cost does not grow with the document; scroll-coupled through a decaying gust. It is
+  deliberately **not** `EmberField` and not worth merging with it — that one is element-scoped,
+  rises, and suspends off-screen. Each mote is one pre-rendered sprite drawn with `drawImage`,
+  **not** a `createRadialGradient` per mote per frame, and the backing store is capped at 1.5x.
+  Verified: same-session A/B over a full-page scroll shows no steady-state frame cost at 1440 or
+  390; the only long frames are the first sweep's warm-up.
 - **`src/components/Buttons/WishlistButton.jsx`** — the gold CTA. An `<a>`, not a `<button>`, so
   middle-click and "copy link address" work. `SteamMark` is exported and reused by the navbar
   and drawer.
