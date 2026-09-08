@@ -78,6 +78,30 @@ export const CTA_WISHLIST = "Wishlist on Steam";
 export const CTA_TRAILER = "Watch Trailer";
 export const CTA_DEMO_BADGE = "Demo coming soon";
 
+// --- The demo notice ---------------------------------------------------------
+// Point this at a form endpoint (Buttondown, Formspree, ConvertKit, a Worker
+// — anything that accepts a POST) and the notice becomes a signup form.
+//
+// Empty on purpose. A form that posts nowhere is worse than no form, so while
+// this is blank the site points at the Discord instead, which is a channel
+// that already exists and already works. Nothing here collects anything until
+// you decide where it should go.
+export const NOTIFY_ENDPOINT = "";
+
+export const NOTIFY_KICKER = "The demo";
+export const NOTIFY_LINE = "It is coming. Be told when it lands.";
+export const NOTIFY_PLACEHOLDER = "you@example.com";
+export const NOTIFY_CTA = "Tell me";
+export const NOTIFY_SENDING = "Sending…";
+export const NOTIFY_DONE = "Noted. You will hear from us once.";
+export const NOTIFY_ERROR = "That did not go through. Try again, or find us on Discord.";
+export const NOTIFY_FALLBACK = "It is coming. The Discord hears first.";
+export const NOTIFY_FALLBACK_CTA = "Join the Discord";
+
+// --- Ambience ---
+export const SOUND_ON_LABEL = "Turn ambience on";
+export const SOUND_OFF_LABEL = "Turn ambience off";
+
 // --- SEO / social ---
 export const SITE_URL = "https://www.epicmillennium.com";
 export const SITE_TITLE = "Epic Millennium — Waybound";

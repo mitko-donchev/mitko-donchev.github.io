@@ -39,9 +39,22 @@ export default function Footer() {
   );
 }
 
+/* The ambience toggle is fixed to the bottom-right corner, so the last row
+   of the page is the one thing on the site that can end up underneath it —
+   at 1280 it landed on the arrow in "Back to top". Cleared by moving this
+   row, not by padding the whole footer: the page ends here, and the fix for
+   a 44px button should not be 48px of dead air for everyone.
+
+   Wide: the meta block stops short of the corner. Stacked: the button is
+   still in the corner but the rows are centred, so the clearance has to be
+   vertical instead. */
 const Wrapper = styled.footer`
   width: 100%;
   padding-bottom: 28px;
+
+  @media (max-width: 640px) {
+    padding-bottom: 76px;
+  }
 `;
 
 const Bar = styled.div`
@@ -79,8 +92,10 @@ const Meta = styled.div`
   display: flex;
   align-items: center;
   gap: 36px;
+  padding-right: 58px;
 
   @media (max-width: 640px) {
+    padding-right: 0;
     flex-direction: column;
     gap: 18px;
   }

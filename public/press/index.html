@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0B0E14" />
+<!-- TODO: remove this noindex once the press contact address below is real.
+     A press kit should be findable; a press kit with a dead contact should
+     not be. -->
+<meta name="robots" content="noindex" />
+<title>Press kit — Waybound, Epic Millennium</title>
+<meta name="description" content="Press kit for Waybound, an action-RPG roguelike by Epic Millennium: fact sheet, figures, art assets and contact." />
+<link rel="icon" href="/favicon.ico?v=2" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" />
+<!--
+  A flat static document, not a route in the app. Journalists and streamers
+  open this, skim it, and copy things out of it; it should not need a bundle
+  to do that, and it should print. Every figure here is the same one the site
+  and the build use — if you change a number in src/config/links.js, change it
+  here. Bound by the COPY RULE like everything else.
+-->
+<style>
+  :root {
+    --ink:#0B0E14; --ink-raised:#131926; --bone:#EDE6D8; --bone-dim:#9C9689; --bone-faint:#827E73;
+    --ember:#E8A33D; --ember-hot:#F7CE84; --verdigris:#5FB6A8;
+    --hairline:rgba(237,230,216,0.10); --hairline-strong:rgba(237,230,216,0.18);
+    --ease-out:cubic-bezier(0.16,1,0.3,1);
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ink); color:var(--bone);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  body::before {
+    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(120% 70% at 50% 120%, rgba(232,163,61,0.10) 0%, transparent 60%),
+      radial-gradient(80% 55% at 88% 4%, rgba(76,92,148,0.12), transparent 60%),
+      linear-gradient(180deg,#0A0D16 0%,var(--ink) 46%,#0C1017 100%);
+  }
+  .wrap { max-width:860px; margin:0 auto; padding:clamp(48px,7vw,90px) 24px 90px; }
+  .kicker { font-size:0.7rem; font-weight:600; letter-spacing:0.24em; text-transform:uppercase; color:var(--ember); margin:0 0 14px; }
+  h1 { font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:clamp(2.4rem,8vw,3.8rem); line-height:1.05; margin:0 0 10px; }
+  h2 {
+    font-family:'Cormorant Garamond',Georgia,serif; font-weight:600;
+    font-size:clamp(1.5rem,4vw,1.9rem); margin:56px 0 18px; padding-top:22px;
+    border-top:1px solid var(--hairline);
+  }
+  h3 { font-size:0.72rem; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; color:var(--bone-faint); margin:26px 0 10px; }
+  .lede { font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-size:1.35rem; color:var(--bone-dim); margin:0 0 8px; }
+  p { margin:0 0 16px; color:var(--bone-dim); }
+  p.plain { color:var(--bone); }
+  a { color:var(--ember); text-decoration:none; border-bottom:1px solid rgba(232,163,61,0.28); }
+  a:hover { color:var(--ember-hot); }
+  a:focus-visible { outline:2px solid var(--ember); outline-offset:3px; }
+  dl { display:grid; grid-template-columns:180px 1fr; gap:0; margin:0; }
+  dt { padding:9px 0; border-bottom:1px solid var(--hairline); font-size:0.72rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--bone-faint); }
+  dd { padding:9px 0; border-bottom:1px solid var(--hairline); margin:0; color:var(--bone); }
+  @media (max-width:560px) { dl { grid-template-columns:1fr; } dt { border-bottom:none; padding-bottom:0; } }
+  ul { margin:0 0 16px; padding-left:20px; color:var(--bone-dim); }
+  li { margin-bottom:9px; }
+  li strong { color:var(--bone); font-weight:600; }
+  table { width:100%; border-collapse:collapse; margin:0 0 18px; font-size:0.94rem; }
+  th { text-align:left; font-size:0.68rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--bone-faint); padding:9px 12px 9px 0; border-bottom:1px solid var(--hairline-strong); }
+  td { padding:10px 12px 10px 0; border-bottom:1px solid var(--hairline); color:var(--bone-dim); }
+  td:first-child { color:var(--bone); }
+  .figures { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:18px; margin:0 0 20px; }
+  .fig { padding:16px 0; border-top:1px solid var(--hairline); }
+  .fig b { display:block; font-family:'Cormorant Garamond',Georgia,serif; font-size:2rem; font-weight:600; color:var(--ember); line-height:1; }
+  .fig span { font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--bone-faint); }
+  .assets { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; }
+  .asset { border:1px solid var(--hairline); border-radius:2px; padding:16px; background:rgba(255,255,255,0.014); }
+  .asset img { display:block; width:100%; height:auto; margin-bottom:12px; background:var(--ink-raised); border-radius:1px; }
+  .asset b { display:block; font-size:0.86rem; color:var(--bone); margin-bottom:2px; }
+  .asset span { font-size:0.74rem; color:var(--bone-faint); }
+  .note { font-size:0.86rem; color:var(--bone-faint); font-style:italic; }
+  footer { margin-top:70px; padding-top:22px; border-top:1px solid var(--hairline); font-size:0.8rem; color:var(--bone-faint); }
+  @media print {
+    body { background:#fff; color:#111; }
+    body::before { display:none; }
+    a { color:#111; }
+    h2 { border-color:#ccc; } dt,dd,td,th,.fig { border-color:#ddd; }
+    p,dd,td,ul,.fig span { color:#333; }
+    .asset img { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Press kit</p>
+  <h1>Waybound</h1>
+  <p class="lede">Something out here is keeping count.</p>
+  <p class="plain">An action-RPG roguelike about one road out of a village. Fast bow combat, a leap that
+  buys you room, and a run that is never quite the one you walked last time.</p>
+
+  <h2>Fact sheet</h2>
+  <dl>
+    <dt>Title</dt><dd>Waybound</dd>
+    <dt>Developer</dt><dd>Epic Millennium — a small, independent team</dd>
+    <dt>Genre</dt><dd>Action RPG · Roguelike</dd>
+    <dt>Platform</dt><dd>Steam (PC)</dd>
+    <dt>Engine</dt><dd>Godot · GDScript</dd>
+    <dt>Release</dt><dd>TBD</dd>
+    <dt>Demo</dt><dd>Coming soon</dd>
+    <dt>Price</dt><dd>TBD</dd>
+    <dt>Website</dt><dd><a href="https://www.epicmillennium.com">epicmillennium.com</a></dd>
+    <dt>Press contact</dt><dd><a href="mailto:press@epicmillennium.com">press@epicmillennium.com</a></dd>
+  </dl>
+
+  <h2>Description</h2>
+  <h3>Short</h3>
+  <p>Waybound is an action-RPG roguelike built around one road out of a village — woods, narrows and a
+  skeleton camp — with fast bow combat, a leap that buys you room, and runs that reshape every time you fall.</p>
+  <h3>Long</h3>
+  <p>There is a village, and there is one road out of it. The gate stands open and nobody is guarding it.
+  Take the road and find out what that is worth.</p>
+  <p>Fast, readable bow combat: nock, loose, and a leap that buys back the distance you just gave away.
+  Skeletons come in pairs, the narrows give you nowhere to stand, and the thing at the far end does not
+  flinch when you chip it.</p>
+  <p>Part action-RPG, part roguelike. Runs reshape themselves every time you fall, and each attempt teaches
+  you something the last one charged you for.</p>
+  <p>Built from the ground up in Godot with GDScript by a small team making the game we always wanted to
+  play — in the open, with the players who care about it as much as we do.</p>
+
+  <h2>Features</h2>
+  <ul>
+    <li><strong>Bow combat you can read.</strong> Nock, loose, and a short leap that buys back the distance you just gave away.</li>
+    <li><strong>Encounters that punish noise.</strong> Wake one skeleton within seven metres of another and both of them come.</li>
+    <li><strong>Ground that takes your options away.</strong> The narrows squeeze the road to fourteen metres. No room to kite.</li>
+    <li><strong>Runs that reshape.</strong> Each attempt teaches you something the last one charged you for.</li>
+    <li><strong>A book you carry.</strong> Not a menu — a real object that keeps a record of the road behind you.</li>
+  </ul>
+
+  <h2>The Cursed Path — arena 01</h2>
+  <p>Seventy-four metres of road, surveyed end to end: wooded path, boulder narrows, and a skeleton camp
+  that has no intention of letting you through quietly. Every figure below is taken from the level's design
+  doc rather than estimated.</p>
+  <div class="figures">
+    <div class="fig"><b>74</b><span>metres end to end</span></div>
+    <div class="fig"><b>12</b><span>things that want you dead</span></div>
+    <div class="fig"><b>3</b><span>chests worth the risk</span></div>
+    <div class="fig"><b>?</b><span>ways out</span></div>
+  </div>
+  <table>
+    <thead><tr><th>Waypoint</th><th>Distance</th><th>What is there</th></tr></thead>
+    <tbody>
+      <tr><td>The Village Gate</td><td>0 m</td><td>Spawn point, open ground</td></tr>
+      <tr><td>The Wooded Path</td><td>≈ 18 m</td><td>Shout radius 7 m, fighting pairs</td></tr>
+      <tr><td>The Narrows</td><td>≈ 34 m</td><td>14 m across, no retreat line</td></tr>
+      <tr><td>The Skeleton Camp</td><td>56 m</td><td>Camp Elite · 90 HP, 2 chests, 3 s each</td></tr>
+      <tr><td>The Far Gate</td><td>74 m</td><td>Gate Boss · 240 HP</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What walks it</h2>
+  <p>Three tiers of the same dead thing, told apart by silhouette before they are told apart by health bar.
+  Heights are measured from the meshes.</p>
+  <table>
+    <thead><tr><th>Name</th><th>Tier</th><th>Height</th><th>Stats</th></tr></thead>
+    <tbody>
+      <tr><td>The Ranger</td><td>You</td><td>1.80 m</td><td>Bow · Disengage</td></tr>
+      <tr><td>Skeleton</td><td>Minion</td><td>2.17 m</td><td>30 HP · 15 dmg</td></tr>
+      <tr><td>Warrior</td><td>Elite</td><td>2.96 m</td><td>90 HP · 23 dmg</td></tr>
+      <tr><td>Golem</td><td>Boss</td><td>4.23 m</td><td>240 HP · 30 dmg</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Assets</h2>
+  <p class="note">Free to use in coverage of the game. Please credit Epic Millennium.</p>
+  <div class="assets">
+    <div class="asset">
+      <img src="/logo-full.png?v=1" alt="Epic Millennium studio logo" width="480" height="480" loading="lazy" />
+      <b>Studio logo</b><span><a href="/logo-full.png?v=1" download>PNG · 480 × 480</a></span>
+    </div>
+    <div class="asset">
+      <img src="/og-image.png" alt="Waybound key art: a road leading out of a village gate at dusk" width="1200" height="630" loading="lazy" />
+      <b>Key art</b><span><a href="/og-image.png" download>PNG · 1200 × 630</a></span>
+    </div>
+  </div>
+  <p class="note" style="margin-top:18px">Screenshots and trailer to follow.</p>
+
+  <h2>The studio</h2>
+  <p>Epic Millennium is an independent studio building the games we always wanted to play. No publishers
+  dictating the vision, no compromises — just games crafted by players, for players.</p>
+  <table>
+    <thead><tr><th>Name</th><th>Role</th><th>Link</th></tr></thead>
+    <tbody>
+      <tr><td>Dimitar Petrov</td><td>Game Developer</td><td><a href="https://github.com/dvp-petrov">github.com/dvp-petrov</a></td></tr>
+      <tr><td>Mitko Donchev</td><td>Game Developer</td><td><a href="https://github.com/mitko-donchev">github.com/mitko-donchev</a></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Elsewhere</h2>
+  <dl>
+    <dt>Steam</dt><dd><a href="https://store.steampowered.com/">Store page</a></dd>
+    <dt>Discord</dt><dd><a href="https://discord.gg/VB3hGbUEb">discord.gg/VB3hGbUEb</a></dd>
+    <dt>X</dt><dd><a href="https://x.com/EpicMillennium">@EpicMillennium</a></dd>
+    <dt>YouTube</dt><dd><a href="https://www.youtube.com/@epicmillennium">@epicmillennium</a></dd>
+  </dl>
+
+  <footer>
+    Epic Millennium · <a href="/">epicmillennium.com</a>
+  </footer>
+</div>
+</body>
+</html>
