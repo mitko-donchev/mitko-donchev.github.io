@@ -83,9 +83,72 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Epic Millennium — Waybound</title>
+    <style>
+      /* Inline on purpose: a stylesheet request would put this behind exactly
+         the round trip it exists to fill. */
+      #firstlight {
+        position: fixed;
+        inset: 0;
+        z-index: 9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background:
+          radial-gradient(120% 80% at 50% 118%, rgba(232, 163, 61, 0.20) 0%, rgba(185, 116, 31, 0.06) 34%, transparent 62%),
+          radial-gradient(80% 55% at 88% 14%, rgba(76, 92, 148, 0.14), transparent 60%),
+          linear-gradient(180deg, #0A0D16 0%, #0B0E14 46%, #0C1017 100%);
+        opacity: 1;
+        transition: opacity 620ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      #firstlight.is-gone { opacity: 0; }
+      .fl-mark {
+        font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+        font-size: 1.05rem;
+        letter-spacing: 0.42em;
+        text-indent: 0.42em;
+        text-transform: uppercase;
+        color: #9C9689;
+      }
+      .fl-rule {
+        width: 84px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(232, 163, 61, 0.55), transparent);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #firstlight { transition: none; }
+      }
+    </style>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <!-- Only parsed when scripting is off, which is exactly when the card
+           below has nothing coming to replace it. -->
+      <style>#firstlight { display: none !important; }</style>
+      You need to enable JavaScript to run this app.
+    </noscript>
+
+    <!--
+      First light.
+
+      #root ships empty, so until the bundle has downloaded and run there is
+      nothing to paint and first contentful paint lands after the load event —
+      about 2.4s of blank on a cold visit. This is a title card in the game's
+      own dark, discoverable in the first packet of HTML, with real text in it
+      so it actually counts as contentful.
+
+      It is a card, not a fake hero. Trying to match the real lockup's
+      position would put a 150px jump between the two; a card that dissolves
+      cannot be in the wrong place because it is never in the same place
+      twice. Landing.jsx removes it after React has committed — see
+      src/lib/firstLight.js.
+    -->
+    <div id="firstlight" aria-hidden="true">
+      <div class="fl-mark">Epic Millennium</div>
+      <div class="fl-rule"></div>
+    </div>
+
     <div id="root"></div>
     <!--
       This HTML file is a template.

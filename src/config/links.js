@@ -68,10 +68,39 @@ export const GAME_DEMO = "Coming soon";
 export const GAME_PLATFORM = "Steam";
 export const GAME_ENGINE = "Godot · GDScript";
 
+// Shown in the tab while the visitor is looking at something else. It has to
+// be atmospheric and it has to explain nothing — an invitation back, not a
+// hint. Lifted from the synopsis, which is already inside the COPY RULE.
+export const AWAY_TITLE = "The gate is still open.";
+
 // --- CTA labels ---
 export const CTA_WISHLIST = "Wishlist on Steam";
 export const CTA_TRAILER = "Watch Trailer";
 export const CTA_DEMO_BADGE = "Demo coming soon";
+
+// --- The demo notice ---------------------------------------------------------
+// Point this at a form endpoint (Buttondown, Formspree, ConvertKit, a Worker
+// — anything that accepts a POST) and the notice becomes a signup form.
+//
+// Empty on purpose. A form that posts nowhere is worse than no form, so while
+// this is blank the site points at the Discord instead, which is a channel
+// that already exists and already works. Nothing here collects anything until
+// you decide where it should go.
+export const NOTIFY_ENDPOINT = "";
+
+export const NOTIFY_KICKER = "The demo";
+export const NOTIFY_LINE = "It is coming. Be told when it lands.";
+export const NOTIFY_PLACEHOLDER = "you@example.com";
+export const NOTIFY_CTA = "Tell me";
+export const NOTIFY_SENDING = "Sending…";
+export const NOTIFY_DONE = "Noted. You will hear from us once.";
+export const NOTIFY_ERROR = "That did not go through. Try again, or find us on Discord.";
+export const NOTIFY_FALLBACK = "It is coming. The Discord hears first.";
+export const NOTIFY_FALLBACK_CTA = "Join the Discord";
+
+// --- Ambience ---
+export const SOUND_ON_LABEL = "Turn ambience on";
+export const SOUND_OFF_LABEL = "Turn ambience off";
 
 // --- SEO / social ---
 export const SITE_URL = "https://www.epicmillennium.com";
@@ -113,6 +142,20 @@ export const PATH_TITLE = "The Cursed Path";
 export const PATH_KICKER = "Arena 01";
 export const PATH_INTRO =
   "Seventy-four metres of road, surveyed end to end: wooded path, boulder narrows, and a skeleton camp that has no intention of letting you through quietly. Walk it, if the road lets you.";
+
+/* The same figures as the intel strings below, as numbers, so the map can
+   draw them to scale instead of only naming them. Kept here rather than
+   parsed back out of "Shout radius 7 m" — a drawing that measures itself
+   against a regex is a drawing waiting to be wrong. */
+export const PATH_SURVEY = {
+  length: 74,        // metres, village gate to far gate
+  shoutRadius: 7,    // wake one skeleton within this of another and both come
+  narrowsWidth: 14,  // how far apart the boulders leave the road
+  scaleBar: 10,      // the bar drawn so the reader can measure anything else
+};
+export const PATH_SURVEY_LABEL = "Survey";
+export const PATH_SURVEY_NOTE =
+  "Drawn to the road's own scale, from the level's design doc.";
 
 export const PATH_WAYPOINTS = [
   {
