@@ -1,40 +1,20 @@
 import React from "react";
-import { Helmet } from "react-helmet";
 // Screens
 import Landing from "./screens/Landing.jsx";
-// Config
-import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL } from "./config/links";
 
+/* There is deliberately no <Helmet> here, and no document-level markup at all.
+   Every tag it used to write — title, description, Open Graph, Twitter — now
+   lives in public/index.html, for two reasons that both cost us once already:
+
+   1. Crawlers and link unfurlers read the served HTML and do not run the
+      bundle, so a share card assembled by React is a share card no scraper
+      ever sees.
+   2. Helmet writes after mount. Anything the browser needs early — the fonts,
+      the preloads, the first-light card — has to be in the document the
+      parser already has.
+
+   The static head is now the only place these are declared, so there is one
+   copy to keep true rather than two that can drift. */
 export default function App() {
-  return (
-    <>
-      <Helmet>
-        <title>{SITE_TITLE}</title>
-        <meta name="description" content={SITE_DESCRIPTION} />
-        <meta name="theme-color" content="#0B0E14" />
-
-        {/* The fonts are NOT here. Helmet writes its tags after React mounts,
-            so a stylesheet declared in this file cannot begin downloading
-            until the whole bundle has arrived and run — measured at ~2s into
-            a cold load, with the preconnect hints arriving too late to have
-            warmed anything. Cormorant Garamond and Inter are requested from
-            public/index.html instead, where the parser finds them in the
-            first packet. Anything else render-blocking belongs there too. */}
-
-        {/* Open Graph */}
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={SITE_TITLE} />
-        <meta property="og:description" content={SITE_DESCRIPTION} />
-        <meta property="og:url" content={SITE_URL} />
-        <meta property="og:image" content={`${SITE_URL}/og-image.png`} />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={SITE_TITLE} />
-        <meta name="twitter:description" content={SITE_DESCRIPTION} />
-        <meta name="twitter:image" content={`${SITE_URL}/og-image.png`} />
-      </Helmet>
-      <Landing />
-    </>
-  );
+  return <Landing />;
 }
