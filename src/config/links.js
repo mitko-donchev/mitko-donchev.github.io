@@ -4,7 +4,7 @@
 // --- External links (placeholders — swap for the real URLs later) ---
 // TODO: Steam store / wishlist page for Waybound.
 export const STEAM_URL = "https://store.steampowered.com/";
-export const DISCORD_URL = "https://discord.gg/VB3hGbUEb";
+export const DISCORD_URL = "https://discord.com/invite/UuWXZYDgg2";
 export const TWITTER_URL = "https://x.com/EpicMillennium";
 export const YOUTUBE_URL = "https://www.youtube.com/@epicmillennium";
 // TODO: YouTube trailer for the "Watch Trailer" CTA.
