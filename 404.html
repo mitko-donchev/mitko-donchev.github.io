@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0B0E14" />
+<meta name="robots" content="noindex" />
+<title>Off the road — Epic Millennium</title>
+<link rel="icon" href="/favicon.ico?v=2" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500;600&display=swap" />
+<!--
+  Served by GitHub Pages for any path that is not a file. Deliberately a flat
+  static page rather than a route in the app: a 404 that has to download and
+  boot a 117 kB bundle before it can say "wrong turn" is a worse 404, and this
+  one is under 5 kB with one font request it shares with the site.
+
+  The copy is duplicated from the tone of src/config/links.js rather than
+  imported, for the same reason the OG tags in index.html are: this file
+  cannot run the bundle. It is still bound by the COPY RULE — keep it in step.
+-->
+<style>
+  :root {
+    --ink: #0B0E14; --bone: #EDE6D8; --bone-dim: #9C9689; --bone-faint: #827E73;
+    --ember: #E8A33D; --ember-hot: #F7CE84;
+    --hairline: rgba(237, 230, 216, 0.10);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100svh; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 24px;
+    background: var(--ink); color: var(--bone);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    position: relative; overflow-x: hidden;
+  }
+  /* The same sky as the site, minus the layers that need JavaScript. */
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(120% 80% at 50% 118%, rgba(232,163,61,0.16) 0%, rgba(185,116,31,0.05) 34%, transparent 62%),
+      radial-gradient(90% 60% at 12% 4%, rgba(95,182,168,0.10), transparent 58%),
+      radial-gradient(80% 55% at 88% 14%, rgba(76,92,148,0.14), transparent 60%),
+      linear-gradient(180deg, #0A0D16 0%, var(--ink) 46%, #0C1017 100%);
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(120% 84% at 50% 44%, transparent 42%, rgba(4,6,10,0.5) 84%, rgba(4,6,10,0.78) 100%);
+  }
+  main { max-width: 560px; text-align: center; animation: rise 1s var(--ease-out) both; }
+  @keyframes rise { from { opacity: 0; transform: translate3d(0, 16px, 0); } to { opacity: 1; transform: none; } }
+  svg { display: block; width: 190px; height: auto; margin: 0 auto 34px; }
+  .label {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--ember); margin: 0 0 18px;
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+    font-weight: 600; font-size: clamp(2rem, 7vw, 3rem); line-height: 1.1;
+    margin: 0 0 20px; letter-spacing: 0.005em;
+  }
+  p { margin: 0 auto 32px; max-width: 42ch; color: var(--bone-dim); line-height: 1.65; }
+  a.back {
+    display: inline-block; padding: 13px 30px;
+    border: 1px solid var(--hairline); border-radius: 2px;
+    color: var(--bone); text-decoration: none;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    transition: color 240ms var(--ease-out), border-color 240ms var(--ease-out);
+  }
+  a.back:hover, a.back:focus-visible { color: var(--ember-hot); border-color: rgba(232,163,61,0.42); }
+  a:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+  .sig { margin-top: 40px; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--bone-faint); }
+  @media (prefers-reduced-motion: reduce) {
+    main { animation: none; }
+    .flame { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <!-- The gate, shut. Everywhere else on the site it stands open.
+       Two braced leaves under a shingled roof, drawn the way a timber gate is
+       actually built: planks running vertically, a diagonal brace in each
+       leaf carrying the weight back to the hinge, and the rings meeting where
+       the doors do. -->
+  <svg viewBox="0 0 200 150" role="img" aria-label="A timber gate, closed and braced, under a shingled roof">
+    <g fill="none" stroke="#6E5638" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Roof and its ridge -->
+      <path d="M8,48 L100,14 L192,48" />
+      <path d="M16,54 L184,54" />
+      <!-- Posts -->
+      <path d="M32,54 L32,140 M168,54 L168,140" />
+      <!-- Lintel over the doors -->
+      <path d="M40,64 L160,64" />
+      <!-- Ground -->
+      <path d="M6,140 L194,140" />
+    </g>
+
+    <!-- The two leaves -->
+    <rect x="44" y="66" width="55" height="74" fill="#0C1017" stroke="#6E5638" stroke-width="2" />
+    <rect x="101" y="66" width="55" height="74" fill="#0C1017" stroke="#6E5638" stroke-width="2" />
+    <g stroke="#7A6141" stroke-width="1.4" opacity="0.8" fill="none">
+      <!-- Planks -->
+      <path d="M58,66 L58,140 M72,66 L72,140 M86,66 L86,140" />
+      <path d="M115,66 L115,140 M129,66 L129,140 M143,66 L143,140" />
+      <!-- A brace in each leaf, running back to its hinge -->
+      <path d="M46,136 L97,70" />
+      <path d="M154,136 L103,70" />
+    </g>
+
+    <!-- Rings, meeting where the doors do -->
+    <g fill="none" stroke="#B9741F" stroke-width="1.8">
+      <circle cx="93" cy="103" r="5" />
+      <circle cx="107" cy="103" r="5" />
+    </g>
+
+    <!-- The lanterns are still lit. Nobody is here. -->
+    <g class="flame">
+      <circle cx="32" cy="60" r="3.2" fill="#F7CE84" opacity="0.9" />
+      <circle cx="168" cy="60" r="3.2" fill="#F7CE84" opacity="0.9" />
+      <circle cx="32" cy="60" r="12" fill="#E8A33D" opacity="0.13" />
+      <circle cx="168" cy="60" r="12" fill="#E8A33D" opacity="0.13" />
+      <animate attributeName="opacity" values="1;0.72;1;0.85;1" dur="5.5s" repeatCount="indefinite" />
+    </g>
+  </svg>
+
+  <p class="label">404</p>
+  <h1>This is not on the map.</h1>
+  <p>There is one road out of the village, and you are not on it. Nothing out here has been surveyed.</p>
+  <a class="back" href="/">Back to the road</a>
+  <p class="sig">Epic Millennium</p>
+</main>
+</body>
+</html>
