@@ -11,16 +11,13 @@ import {
   PATH_INTRO,
   PATH_WAYPOINTS,
   PATH_FACTS,
-  PATH_SURVEY,
-  PATH_SURVEY_LABEL,
-  PATH_SURVEY_NOTE,
 } from "../../config/links";
 import { STACKED } from "../../config/breakpoints";
 
 /* ---------------------------------------------------------------------------
    Geometry
 
-   OUTBOUND is the surveyed road: west gate to far gate, and the only thing
+   OUTBOUND is the drawn road: west gate to far gate, and the only thing
    the map draws. RETURN_TAIL is the traveller's way back to the start of its
    circuit — deliberately NEVER RENDERED. The two are concatenated into LOOP
    only so the wisp has a route, and it fades out before it reaches that leg.
@@ -47,7 +44,7 @@ const NODES = [
   { x: 866, y: 292 },
 ];
 
-/* The same road, surveyed down the page instead of across it.
+/* The same road, drawn down the page instead of across it.
 
    A phone cannot hold a 1000-unit map: squeezed to fit, the waypoint names
    come out a few pixels tall, and held at full size it has to be dragged
@@ -71,7 +68,7 @@ const NODES_V = [
 ];
 
 /* Everything the two orientations disagree about, in one place: the road, the
-   nodes, the survey grid, and where a node hangs its name. */
+   nodes, the grid, and where a node hangs its name. */
 const ACROSS = {
   viewBox: "0 0 1000 420",
   outbound: OUTBOUND,
@@ -89,17 +86,6 @@ const ACROSS = {
   /* One block, so the name and the distance beneath it cannot end up on
      different sides of the node. */
   label: { x: 0, anchor: "middle", y: 54, distanceY: 72 },
-  /* Across the road, for the narrows dimension, and a clear corner for the
-     scale bar. The road runs left to right here, so across it is down. */
-  survey: {
-    perp: { x: 0, y: 1 },
-    bar: { x: 60, y: 58 },
-    /* Shifted down the road, into the gap before the camp. Centred on the
-       node it ran straight through the waypoint's own name and distance. */
-    narrowsOffset: 62,
-    labelSide: -1,
-    labelAnchor: "middle",
-  },
 };
 
 const DOWN = {
@@ -117,153 +103,7 @@ const DOWN = {
   ],
   tick: { x1: 22, y1: 0, x2: 32, y2: 0 },
   label: { x: 40, anchor: "start", y: -2, distanceY: 16 },
-  survey: {
-    perp: { x: 1, y: 0 },
-    bar: { x: 210, y: 632 },
-    /* Pushed clear of the node's own name, which sits beside it down here. */
-    narrowsOffset: 34,
-    labelSide: 1,
-    labelAnchor: "start",
-  },
 };
-
-
-/* The three figures the drawing knows but does not say.
- *
- * Everything is derived from one measurement — SVG units per metre, taken off
- * the road's own path — so the annotations are to the drawing's scale in both
- * orientations without a second set of numbers to keep in step. The distances
- * at each waypoint are already on the map; these are the ones that were only
- * ever words.
- */
-function surveyMarks(layout, upm) {
-  const { nodes, survey } = layout;
-  const { perp, bar, narrowsOffset, labelSide, labelAnchor } = survey;
-  // Along the road is the other axis; both are unit vectors by construction.
-  const along = { x: perp.y, y: perp.x };
-
-  const wood = nodes[1];
-  const narrows = nodes[2];
-  const shoutR = PATH_SURVEY.shoutRadius * upm;
-  const half = (PATH_SURVEY.narrowsWidth / 2) * upm;
-  const barLength = PATH_SURVEY.scaleBar * upm;
-  const TICK = 6;
-
-  const cx = narrows.x + along.x * narrowsOffset;
-  const cy = narrows.y + along.y * narrowsOffset;
-  const ax = cx - perp.x * half;
-  const ay = cy - perp.y * half;
-  const bx = cx + perp.x * half;
-  const by = cy + perp.y * half;
-  const lx = cx + perp.x * labelSide * (half + 10);
-  const ly = cy + perp.y * labelSide * (half + 10);
-
-  return (
-    <>
-      {/* Wake one skeleton this close to another and both of them come. */}
-      <circle cx={wood.x} cy={wood.y} r={shoutR} fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="5 7" opacity="0.62" />
-      <circle cx={wood.x} cy={wood.y} r="2" fill="currentColor" />
-      <SurveyText x={wood.x} y={wood.y - shoutR - 9} textAnchor="middle">
-        {`shout ${PATH_SURVEY.shoutRadius} m`}
-      </SurveyText>
-
-      {/* How much road the boulders leave you. */}
-      <line x1={ax} y1={ay} x2={bx} y2={by} stroke="currentColor" strokeWidth="1" />
-      <line x1={ax - along.x * TICK} y1={ay - along.y * TICK} x2={ax + along.x * TICK} y2={ay + along.y * TICK} stroke="currentColor" strokeWidth="1" />
-      <line x1={bx - along.x * TICK} y1={by - along.y * TICK} x2={bx + along.x * TICK} y2={by + along.y * TICK} stroke="currentColor" strokeWidth="1" />
-      <SurveyText x={lx} y={ly + 4} textAnchor={labelAnchor}>
-        {`${PATH_SURVEY.narrowsWidth} m across`}
-      </SurveyText>
-
-      {/* So anything else on the map can be measured by eye. */}
-      <g transform={`translate(${bar.x} ${bar.y})`}>
-        <line x1="0" y1="0" x2={barLength} y2="0" stroke="currentColor" strokeWidth="1" />
-        <line x1="0" y1="-4" x2="0" y2="4" stroke="currentColor" strokeWidth="1" />
-        <line x1={barLength / 2} y1="-3" x2={barLength / 2} y2="3" stroke="currentColor" strokeWidth="1" opacity="0.6" />
-        <line x1={barLength} y1="-4" x2={barLength} y2="4" stroke="currentColor" strokeWidth="1" />
-        <SurveyText x={barLength / 2} y="-9" textAnchor="middle">
-          {`${PATH_SURVEY.scaleBar} m`}
-        </SurveyText>
-      </g>
-    </>
-  );
-}
-
-/* --- survey overlay styles ---------------------------------------------- */
-
-/* Verdigris, not ember. The road is drawn in firelight; the survey is drawn
-   in ink over the top of it, and keeping the two inks apart is what stops the
-   annotations reading as part of the place. */
-const SurveyLayer = styled.g`
-  color: var(--verdigris);
-  opacity: ${(props) => (props.$on ? 1 : 0)};
-  pointer-events: none;
-  transition: opacity 420ms var(--ease-soft);
-`;
-
-const SurveyText = styled.text`
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  fill: currentColor;
-`;
-
-const SurveyRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-top: var(--space-group);
-`;
-
-const SurveyButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 16px;
-  background: transparent;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 2px;
-  color: var(--bone-dim);
-  font-family: var(--font-ui);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 240ms var(--ease-soft), border-color 240ms var(--ease-soft);
-
-  &:hover {
-    color: var(--verdigris-hot);
-    border-color: var(--verdigris-glow);
-  }
-
-  &[aria-pressed="true"] {
-    color: var(--verdigris-hot);
-    border-color: var(--verdigris-glow);
-  }
-`;
-
-/* A surveyor's checkbox. Fills rather than ticks, so there is no glyph to go
-   missing in a font that does not have one. */
-const SurveyTick = styled.span`
-  width: 9px;
-  height: 9px;
-  border: 1px solid currentColor;
-  border-radius: 1px;
-  background: ${(props) => (props.$on ? "currentColor" : "transparent")};
-  transition: background 240ms var(--ease-soft);
-`;
-
-const SurveyNote = styled.p`
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--bone-faint);
-  opacity: ${(props) => (props.$on ? 1 : 0)};
-  transition: opacity 320ms var(--ease-soft);
-`;
 
 /* One lap. Slow on purpose — the road is a sentence, not a loading bar. */
 const LAP_SECONDS = 22;
@@ -313,16 +153,6 @@ export default function CursedPath() {
   const [hovered, setHovered] = useState(null);
   const active = hovered !== null ? hovered : reached;
 
-  /* Off by default. The map is a drawing first; the figures are for anyone
-     who wants to check the drawing. */
-  const [survey, setSurvey] = useState(false);
-
-  /* SVG units per metre, measured off the drawn road rather than declared.
-     The two orientations are different lengths and the road winds, so the
-     only honest scale is the one the path itself reports. */
-  const [unitsPerMetre, setUnitsPerMetre] = useState(0);
-
-  const roadRef = useRef(null);
   const loopRef = useRef(null);
   const travellerRef = useRef(null);
   const tailRefs = useRef([]);
@@ -340,13 +170,6 @@ export default function CursedPath() {
   const setNodeRef = useCallback((index) => (element) => {
     nodeRefs.current[index] = element;
   }, []);
-
-  useEffect(() => {
-    const road = roadRef.current;
-    if (!road) return;
-    // User units, so this is correct before layout and at any rendered size.
-    setUnitsPerMetre(road.getTotalLength() / PATH_SURVEY.length);
-  }, [layout]);
 
   useEffect(() => {
     if (reduced || !inView) return undefined;
@@ -481,21 +304,10 @@ export default function CursedPath() {
         <span className="hudLabel">{PATH_KICKER}</span>
         <Title className="displayFont textGradient">{PATH_TITLE}</Title>
         <Intro className="font18">{PATH_INTRO}</Intro>
-        <SurveyRow>
-          <SurveyButton
-            type="button"
-            aria-pressed={survey}
-            onClick={() => setSurvey((on) => !on)}
-          >
-            <SurveyTick aria-hidden="true" $on={survey} />
-            {PATH_SURVEY_LABEL}
-          </SurveyButton>
-          <SurveyNote $on={survey}>{PATH_SURVEY_NOTE}</SurveyNote>
-        </SurveyRow>
       </Head>
 
       <MapFrame $in={inView} $stacked={stacked}>
-        <Svg viewBox={layout.viewBox} $stacked={stacked} role="img" aria-label={`${PATH_TITLE} — a surveyed map of the road out of the village, from the village gate to the far gate`}>
+        <Svg viewBox={layout.viewBox} $stacked={stacked} role="img" aria-label={`${PATH_TITLE} — a map of the road out of the village, from the village gate to the far gate`}>
           <defs>
             <radialGradient id="wispGlow">
               <stop offset="0%" stopColor="#FBE7BC" stopOpacity="1" />
@@ -516,7 +328,7 @@ export default function CursedPath() {
             </filter>
           </defs>
 
-          {/* Faint survey grid — a chart of somewhere real, not a diagram. */}
+          {/* Faint chart grid — a drawing of somewhere real, not a diagram. */}
           <g opacity="0.16">
             {layout.grid.map((line, index) => (
               <line
@@ -534,7 +346,6 @@ export default function CursedPath() {
 
           {/* The road itself: a wide dim bed with the lit line drawn over it. */}
           <path
-            ref={roadRef}
             d={layout.outbound}
             fill="none"
             stroke="rgba(232,163,61,0.13)"
@@ -545,15 +356,6 @@ export default function CursedPath() {
 
           {/* Measured, invisible, and the only thing the traveller follows. */}
           <path ref={loopRef} d={layout.loop} fill="none" stroke="none" />
-
-          {/* The figures, when asked for. Purely visual — every number here is
-              already spoken in the waypoints' aria-labels, so the overlay is
-              hidden from assistive tech rather than repeated to it. */}
-          {unitsPerMetre > 0 && (
-            <SurveyLayer $on={survey} aria-hidden="true">
-              {surveyMarks(layout, unitsPerMetre)}
-            </SurveyLayer>
-          )}
 
           {/* Comet tail, then the head, so the head sits on top. */}
           {!reduced &&
@@ -711,7 +513,7 @@ const MapFrame = styled.div`
 `;
 
 /* No min-width any more: the portrait viewBox is authored to fit the viewport
-   it is chosen for, so the survey stays legible without being dragged. */
+   it is chosen for, so the map stays legible without being dragged. */
 const Svg = styled.svg`
   display: block;
   width: 100%;
@@ -738,7 +540,6 @@ const RoadPath = styled.path.attrs({ pathLength: 1 })`
   stroke-dashoffset: ${(props) => (props.$in ? 0 : 1)};
   transition: stroke-dashoffset 2.6s var(--ease-out) 0.15s;
 `;
-
 
 const Wisp = styled.circle`
   fill: #FFF6E4;

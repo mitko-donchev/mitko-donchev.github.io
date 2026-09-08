@@ -109,7 +109,7 @@ export const SITE_DESCRIPTION =
   "Waybound is an action-RPG roguelike built around one road out of a village — woods, narrows and a skeleton camp — with fast bow combat, a leap that buys you room, and runs that reshape every time you fall. Made in Godot by indie studio Epic Millennium. Wishlist on Steam.";
 
 // --- The Cursed Path ---------------------------------------------------------
-// The first playable arena, presented as a surveyed map. Every figure is the
+// The first playable arena, drawn as a map. Every figure is the
 // real one from the level's design doc — walked distances, not marketing
 // numbers — so the map on the site and the arena in the build cannot drift.
 //
@@ -141,21 +141,7 @@ export const GATE_ALT =
 export const PATH_TITLE = "The Cursed Path";
 export const PATH_KICKER = "Arena 01";
 export const PATH_INTRO =
-  "Seventy-four metres of road, surveyed end to end: wooded path, boulder narrows, and a skeleton camp that has no intention of letting you through quietly. Walk it, if the road lets you.";
-
-/* The same figures as the intel strings below, as numbers, so the map can
-   draw them to scale instead of only naming them. Kept here rather than
-   parsed back out of "Shout radius 7 m" — a drawing that measures itself
-   against a regex is a drawing waiting to be wrong. */
-export const PATH_SURVEY = {
-  length: 74,        // metres, village gate to far gate
-  shoutRadius: 7,    // wake one skeleton within this of another and both come
-  narrowsWidth: 14,  // how far apart the boulders leave the road
-  scaleBar: 10,      // the bar drawn so the reader can measure anything else
-};
-export const PATH_SURVEY_LABEL = "Survey";
-export const PATH_SURVEY_NOTE =
-  "Drawn to the road's own scale, from the level's design doc.";
+  "Seventy-four metres of road, end to end: wooded path, boulder narrows, and a skeleton camp that has no intention of letting you through quietly. Walk it, if the road lets you.";
 
 export const PATH_WAYPOINTS = [
   {
@@ -196,7 +182,7 @@ export const PATH_WAYPOINTS = [
     name: "The Far Gate",
     distance: "74 m",
     lore: "The road ends at a gate. You are almost sure you have seen its ironwork somewhere before. Something is standing in it.",
-    intel: ["Gate Boss · 240 HP", "End of the survey"],
+    intel: ["Gate Boss · 240 HP", "End of the road"],
   },
 ];
 
