@@ -1,17 +1,13 @@
 {
   "files": {
     "main.css": "/static/css/main.cc3ee7e1.css",
-    "main.js": "/static/js/main.87188615.js",
-    "static/js/488.c7572bf2.chunk.js": "/static/js/488.c7572bf2.chunk.js",
-    "static/media/logo.png": "/static/media/logo.ff0c0f7cc65c4b102369.png",
-    "static/media/team-dimitar.png": "/static/media/team-dimitar.3091d389842c43ac680e.png",
+    "main.js": "/static/js/main.6ef86206.js",
     "index.html": "/index.html",
     "main.cc3ee7e1.css.map": "/static/css/main.cc3ee7e1.css.map",
-    "main.87188615.js.map": "/static/js/main.87188615.js.map",
-    "488.c7572bf2.chunk.js.map": "/static/js/488.c7572bf2.chunk.js.map"
+    "main.6ef86206.js.map": "/static/js/main.6ef86206.js.map"
   },
   "entrypoints": [
     "static/css/main.cc3ee7e1.css",
-    "static/js/main.87188615.js"
+    "static/js/main.6ef86206.js"
   ]
 }
