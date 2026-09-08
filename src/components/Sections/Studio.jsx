@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Reveal from "../Elements/Reveal";
 // Assets — GitHub profile photos, keyed by the team member's `id`.
 import MitkoImg from "../../assets/img/team-mitko.jpg";
-import DimitarImg from "../../assets/img/team-dimitar.png";
+import DimitarImg from "../../assets/img/team-dimitar.jpg";
 // Config
 import {
   STUDIO_TAGLINE,

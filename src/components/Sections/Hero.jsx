@@ -25,7 +25,7 @@ import {
    It is also no longer 822 kB. It was a 900x900 PNG rendered into a 210px
    slot; at 480x480 it never upscales on any real device — 210 at 2x is 420,
    158 at 3x is 474 — and weighs 173 kB. */
-const LOGO_FULL = `${process.env.PUBLIC_URL}/logo-full.png?v=1`;
+const LOGO_FULL = `${process.env.PUBLIC_URL}/logo-full.png?v=3`;
 
 /* The cold open, not the premise. It is stranger, it is specific, and it
    leaves the first real surprise for the game to spend. */
